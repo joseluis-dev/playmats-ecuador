@@ -1,22 +1,46 @@
+---
+import { ClientRouter } from 'astro:transitions'
+import '@/styles/global.css'
+
+const { title } = Astro.props
+---
 <!doctype html>
-<html lang="en">
+<html lang="es" class="dark">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>{title}</title>
+		<ClientRouter />
 	</head>
 	<body>
-		<slot />
+		<header>
+			<button id="theme-button"></button>
+		</header>
+		<main>
+			<slot />
+		</main>
+		<footer>
+			Footer
+		</footer>
 	</body>
 </html>
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
+<script>
+	const toggle = document.querySelector('#theme-button')
+	const root = document.querySelector('html')
+
+	const savedTheme = localStorage.getItem('theme');
+	if (savedTheme === 'dark') {
+		root?.classList.add('dark');
 	}
-</style>
+	toggle !== null && (toggle.innerHTML = savedTheme === 'dark' ? 'Light' : 'Dark');
+
+	toggle?.addEventListener('click', () => {
+		root?.classList.toggle('dark');
+		const currentTheme = root?.classList.contains('dark') ? 'dark' : 'light';
+		localStorage.setItem('theme', currentTheme);
+		toggle.innerHTML = currentTheme === 'dark' ? 'Light' : 'Dark';
+	});
+</script>
