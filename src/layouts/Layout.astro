@@ -37,10 +37,10 @@ const { title } = Astro.props
 		<ClientRouter />
 	</head>
 	<body>
-		<header>
+		<header class="sticky top-0 z-50">
 			<Header />
 		</header>
-		<main>
+		<main class="flex flex-col items-center justify-center">
 			<slot />
 		</main>
 		<footer>

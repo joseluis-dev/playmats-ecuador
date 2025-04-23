@@ -6,7 +6,7 @@ import SunIcon from "@/components/icons/SunIcon.astro"
 import Menu from "@/components/Menu.astro"
 import NavLink from "@/components/NavLink.astro"
 ---
-<div class="relative flex items-center justify-between py-4 px-8">
+<div class="relative flex items-center justify-between py-4 px-8 bg-[var(--color-background)]">
   <span class="z-100">LOGO</span>
   <ul class="hidden md:flex space-x-4">
     <li><NavLink href="/">Tienda</NavLink></li>
@@ -16,12 +16,12 @@ import NavLink from "@/components/NavLink.astro"
   </ul>
   <div class="flex items-center">
     <Cart client:load transition:persist/>
-    <Menu />
     <button id="theme-button" class="hidden gap-4 ml-4 hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2 md:flex">
       <span class="dark:hidden"><MoonStarIcon /></span>
       <span class="hidden dark:inline"><SunIcon /></span>
       <span class="sr-only">Toggle theme</span>
     </button>
+    <Menu />
   </div>
 </div>
 
