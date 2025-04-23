@@ -1,0 +1,57 @@
+---
+import NavLink from "@/components/NavLink.astro";
+import BurguerIcon from "@/components/icons/BurguerIcon.astro";
+import MoonStarIcon from "@/components/icons/MoonStarIcon.astro";
+import SunIcon from "@/components/icons/SunIcon.astro";
+import XIcon from "@/components/icons/XIcon.astro";
+---
+<button id="burger-button" class="hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2 z-100">
+  <BurguerIcon class="w-6 h-6" />
+  <XIcon class="w-6 h-6 hidden" />
+</button>
+<nav
+  id="movile-menu"
+  class="absolute flex top-[80px] left-0 inset-0 w-full h-0 bg-[var(--color-background)] dark:bg-[var(--color-background)] flex-col items-center justify-center space-y-4 transform transition-all duration-300 ease-in-out z-50 translate-y-[20px] opacity-0 overflow-hidden"
+  data-menu
+>
+  <ul class="flex flex-col space-y-4">
+    <li><NavLink href="/">Tienda</NavLink></li>
+    <li><NavLink href="/cataloge">Catalogo</NavLink></li>
+    <li><NavLink href="/customise">Personalizar</NavLink></li>
+    <li><NavLink href="/contact">Contacto</NavLink></li>
+    <li>
+      <button id="theme-button-menu" class="flex gap-4 hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2">
+        <span class="dark:hidden min-w-14">Oscuro</span>
+        <span class="hidden dark:inline min-w-14">Claro</span>
+        <div>
+          <span class="dark:hidden"><MoonStarIcon /></span>
+          <span class="hidden dark:inline"><SunIcon /></span>
+          <span class="sr-only">Toggle theme</span>
+        </div>
+      </button>
+    </li>
+  </ul>
+</nav>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    document.querySelector("#burger-button")?.addEventListener("click", () => {
+      const menu = document.querySelector("#movile-menu");
+      menu?.classList.toggle("translate-y-[20px]");
+      menu?.classList.toggle("h-[calc(100vh-80px)]");
+      menu?.classList.toggle("opacity-100");
+      menu?.classList.toggle("opacity-0");
+    });
+
+    document.querySelector("#theme-button-menu")?.addEventListener("click", () => {
+      const theme = localStorage.getItem("theme");
+      if (theme === "dark") {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      } else {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      }
+    });
+  });
+</script>

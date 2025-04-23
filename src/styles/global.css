@@ -23,11 +23,15 @@
   --color-border: #2e2e2e;
   --color-primary: #1e90ff;
   --color-accent: #ff5722;
-  --btn-primary-bg: var(--color-accent);
+  --btn-primary-bg: var(--color-primary);
   --btn-primary-text: #ffffff;
   --btn-hover-bg: #e64a19;
   --link-color: var(--color-primary);
   --link-hover-color: #90caff;
+}
+
+html {
+  color-scheme: light dark;
 }
 
 body {
@@ -36,5 +40,19 @@ body {
   min-height: 100vh;
   background-color: var(--color-background);
   color: var(--color-text);
-  transition: background-color 0.3s, color 0.3s;
+  transition: background-color 0.3s, color 0.3s ease-in-out;
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: var(--link-hover-color);
+}
+
+button {
+  @apply cursor-pointer;
 }

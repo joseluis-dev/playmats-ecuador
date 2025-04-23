@@ -1,0 +1,41 @@
+---
+import { Cart } from "@/components/Cart.tsx"
+import MoonStarIcon from "@/components/icons/MoonStarIcon.astro"
+import SunIcon from "@/components/icons/SunIcon.astro"
+
+import Menu from "@/components/Menu.astro"
+import NavLink from "@/components/NavLink.astro"
+---
+<div class="relative flex items-center justify-between py-4 px-8">
+  <span class="z-100">LOGO</span>
+  <Menu />
+  <ul class="hidden md:flex space-x-4">
+    <li><NavLink href="/">Tienda</NavLink></li>
+    <li><NavLink href="/cataloge">Catalogo</NavLink></li>
+    <li><NavLink href="/customise">Personalizar</NavLink></li>
+    <li><NavLink href="/contact">Contacto</NavLink></li>
+  </ul>
+  <div class="flex items-center">
+    <Cart client:load/>
+    <button id="theme-button" class="hidden gap-4 ml-4 hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2 md:flex">
+      <span class="dark:hidden"><MoonStarIcon /></span>
+      <span class="hidden dark:inline"><SunIcon /></span>
+      <span class="sr-only">Toggle theme</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    document.querySelector("#theme-button")?.addEventListener("click", () => {
+      const theme = localStorage.getItem("theme");
+      if (theme === "dark") {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      } else {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      }
+    });
+  });
+</script>
