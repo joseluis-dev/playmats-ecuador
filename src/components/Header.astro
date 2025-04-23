@@ -8,7 +8,6 @@ import NavLink from "@/components/NavLink.astro"
 ---
 <div class="relative flex items-center justify-between py-4 px-8">
   <span class="z-100">LOGO</span>
-  <Menu />
   <ul class="hidden md:flex space-x-4">
     <li><NavLink href="/">Tienda</NavLink></li>
     <li><NavLink href="/cataloge">Catalogo</NavLink></li>
@@ -16,7 +15,8 @@ import NavLink from "@/components/NavLink.astro"
     <li><NavLink href="/contact">Contacto</NavLink></li>
   </ul>
   <div class="flex items-center">
-    <Cart client:load/>
+    <Cart client:load transition:persist/>
+    <Menu />
     <button id="theme-button" class="hidden gap-4 ml-4 hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2 md:flex">
       <span class="dark:hidden"><MoonStarIcon /></span>
       <span class="hidden dark:inline"><SunIcon /></span>
@@ -31,9 +31,11 @@ import NavLink from "@/components/NavLink.astro"
       const theme = localStorage.getItem("theme");
       if (theme === "dark") {
         document.documentElement.classList.remove("dark");
+        document.documentElement.classList.add("light");
         localStorage.setItem("theme", "light");
-      } else {
+      } else if (theme === "light") {
         document.documentElement.classList.add("dark");
+        document.documentElement.classList.remove("light");
         localStorage.setItem("theme", "dark");
       }
     });

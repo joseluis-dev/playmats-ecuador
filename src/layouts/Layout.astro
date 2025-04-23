@@ -10,9 +10,22 @@ const { title } = Astro.props
 	<head>
 		<script is:inline>
 			try {
-				const theme = localStorage.getItem('theme');
-				if (theme === 'dark') {
+				if (localStorage.theme === "dark") {
+					document.documentElement.classList.remove('light');
 					document.documentElement.classList.add('dark');
+				} else if (localStorage.theme === "light") {
+					document.documentElement.classList.remove('dark');
+					document.documentElement.classList.add('light');
+				} else {
+					if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+						document.documentElement.classList.remove('light');
+						document.documentElement.classList.add('dark');
+						localStorage.setItem('theme', 'dark');
+					} else {
+						document.documentElement.classList.remove('dark');
+						document.documentElement.classList.add('light');
+						localStorage.setItem('theme', 'light');
+					}
 				}
 			} catch (e) {}
 		</script>
@@ -38,9 +51,13 @@ const { title } = Astro.props
 
 <script is:inline>
 	function applyTheme() {
-			localStorage.theme === "dark"
-				? document.documentElement.classList.add("dark")
-				: document.documentElement.classList.remove("dark");
+		if (localStorage.theme === "dark") {
+			document.documentElement.classList.remove('light');
+			document.documentElement.classList.add('dark');
+		} else if (localStorage.theme === "light") {
+			document.documentElement.classList.remove('dark');
+			document.documentElement.classList.add('light');
+		}
 		}
 	
 		document.addEventListener("astro:after-swap", applyTheme);

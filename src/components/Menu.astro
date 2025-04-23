@@ -5,9 +5,9 @@ import MoonStarIcon from "@/components/icons/MoonStarIcon.astro";
 import SunIcon from "@/components/icons/SunIcon.astro";
 import XIcon from "@/components/icons/XIcon.astro";
 ---
-<button id="burger-button" class="hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2 z-100">
-  <BurguerIcon class="w-6 h-6" />
-  <XIcon class="w-6 h-6 hidden" />
+<button id="burger-button" class="hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2 ml-4 z-100 md:hidden">
+  <BurguerIcon id="burguer-icon" class="w-6 h-6" />
+  <XIcon id="x-icon" class="w-6 h-6 hidden" />
 </button>
 <nav
   id="movile-menu"
@@ -37,19 +37,26 @@ import XIcon from "@/components/icons/XIcon.astro";
   document.addEventListener("astro:page-load", () => {
     document.querySelector("#burger-button")?.addEventListener("click", () => {
       const menu = document.querySelector("#movile-menu");
+      const burguerIcon = document.querySelector("#burguer-icon");
+      const xIcon = document.querySelector("#x-icon");
       menu?.classList.toggle("translate-y-[20px]");
       menu?.classList.toggle("h-[calc(100vh-80px)]");
       menu?.classList.toggle("opacity-100");
       menu?.classList.toggle("opacity-0");
+
+      burguerIcon?.classList.toggle("hidden");
+      xIcon?.classList.toggle("hidden");
     });
 
     document.querySelector("#theme-button-menu")?.addEventListener("click", () => {
       const theme = localStorage.getItem("theme");
       if (theme === "dark") {
         document.documentElement.classList.remove("dark");
+        document.documentElement.classList.add("light");
         localStorage.setItem("theme", "light");
-      } else {
+      } else if (theme === "light") {
         document.documentElement.classList.add("dark");
+        document.documentElement.classList.remove("light");
         localStorage.setItem("theme", "dark");
       }
     });
