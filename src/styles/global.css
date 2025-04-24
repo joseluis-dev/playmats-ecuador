@@ -10,7 +10,7 @@
     --color-border: #2e2e2e;
     --color-primary: #1e90ff;
     --color-accent: #ff5722;
-    --btn-primary-bg: var(--color-primary);
+    --btn-primary-bg: var(--color-accent);
     --btn-primary-text: #ffffff;
     --btn-hover-bg: #e64a19;
     --link-color: var(--color-primary);
@@ -55,7 +55,7 @@
   --color-border: #2e2e2e;
   --color-primary: #1e90ff;
   --color-accent: #ff5722;
-  --btn-primary-bg: var(--color-primary);
+  --btn-primary-bg: var(--color-accent);
   --btn-primary-text: #ffffff;
   --btn-hover-bg: #e64a19;
   --link-color: var(--color-primary);
@@ -69,7 +69,7 @@ html {
 
 body {
   display: grid;
-  grid-template-rows: 80px 1fr 100px;
+  grid-template-rows: 0.333fr 3fr 0.333fr;
   min-height: 100vh;
   background-color: var(--color-background);
   color: var(--color-text);

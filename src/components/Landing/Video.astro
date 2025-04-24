@@ -1,0 +1,71 @@
+<div class="w-full relative">
+  <div class="absolute flex top-0 left-0 right-0 bottom-0 justify-center items-center w-full h-full z-10">
+    <div class="flex flex-col max-w-[80%] gap-2 md:justify-center  bg-[var(--color-surface)]/60 backdrop-blur-xl p-5 md:p-10 rounded-md font-bold text-clamp-lg z-10">
+      <div>
+        <span class="">TU PLAYMAT </span> - <span class=""> TU ESTILO</span>
+      </div>
+      <p class="text-xs sm:text-sm md:text-lg font-medium text-pretty">
+        PERSONALIZA TUS PLAYMATS CON TUS IMÁGENES, TEXTOS Y DISEÑOS.
+      </p>
+      <button class="py-2 px-10 bg-[var(--btn-primary-bg)]/80 hover:bg-[var(--btn-hover-bg)] rounded-md font-medium text-clamp-md">Personalizar</button>
+    </div>
+  </div>
+  <video
+    src="/Video Banner.mp4"
+    autoplay
+    muted
+    loop
+    playsinline
+    class="w-full object-cover object-top video-banner"
+  >
+    Your browser does not support the video tag.
+  </video>
+  <video
+    src="/Video Banner.mp4"
+    autoplay
+    muted
+    loop
+    playsinline
+    class="absolute w-screen top-0 blur-3xl -z-40 scale-105"
+  >
+  </video>
+</div>
+
+<style>
+  .video-banner {
+    -webkit-mask-image: linear-gradient(
+      to right, 
+      transparent 0%, 
+      black 1%, 
+      black 99%, 
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom, 
+      black 99%, 
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right, 
+      transparent 0%, 
+      black 1%, 
+      black 99%, 
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom, 
+      black 99%, 
+      transparent 100%
+    );
+    -webkit-mask-composite: destination-in;
+    mask-composite: intersect;
+  }
+
+  .text-clamp-lg {
+    font-size: clamp(15px, 4vw, 100px);
+  }
+
+  .text-clamp-md {
+    font-size: clamp(15px, 2vw, 100px);
+  }
+</style>
