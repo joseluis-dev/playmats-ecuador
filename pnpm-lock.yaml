@@ -14,6 +14,12 @@ importers:
       '@astrojs/vercel':
         specifier: 8.1.4
         version: 8.1.4(astro@5.7.5(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.0)(typescript@5.8.3))(react@19.1.0)(rollup@4.40.0)
+      '@fontsource/nunito':
+        specifier: 5.2.5
+        version: 5.2.5
+      '@fontsource/orbitron':
+        specifier: 5.2.5
+        version: 5.2.5
       '@tailwindcss/vite':
         specifier: 4.1.4
         version: 4.1.4(vite@6.3.2(jiti@2.4.2)(lightningcss@1.29.2))
@@ -320,6 +326,12 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@fontsource/nunito@5.2.5':
+    resolution: {integrity: sha512-KeB3US1uHB3GpVo0FewYRtHpG+UZJiRqu4xzvCRkZ8ceJPTx7lf0ZsKKWpvXCMALUJSeaD/ol/BSvLaqli5ZRQ==}
+
+  '@fontsource/orbitron@5.2.5':
+    resolution: {integrity: sha512-e3164ITI9u27irFN4tszwj/OIA9q/TIGKWJ6NUEDvziRO3/9RfnJjioBRyLW6lpslu+oV6US/17bNGlMfZqr5A==}
 
   '@img/sharp-darwin-arm64@0.33.5':
     resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
@@ -2402,6 +2414,10 @@ snapshots:
 
   '@esbuild/win32-x64@0.25.2':
     optional: true
+
+  '@fontsource/nunito@5.2.5': {}
+
+  '@fontsource/orbitron@5.2.5': {}
 
   '@img/sharp-darwin-arm64@0.33.5':
     optionalDependencies:

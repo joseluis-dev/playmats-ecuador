@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 @plugin "@tailwindcss/typography";
+/* Nunito */
+@import "@fontsource/nunito";
+
+/* Orbitron */
+@import "@fontsource/orbitron";
+
+
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -22,7 +29,7 @@
   :root {
     --color-background: #ffffff;
     --color-text: #000000;
-    --color-surface: #f5f5f5;
+    --color-surface: #e4e4e4;
     --color-border: #d3d3d3;
     --color-primary: #1e90ff;
     --color-accent: #ff4500;
@@ -37,7 +44,7 @@
 .light {
   --color-background: #ffffff;
   --color-text: #000000;
-  --color-surface: #f5f5f5;
+  --color-surface: #e4e4e4;
   --color-border: #d3d3d3;
   --color-primary: #1e90ff;
   --color-accent: #ff4500;
@@ -62,6 +69,10 @@
   --link-hover-color: #90caff;
 }
 
+.font-heading {
+  font-family: "Orbitron", sans-serif;
+}
+
 html {
   color-scheme: light dark;
   scroll-behavior: smooth;
@@ -69,11 +80,12 @@ html {
 
 body {
   display: grid;
-  grid-template-rows: 0.333fr 3fr 0.333fr;
+  grid-template-rows: auto 3fr auto;
   min-height: 100vh;
   background-color: var(--color-background);
   color: var(--color-text);
   transition: background-color 0.3s, color 0.3s ease-in-out;
+  font-family: "Nunito", sans-serif;
 }
 
 a {
@@ -88,4 +100,8 @@ a:hover {
 
 button {
   @apply cursor-pointer;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Orbitron", sans-serif;
 }
