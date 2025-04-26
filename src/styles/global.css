@@ -7,7 +7,12 @@
 /* Orbitron */
 @import "@fontsource/orbitron";
 
-
+@font-face {
+  font-family: 'BatmanForever';
+  src: url('/fonts/batmfa__.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -16,10 +21,10 @@
     --color-surface: #1e1e1e;
     --color-border: #2e2e2e;
     --color-primary: #1e90ff;
-    --color-accent: #ff5722;
+    --color-accent: #ffffffd0;
     --btn-primary-bg: var(--color-accent);
-    --btn-primary-text: #ffffff;
-    --btn-hover-bg: #e64a19;
+    --btn-primary-text: #000000;
+    --btn-hover-bg: #ffffff;
     --link-color: var(--color-primary);
     --link-hover-color: #90caff;
   }
@@ -32,41 +37,41 @@
     --color-surface: #e4e4e4;
     --color-border: #d3d3d3;
     --color-primary: #1e90ff;
-    --color-accent: #ff4500;
+    --color-accent: #000000;
     --btn-primary-bg: var(--color-accent);
     --btn-primary-text: #ffffff;
-    --btn-hover-bg: #e03e00;
+    --btn-hover-bg: #000000;
     --link-color: var(--color-primary);
     --link-hover-color: #0073e6;
   }
 }
 
-.light {
-  --color-background: #ffffff;
-  --color-text: #000000;
-  --color-surface: #e4e4e4;
-  --color-border: #d3d3d3;
-  --color-primary: #1e90ff;
-  --color-accent: #ff4500;
-  --btn-primary-bg: var(--color-accent);
-  --btn-primary-text: #ffffff;
-  --btn-hover-bg: #e03e00;
-  --link-color: var(--color-primary);
-  --link-hover-color: #0073e6;
-}
-
 .dark {
   --color-background: #121212;
-  --color-text: #ffffff;
-  --color-surface: #1e1e1e;
-  --color-border: #2e2e2e;
-  --color-primary: #1e90ff;
-  --color-accent: #ff5722;
-  --btn-primary-bg: var(--color-accent);
-  --btn-primary-text: #ffffff;
-  --btn-hover-bg: #e64a19;
-  --link-color: var(--color-primary);
-  --link-hover-color: #90caff;
+    --color-text: #ffffff;
+    --color-surface: #1e1e1e;
+    --color-border: #2e2e2e;
+    --color-primary: #1e90ff;
+    --color-accent: #ffffffd0;
+    --btn-primary-bg: var(--color-accent);
+    --btn-primary-text: #000000;
+    --btn-hover-bg: #ffffff;
+    --link-color: var(--color-primary);
+    --link-hover-color: #90caff;
+}
+
+.light {
+  --color-background: #ffffff;
+    --color-text: #000000;
+    --color-surface: #e4e4e4;
+    --color-border: #d3d3d3;
+    --color-primary: #1e90ff;
+    --color-accent: #000000;
+    --btn-primary-bg: var(--color-accent);
+    --btn-primary-text: #ffffff;
+    --btn-hover-bg: #000000;
+    --link-color: var(--color-primary);
+    --link-hover-color: #0073e6;
 }
 
 .font-heading {
@@ -90,7 +95,6 @@ body {
 
 a {
   color: var(--link-color);
-  text-decoration: none;
   transition: color 0.3s;
 }
 
@@ -103,5 +107,5 @@ button {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Orbitron", sans-serif;
+  font-family: "BatmanForever", sans-serif;
 }

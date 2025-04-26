@@ -1,66 +1,44 @@
-<section class="w-full max-w-[90%] relative">
+<section class="w-full md:max-w-[90%] relative">
   <div class="absolute flex top-0 left-0 right-0 bottom-0 justify-center items-center w-full h-full z-10">
     <div class="flex flex-col max-w-[80%] gap-2 md:justify-center  bg-[var(--color-surface)]/70 backdrop-blur-xl p-5 md:p-10 rounded-md font-bold text-clamp-lg z-10">
-      <h1>
-        <span class="text-">TU PLAYMAT </span> - <span class=""> TU ESTILO</span>
+      <h1 class="flex">
+        <span class="text-red-600">TU PLAYMAT</span> - <span class="text-cyan-600">TU ESTILO</span>
       </h1>
-      <p class="text-xs sm:text-sm md:text-lg font-normal text-pretty">
+      <p class="text-xs sm:text-sm md:text-lg md:mb-2 font-normal text-pretty">
         Personaliza tus playmats con tus imágenes, textos y diseños favoritos.
       </p>
-      <button class="py-2 px-10 bg-[var(--btn-primary-bg)]/80 hover:bg-[var(--btn-hover-bg)] rounded-md text-clamp-md">Personalizar</button>
+      <button class="py-2 px-10 bg-[var(--btn-primary-bg)]/80 hover:bg-[var(--btn-hover-bg)] text-[var(--btn-primary-text)] rounded-md text-clamp-md md:w-fit md:self-center md:px-25" data-astro-cid-tnou2ofk="">Personalizar</button>
     </div>
   </div>
   <video
-    src="/Video Banner.mp4"
+    id="video-banner"
     autoplay
     muted
     loop
     playsinline
-    class="w-full object-cover object-top video-banner"
+    preload="auto"
+    class="w-screen object-cover object-top video-banner rounded-md md:rounded-lg rounded-t-none md:rounded-t-none"
   >
-    Your browser does not support the video tag.
+    <source src="/videos/Video Banner-Movile.webm" type="video/mp4" media="(max-width: 768px)">
+    <source src="/videos/Video Banner.mp4" type="video/mp4">
+    Tu navegador no soporta videos HTML5.
   </video>
   <video
-    src="/Video Banner.mp4"
+    id="video-banner-shadow"
     autoplay
     muted
     loop
     playsinline
-    class="absolute w-screen top-0 blur-3xl -z-40 scale-105"
+    preload="auto"
+    class="absolute w-screen top-0 blur-[80px] -z-40 scale-105"
   >
+    <source src="/videos/Video Banner-Movile.webm" type="video/mp4" media="(max-width: 768px)">
+    <source src="/videos/Video Banner.mp4" type="video/mp4">
+    Tu navegador no soporta videos HTML5.
   </video>
 </section>
 
 <style>
-  .video-banner {
-    -webkit-mask-image: linear-gradient(
-      to right, 
-      transparent 0%, 
-      black 1%, 
-      black 99%, 
-      transparent 100%
-    ),
-    linear-gradient(
-      to bottom, 
-      black 99%, 
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to right, 
-      transparent 0%, 
-      black 1%, 
-      black 99%, 
-      transparent 100%
-    ),
-    linear-gradient(
-      to bottom, 
-      black 99%, 
-      transparent 100%
-    );
-    -webkit-mask-composite: destination-in;
-    mask-composite: intersect;
-  }
-
   .text-clamp-lg {
     font-size: clamp(15px, 4vw, 100px);
   }
