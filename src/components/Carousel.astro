@@ -30,7 +30,7 @@ const { items, className } = Astro.props as CarouselProps;
           class="shrink-0 snap-start w-[250px]"
         >
           <div class="relative w-full h-[478px] bg-gray-200 rounded-lg">
-            {image && <img src={image} alt={title} class="w-full h-full object-cover" />}
+            {image && <img src={image} alt={title} crossorigin="anonymous" class="w-full h-full object-cover" />}
             <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
               <h3 class="text-white text-lg font-semibold">{title}</h3>
             </div>
@@ -70,7 +70,7 @@ const { items, className } = Astro.props as CarouselProps;
     const rightButton = carouselContainer.querySelector('[data-role="carousel-right-button"]') as HTMLButtonElement;
 
     const scrollAmount = 250;
-    
+
     const scrollLeft = () => {
       carousel.scrollBy({
         left: -scrollAmount,
