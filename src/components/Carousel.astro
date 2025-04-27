@@ -20,7 +20,7 @@ const hasChildren = Astro.slots.default;
 ---
 <div data-role="carousel-component" class="flex flex-col gap-4">
   <div class="flex items-center justify-between gap-2">
-    <h2 class="text-3xl font-semibold text-balance flex items-center">{title}</h2>
+    <h2 class="text-[16px] md:text-3xl font-semibold text-balance flex items-center">{title}</h2>
     <div class="flex gap-2">
       <button data-role="carousel-left-button" class="transform bg-[var(--color-surface)] rounded-full p-2 shadow-lg z-10">
         <ArrowLeftIcon />
@@ -44,7 +44,7 @@ const hasChildren = Astro.slots.default;
             <div class="relative w-full h-[478px] rounded-lg">
               {image && <img src={image} alt={title} class="w-full h-full object-cover group-hover:scale-105 transition-scale duration-1000 ease-in-out" />}
               <div class="absolute bottom-0 left-0 right-0 bg-[var(--color-surface)]/70 p-4 ">
-                <h3 class="text-lg font-semibold">{title}</h3>
+                <h3 class="text-sm md:text-lg font-semibold">{title}</h3>
               </div>
             </div>
           </div>
