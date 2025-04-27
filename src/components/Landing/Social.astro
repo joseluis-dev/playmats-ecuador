@@ -1,36 +1,53 @@
 ---
 import Carousel from "@/components/Carousel.astro"
+import ReelPlayer from "./ReelPlayer.astro"
 
 const VIDEOS = [
   {
     id: 'dQw4w9WgXcQ',
-    image: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    image: '/images/Reel-Facebook-Image.jpg',
     title: 'Video 1',
+    source: '/videos/Reel Facebook.mp4',
   },
   {
     id: 'dQw4w9WgXc2',
-    image: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    image: '/images/Reel-Facebook-Image.jpg',
     title: 'Video 2',
+    source: '/videos/Reel Facebook.mp4',
   },
   {
     id: 'dQw4w9WgXc3',
-    image: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    image: '/images/Reel-Facebook-Image.jpg',
     title: 'Video 3',
+    source: '/videos/Reel Facebook.mp4',
   },
   {
     id: 'dQw4w9WgXc4',
-    image: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    image: '/images/Reel-Facebook-Image.jpg',
     title: 'Video 4',
+    source: '/videos/Reel Facebook.mp4',
   },
   {
     id: 'dQw4w9WgXc5',
-    image: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    image: '/images/Reel-Facebook-Image.jpg',
     title: 'Video 5',
+    source: '/videos/Reel Facebook.mp4',
   }
 ]
 ---
 
 <section id="social" class="w-full max-w-[1400px]
     mx-auto p-16 md:p-20">
-    <Carousel items={VIDEOS}/>
+    <Carousel items={VIDEOS}>
+      {
+        VIDEOS.map(({ id, image, title, source }) => (
+          <ReelPlayer
+            videoId={id}
+            image={image}
+            title={title}
+            source={source}
+          />
+        ))
+      }
+    </Carousel>
 </section>

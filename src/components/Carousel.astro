@@ -15,33 +15,42 @@ interface CarouselProps {
 }
 
 const { items, className } = Astro.props as CarouselProps;
+const hasChildren = Astro.slots.default;
+console.log(hasChildren)
 ---
-
-<div data-role="carousel-container" class="flex overflow-hidden items-center gap-2">
-  <button data-role="carousel-left-button" class="top-1/2 left-2 transform bg-[var(--color-surface)] rounded-full p-2 shadow-lg z-10">
-    <ArrowLeftIcon />
-  </button>
-  <div class="flex overflow-x-scroll custom-scrollbar gap-x-4 md:gap-x-8 snap-mandatory snap-x"
-  id="carousel"
-  >
-    {
-      items.map(({ id, image, title }) => (
-        <div
-          class="shrink-0 snap-start w-[250px]"
-        >
-          <div class="relative w-full h-[478px] bg-gray-200 rounded-lg">
-            {image && <img src={image} alt={title} crossorigin="anonymous" class="w-full h-full object-cover" />}
-            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
-              <h3 class="text-white text-lg font-semibold">{title}</h3>
+<div class="flex flex-col gap-4">
+  <div class="flex items-center justify-between gap-2">
+    <h2 class="text-3xl font-semibold text-balance flex items-center">Videos</h2>
+    <div class="flex gap-2">
+      <button data-role="carousel-left-button" class="transform bg-[var(--color-surface)] rounded-full p-2 shadow-lg z-10">
+        <ArrowLeftIcon />
+      </button>
+      <button data-role="carousel-right-button" class="transform bg-[var(--color-surface)] rounded-full p-2 shadow-lg z-10">
+        <ArrowRightIcon />
+      </button>
+    </div>
+  </div>
+  <div data-role="carousel-container" class="overflow-hidden items-center gap-2">
+    <div class="flex overflow-x-scroll custom-scrollbar gap-x-4 md:gap-x-8 snap-mandatory snap-x no-scrollbar"
+    id="carousel"
+    >
+      { hasChildren ?
+        <slot />
+        : items.map(({ id, image, title }) => (
+          <div
+            class="shrink-0 snap-start w-[250px] rounded-lg cursor-pointer group"
+          >
+            <div class="relative w-full h-[478px] bg-gray-200 rounded-lg">
+              {image && <img src={''} alt={title} class="w-full h-full object-cover group-hover:scale-110 transition-scale duration-1000 ease-in-out" />}
+              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 rounded-lg">
+                <h3 class="text-white text-lg font-semibold">{title}</h3>
+              </div>
             </div>
           </div>
-        </div>
-      ))
-    }
+        ))
+      }
+    </div>
   </div>
-  <button data-role="carousel-right-button" class="top-1/2 left-2 transform bg-[var(--color-surface)] rounded-full p-2 shadow-lg z-10">
-    <ArrowRightIcon />
-  </button>
 </div>
 
 <script>
@@ -60,7 +69,6 @@ const { items, className } = Astro.props as CarouselProps;
           ? document.documentElement.clientWidth - socialSectionPadding
           : 1400 - socialSectionPadding;
       carouselContainer.style.width = `${carouselWidth}px`;
-      console.log('carouselWidth:', carouselWidth);
     };
 
     window.addEventListener('resize', updateCarouselWidth);
@@ -68,9 +76,9 @@ const { items, className } = Astro.props as CarouselProps;
 
     updateCarouselWidth();
 
-    const leftButton = carouselContainer.querySelector('[data-role="carousel-left-button"]') as HTMLButtonElement;
-    const rightButton = carouselContainer.querySelector('[data-role="carousel-right-button"]') as HTMLButtonElement;
-
+    const leftButton = document.querySelector('[data-role="carousel-left-button"]') as HTMLButtonElement;
+    const rightButton = document.querySelector('[data-role="carousel-right-button"]') as HTMLButtonElement;
+    
     const scrollAmount = 250;
 
     const scrollLeft = () => {
@@ -90,3 +98,13 @@ const { items, className } = Astro.props as CarouselProps;
     rightButton.addEventListener('click', scrollRight);
   });
 </script>
+
+<style>
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+</style>
