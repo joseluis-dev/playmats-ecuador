@@ -1,3 +1,36 @@
 ---
+import Carousel from "../Carousel.astro"
+
+const VIDEOS = [
+  {
+    id: 'dQw4w9WgXcQ',
+    image: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    title: 'Video 1',
+  },
+  {
+    id: 'dQw4w9WgXc2',
+    image: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    title: 'Video 2',
+  },
+  {
+    id: 'dQw4w9WgXc3',
+    image: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    title: 'Video 3',
+  },
+  {
+    id: 'dQw4w9WgXc4',
+    image: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    title: 'Video 4',
+  },
+  {
+    id: 'dQw4w9WgXc5',
+    image: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    title: 'Video 5',
+  }
+]
 ---
 
+<section id="social" class="w-full max-w-[1400px]
+    mx-auto p-16 md:p-20">
+    <Carousel client:visible items={VIDEOS}/>
+</section>

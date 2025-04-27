@@ -1,0 +1,90 @@
+---
+import ArrowLeftIcon from "./icons/ArrowLeftIcon.astro";
+import ArrowRightIcon from "./icons/ArrowRightIcon.astro";
+
+interface CarouselItem {
+  id: string;
+  image?: string;
+  title: string;
+  description?: string;
+}
+
+interface CarouselProps {
+  items: CarouselItem[];
+  className?: string;
+}
+
+const { items, className } = Astro.props as CarouselProps;
+---
+
+<div data-role="carousel-container" class="flex w-full overflow-hidden items-center gap-2">
+  <button data-role="carousel-left-button" class="top-1/2 left-2 transform bg-[var(--color-surface)] rounded-full p-2 shadow-lg z-10">
+    <ArrowLeftIcon />
+  </button>
+  <div class="flex overflow-x-scroll custom-scrollbar gap-x-4 md:gap-x-8 snap-mandatory snap-x pr-4 md:mr-0 md:pr-0"
+  id="carousel"
+  >
+    {
+      items.map(({ id, image, title }) => (
+        <div
+          class="shrink-0 snap-start w-[250px]"
+        >
+          <div class="relative w-full h-[478px] bg-gray-200 rounded-lg">
+            {image && <img src={image} alt={title} class="w-full h-full object-cover" />}
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+              <h3 class="text-white text-lg font-semibold">{title}</h3>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+  <button data-role="carousel-right-button" class="top-1/2 left-2 transform bg-[var(--color-surface)] rounded-full p-2 shadow-lg z-10">
+    <ArrowRightIcon />
+  </button>
+</div>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const socialSection = document.getElementById('social') as HTMLElement;
+    const carouselContainer = document.querySelector('[data-role="carousel-container"]') as HTMLElement;
+    const carousel = document.getElementById('carousel') as HTMLElement;
+
+    if (!socialSection || !carouselContainer || !carousel) {
+      return;
+    }
+
+    const updateCarouselWidth = () => {
+      const socialSectionPadding = parseInt(getComputedStyle(socialSection).paddingLeft) + parseInt(getComputedStyle(socialSection).paddingRight);
+      const carouselWidth = window.innerWidth < 1400 ? window.innerWidth - socialSectionPadding : 1400 - socialSectionPadding;
+      carouselContainer.style.width = `${carouselWidth}px`;
+    };
+
+    window.addEventListener('resize', updateCarouselWidth);
+    window.addEventListener('orientationchange', updateCarouselWidth);
+    document.addEventListener('DOMContentLoaded', updateCarouselWidth);
+
+    updateCarouselWidth();
+
+    const leftButton = carouselContainer.querySelector('[data-role="carousel-left-button"]') as HTMLButtonElement;
+    const rightButton = carouselContainer.querySelector('[data-role="carousel-right-button"]') as HTMLButtonElement;
+
+    const scrollAmount = 250;
+    
+    const scrollLeft = () => {
+      carousel.scrollBy({
+        left: -scrollAmount,
+        behavior: 'smooth'
+      });
+    };
+    const scrollRight = () => {
+      carousel.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+    };
+
+    leftButton.addEventListener('click', scrollLeft);
+    rightButton.addEventListener('click', scrollRight);
+  });
+</script>
