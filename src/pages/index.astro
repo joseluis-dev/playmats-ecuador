@@ -1,10 +1,16 @@
 ---
-import Hero from '@/components/Landing/Hero.astro';
+import Bento from '@/components/Landing/Bento.astro';
+import Prefooter from '@/components/Landing/Prefooter.astro';
+import Social from '@/components/Landing/Social.astro';
+import Video from '@/components/Landing/Video.astro';
 import Layout from '@/layouts/Layout.astro';
 
 export const prerender = true;
 ---
 
 <Layout title="Playmats EC">
-	<Hero />
+	<Video />
+	<Bento />
+	<Social />
+	<Prefooter />
 </Layout>
