@@ -49,6 +49,12 @@ const { videoId, image, title, source } = Astro.props
     }
 
     activateVideo() {
+      const reelVideos = document.querySelectorAll("reel-video") as NodeListOf<ReelVideo>
+      reelVideos.forEach((reel) => {
+        if (reel.querySelector("video") && reel !== this) {
+          reel.querySelector("video")?.pause()
+        }
+      })
       this.style.backgroundImage = "unset"
 
       this.querySelector(`#Id${this.videoId}`)?.remove()
@@ -59,6 +65,14 @@ const { videoId, image, title, source } = Astro.props
 
       // this.unMutePlayerByDefault()
       this.removeEventListener("click", this.activateVideo)
+
+      videoEl.addEventListener('click', () => {
+        reelVideos.forEach((reel) => {
+          if (reel.querySelector("video") && reel !== this) {
+            reel.querySelector("video")?.pause()
+          }
+        })
+      })
     }
 
     handleKeyPress(event: KeyboardEvent) {
