@@ -7,12 +7,14 @@ import Menu from "@/components/Menu.astro"
 import NavLink from "@/components/NavLink.astro"
 ---
 <div class="relative flex items-center justify-between py-4 px-8 ">
-  <h1 class="flex items-center gap-2 z-100">
-    <img src="/images/Playmats-EC-Logo.png" alt="logo playmats ecuador" class="size-10" />
-    PlayMats EC
-  </h1>
+  <a href="/">
+    <h1 class="flex items-center gap-2 z-100">
+      <img src="/images/Playmats-EC-Logo.png" alt="logo playmats ecuador" class="size-10" />
+      PlayMats EC
+    </h1>
+  </a>
   <ul class="hidden md:flex space-x-4">
-    <li><NavLink href="/">Tienda</NavLink></li>
+    <li><NavLink href="/">Inicio</NavLink></li>
     <li><NavLink href="/cataloge">Catalogo</NavLink></li>
     <li><NavLink href="/customise">Personalizar</NavLink></li>
     <li><NavLink href="/contact">Contacto</NavLink></li>
