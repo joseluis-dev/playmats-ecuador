@@ -17,11 +17,11 @@ interface CarouselProps {
 const { items, className } = Astro.props as CarouselProps;
 ---
 
-<div data-role="carousel-container" class="flex w-full overflow-hidden items-center gap-2">
+<div data-role="carousel-container" class="flex overflow-hidden items-center gap-2">
   <button data-role="carousel-left-button" class="top-1/2 left-2 transform bg-[var(--color-surface)] rounded-full p-2 shadow-lg z-10">
     <ArrowLeftIcon />
   </button>
-  <div class="flex overflow-x-scroll custom-scrollbar gap-x-4 md:gap-x-8 snap-mandatory snap-x pr-4 md:mr-0 md:pr-0"
+  <div class="flex overflow-x-scroll custom-scrollbar gap-x-4 md:gap-x-8 snap-mandatory snap-x"
   id="carousel"
   >
     {
@@ -56,13 +56,15 @@ const { items, className } = Astro.props as CarouselProps;
 
     const updateCarouselWidth = () => {
       const socialSectionPadding = parseInt(getComputedStyle(socialSection).paddingLeft) + parseInt(getComputedStyle(socialSection).paddingRight);
-      const carouselWidth = window.innerWidth < 1400 ? window.innerWidth - socialSectionPadding : 1400 - socialSectionPadding;
+      const carouselWidth = document.documentElement.clientWidth < 1400
+          ? document.documentElement.clientWidth - socialSectionPadding
+          : 1400 - socialSectionPadding;
       carouselContainer.style.width = `${carouselWidth}px`;
+      console.log('carouselWidth:', carouselWidth);
     };
 
     window.addEventListener('resize', updateCarouselWidth);
     window.addEventListener('orientationchange', updateCarouselWidth);
-    document.addEventListener('DOMContentLoaded', updateCarouselWidth);
 
     updateCarouselWidth();
 
