@@ -5,11 +5,11 @@ import BentoItem from "./BentoItem.astro";
 <section
   class={`
     w-full max-w-[1400px]
-    grid grid-cols-10 auto-rows-[30rem] gap-4
+    grid grid-cols-10 auto-rows-[30rem] md:auto-rows-[25rem] gap-4
     mx-auto p-16 md:p-20
   `}
 >
-  <BentoItem class="col-span-10 md:col-span-6" title="PLAYMATS" subtitle="Catálogo de productos">
+  <BentoItem class="col-span-10" title="Playmats" subtitle="Catálogo de productos">
     <div 
       slot="image"
       class="
@@ -20,13 +20,13 @@ import BentoItem from "./BentoItem.astro";
         opacity-90 -z-10
         bg-center bg-cover bg-no-repeat bg-blend-luminosity
       "
-      style="background-image: url(/Playmat-Vitral-de-Tierras.jpg);"
+      style="background-image: url(/images/Playmat-Vitral-de-Tierras.jpg);"
     />
     <p slot="content" class="max-w-xl">
       Explora nuestra amplia variedad de playmats, diseñados para ofrecerte la mejor experiencia de juego. Desde diseños personalizados hasta opciones temáticas, tenemos algo para todos los gustos.
     </p>
   </BentoItem>
-  <BentoItem class="col-span-10 md:col-span-4" title="LOGOS">
+  <BentoItem class="col-span-10 md:col-span-4" title="Logos">
     <div 
       slot="image"
       class="
@@ -37,14 +37,14 @@ import BentoItem from "./BentoItem.astro";
         opacity-90 -z-10
         bg-center bg-cover bg-no-repeat bg-blend-luminosity
       "
-      style="background-image: url(/Logos.jpg);"
+      style="background-image: url(/images/Logos.jpg);"
       data-src="/Logos.jpg"
     />
     <p slot="content" class="max-w-xl">
       Personaliza tu playmat con tu logo o diseño favorito. Ofrecemos una amplia gama de opciones para que puedas mostrar tu estilo único en cada partida.
     </p>
   </BentoItem>
-  <BentoItem class="col-span-10 md:col-span-4" title="BORDADOS">
+  <BentoItem class="col-span-10 md:col-span-6" title="Mouspad Gamer" subtitle="Catálogo de productos">
     <div 
       slot="image"
       class="
@@ -55,14 +55,13 @@ import BentoItem from "./BentoItem.astro";
         opacity-90 -z-10
         bg-center bg-cover bg-no-repeat bg-blend-luminosity
       "
-      style="background-image: url(/Bordados.jpg);"
-      data-src="/Bordados.jpg"
+      style="background-image: url(/images/Mouspad-Gamer.jpg);"
     />
     <p slot="content" class="max-w-xl">
-      Dale un toque especial a tu playmat con nuestros bordados personalizados. Elige entre una variedad de colores y estilos para hacer que tu juego sea aún más único.
+      Mejora tu experiencia de juego con nuestros mouspads gamer. Con superficies suaves y antideslizantes, son perfectos para cualquier tipo de juego. Disponibles en varios tamaños y diseños.
     </p>
   </BentoItem>
-  <BentoItem class="col-span-10 md:col-span-6" title="FUNDAS">
+  <BentoItem class="col-span-10 md:col-span-6" title="Mouspad Corporativo" subtitle="Catálogo de productos">
     <div 
       slot="image"
       class="
@@ -73,7 +72,24 @@ import BentoItem from "./BentoItem.astro";
         opacity-90 -z-10
         bg-center bg-cover bg-no-repeat bg-blend-luminosity
       "
-      style="background-image: url(/Fundas.jpg);"
+      style="background-image: url(/images/Mouspad-Gamer.jpg);"
+    />
+    <p slot="content" class="max-w-xl">
+      Mejora tu experiencia de juego con nuestros mouspads gamer. Con superficies suaves y antideslizantes, son perfectos para cualquier tipo de juego. Disponibles en varios tamaños y diseños.
+    </p>
+  </BentoItem>
+  <BentoItem class="col-span-10 md:col-span-4" title="Fundas">
+    <div 
+      slot="image"
+      class="
+        absolute top-0 left-0 bottom-0
+        h-full w-full
+        group-hover:scale-110
+        transition-scale duration-1000 ease-in-out
+        opacity-90 -z-10
+        bg-center bg-cover bg-no-repeat bg-blend-luminosity
+      "
+      style="background-image: url(/images/Fundas.jpg);"
       data-src="/Fundas.jpg"
     />
     <p slot="content" class="max-w-xl">
