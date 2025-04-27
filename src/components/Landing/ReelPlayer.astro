@@ -21,6 +21,7 @@ const { videoId, image, title, source } = Astro.props
   aria-label="Reproducir video"
   role="button"
   tabindex="0"
+  data-role="carousel-item"
 >
   <div
     class="p-4 pl-[18px] bg-[var(--color-surface)] rounded-full absolute bottom-6 right-6 hover:scale-110 transition-transform duration-300 ease-in-out"
@@ -32,7 +33,6 @@ const { videoId, image, title, source } = Astro.props
 </reel-video>
 
 <script>
-  const reelVideos = document.querySelectorAll("reel-video") as NodeListOf<ReelVideo>
   class ReelVideo extends HTMLElement {
     videoId?: string
     source?: string
@@ -49,6 +49,7 @@ const { videoId, image, title, source } = Astro.props
     }
 
     activateVideo() {
+      const reelVideos = document.querySelectorAll("reel-video") as NodeListOf<ReelVideo>
       const pauseVideos = () => {
         reelVideos.forEach((reel) => {
           if (reel.querySelector("video") && reel !== this) {

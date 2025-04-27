@@ -1,1 +1,36 @@
-PREFOOTER
+---
+import Carousel from "@/components/Carousel.astro";
+
+const ITEMS = [
+  {
+    id: '1',
+    image: '/images/Playmat-Vitral-de-Tierras.jpg',
+    title: 'Info 1',
+  },
+  {
+    id: '2',
+    image: '/images/Info-Playmats.jpg',
+    title: 'Info 2',
+  },
+  {
+    id: '3',
+    image: '/images/Mouspad-Gamer.jpg',
+    title: 'Info 3',
+  },
+  {
+    id: '4',
+    image: '/images/Info-Logos.jpg',
+    title: 'Info 4',
+  },
+  {
+    id: '5',
+    image: '/images/Info-Bordados.jpg',
+    title: 'Info 5',
+  }
+]
+---
+
+<section class="w-full max-w-[1400px]
+    mx-auto p-16 md:p-20">
+  <Carousel items={ITEMS} title="Trabaja con nosotros"/>
+</section>

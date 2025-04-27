@@ -11,15 +11,16 @@ interface CarouselItem {
 
 interface CarouselProps {
   items: CarouselItem[];
+  title: string;
   className?: string;
 }
 
-const { items } = Astro.props as CarouselProps;
+const { items, title } = Astro.props as CarouselProps;
 const hasChildren = Astro.slots.default;
 ---
-<div class="flex flex-col gap-4">
+<div data-role="carousel-component" class="flex flex-col gap-4">
   <div class="flex items-center justify-between gap-2">
-    <h2 class="text-3xl font-semibold text-balance flex items-center">Videos</h2>
+    <h2 class="text-3xl font-semibold text-balance flex items-center">{title}</h2>
     <div class="flex gap-2">
       <button data-role="carousel-left-button" class="transform bg-[var(--color-surface)] rounded-full p-2 shadow-lg z-10">
         <ArrowLeftIcon />
@@ -31,18 +32,19 @@ const hasChildren = Astro.slots.default;
   </div>
   <div data-role="carousel-container" class="overflow-hidden items-center gap-2">
     <div class="flex overflow-x-scroll custom-scrollbar gap-x-4 md:gap-x-8 snap-mandatory snap-x no-scrollbar"
-    id="carousel"
+    data-role="carousel"
     >
       { hasChildren ?
         <slot />
         : items.map(({ id, image, title }) => (
           <div
-            class="shrink-0 snap-start w-[250px] rounded-lg cursor-pointer group"
+            data-role="carousel-item"
+            class="shrink-0 snap-start w-[250px] rounded-lg cursor-pointer group overflow-hidden"
           >
-            <div class="relative w-full h-[478px] bg-gray-200 rounded-lg">
-              {image && <img src={''} alt={title} class="w-full h-full object-cover group-hover:scale-110 transition-scale duration-1000 ease-in-out" />}
-              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 rounded-lg">
-                <h3 class="text-white text-lg font-semibold">{title}</h3>
+            <div class="relative w-full h-[478px] rounded-lg">
+              {image && <img src={image} alt={title} class="w-full h-full object-cover group-hover:scale-105 transition-scale duration-1000 ease-in-out" />}
+              <div class="absolute bottom-0 left-0 right-0 bg-[var(--color-surface)]/70 p-4 ">
+                <h3 class="text-lg font-semibold">{title}</h3>
               </div>
             </div>
           </div>
@@ -52,50 +54,107 @@ const hasChildren = Astro.slots.default;
   </div>
 </div>
 
-<script>
-  document.addEventListener("astro:page-load", () => {
-    const socialSection = document.getElementById('social') as HTMLElement;
-    const carouselContainer = document.querySelector('[data-role="carousel-container"]') as HTMLElement;
-    const carousel = document.getElementById('carousel') as HTMLElement;
-
-    if (!socialSection || !carouselContainer || !carousel) {
-      return;
+<script type="module">
+  class CarouselManager {
+    constructor(rootElement) {
+      this.root = rootElement;
+      this.windowListeners = [];
+      this.elementListeners = [];
     }
 
-    const updateCarouselWidth = () => {
-      const socialSectionPadding = parseInt(getComputedStyle(socialSection).paddingLeft) + parseInt(getComputedStyle(socialSection).paddingRight);
-      const carouselWidth = document.documentElement.clientWidth < 1400
-          ? document.documentElement.clientWidth - socialSectionPadding
-          : 1400 - socialSectionPadding;
-      carouselContainer.style.width = `${carouselWidth}px`;
-    };
+    mount() {
+      const carouselContainer = this.root.querySelector('[data-role="carousel-container"]');
+      const carousel = this.root.querySelector('[data-role="carousel"]');
+      const leftButton = this.root.querySelector('[data-role="carousel-left-button"]');
+      const rightButton = this.root.querySelector('[data-role="carousel-right-button"]');
+      const carouselItems = this.root.querySelectorAll('[data-role="carousel-item"]');
 
-    window.addEventListener('resize', updateCarouselWidth);
-    window.addEventListener('orientationchange', updateCarouselWidth);
+      if (!carouselContainer || !carousel || !leftButton || !rightButton || carouselItems.length === 0) {
+        console.warn('CarouselManager: Missing elements, cannot initialize.');
+        return;
+      }
 
-    updateCarouselWidth();
+      const carouselItemWidth = carouselItems[0].offsetWidth;
+      const scrollAmount = carouselItemWidth;
 
-    const leftButton = document.querySelector('[data-role="carousel-left-button"]') as HTMLButtonElement;
-    const rightButton = document.querySelector('[data-role="carousel-right-button"]') as HTMLButtonElement;
-    
-    const scrollAmount = 250;
+      // --- Definir funciones ---
+      this.updateCarouselWidth = () => {
+        const elementParentPadding = this.root.parentElement
+          ? parseInt(getComputedStyle(this.root.parentElement).paddingLeft) + parseInt(getComputedStyle(this.root.parentElement).paddingRight)
+          : 0;
+        const carouselWidth = document.documentElement.clientWidth < 1400
+          ? document.documentElement.clientWidth - elementParentPadding
+          : 1400 - elementParentPadding;
+        carouselContainer.style.width = `${carouselWidth}px`;
+      };
 
-    const scrollLeft = () => {
-      carousel.scrollBy({
-        left: -scrollAmount,
-        behavior: 'smooth'
+      this.scrollLeft = () => {
+        carousel.scrollBy({
+          left: -scrollAmount,
+          behavior: 'smooth'
+        });
+      };
+
+      this.scrollRight = () => {
+        carousel.scrollBy({
+          left: scrollAmount,
+          behavior: 'smooth'
+        });
+      };
+
+      // --- Añadir eventos ---
+      window.addEventListener('resize', this.updateCarouselWidth);
+      this.windowListeners.push({ type: 'resize', listener: this.updateCarouselWidth });
+
+      window.addEventListener('orientationchange', this.updateCarouselWidth);
+      this.windowListeners.push({ type: 'orientationchange', listener: this.updateCarouselWidth });
+
+      leftButton.addEventListener('click', this.scrollLeft);
+      this.elementListeners.push({ element: leftButton, type: 'click', listener: this.scrollLeft });
+
+      rightButton.addEventListener('click', this.scrollRight);
+      this.elementListeners.push({ element: rightButton, type: 'click', listener: this.scrollRight });
+
+      // --- Inicializar ---
+      this.updateCarouselWidth();
+    }
+
+    destroy() {
+      // Limpiar eventos de window
+      this.windowListeners.forEach(({ type, listener }) => {
+        window.removeEventListener(type, listener);
       });
-    };
-    const scrollRight = () => {
-      carousel.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth'
-      });
-    };
 
-    leftButton.addEventListener('click', scrollLeft);
-    rightButton.addEventListener('click', scrollRight);
-  });
+      // Limpiar eventos de elementos
+      this.elementListeners.forEach(({ element, type, listener }) => {
+        element.removeEventListener(type, listener);
+      });
+
+      // Vaciar arrays
+      this.windowListeners.length = 0;
+      this.elementListeners.length = 0;
+    }
+  }
+
+  // --- Controlar todas las instancias ---
+  const carousels = [];
+
+  const initializeCarousels = () => {
+    document.querySelectorAll('[data-role="carousel-component"]').forEach((carouselElement) => {
+      const manager = new CarouselManager(carouselElement);
+      manager.mount();
+      carousels.push(manager);
+    });
+  };
+
+  const destroyCarousels = () => {
+    carousels.forEach(manager => manager.destroy());
+    carousels.length = 0;
+  };
+
+  // --- Hooks de ciclo de vida de Astro ---
+  document.addEventListener('astro:page-load', initializeCarousels);
+  document.addEventListener('astro:after-preparation', destroyCarousels);
 </script>
 
 <style>
