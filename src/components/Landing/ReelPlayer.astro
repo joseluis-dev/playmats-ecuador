@@ -32,6 +32,7 @@ const { videoId, image, title, source } = Astro.props
 </reel-video>
 
 <script>
+  const reelVideos = document.querySelectorAll("reel-video") as NodeListOf<ReelVideo>
   class ReelVideo extends HTMLElement {
     videoId?: string
     source?: string
@@ -41,20 +42,20 @@ const { videoId, image, title, source } = Astro.props
       this.videoId = this.getAttribute("videoId")!
       this.source = this.getAttribute("source")!
 
-      this.style.backgroundImage = `url('/images/Reel-Facebook-Image.jpg')`
-      console.log(image)
+      this.style.backgroundImage = `url(${image})`
 
       this.addEventListener("click", this.activateVideo)
       this.addEventListener("keydown", this.handleKeyPress)
     }
 
     activateVideo() {
-      const reelVideos = document.querySelectorAll("reel-video") as NodeListOf<ReelVideo>
-      reelVideos.forEach((reel) => {
-        if (reel.querySelector("video") && reel !== this) {
-          reel.querySelector("video")?.pause()
-        }
-      })
+      const pauseVideos = () => {
+        reelVideos.forEach((reel) => {
+          if (reel.querySelector("video") && reel !== this) {
+            reel.querySelector("video")?.pause()
+          }
+        })
+      }
       this.style.backgroundImage = "unset"
 
       this.querySelector(`#Id${this.videoId}`)?.remove()
@@ -66,13 +67,7 @@ const { videoId, image, title, source } = Astro.props
       // this.unMutePlayerByDefault()
       this.removeEventListener("click", this.activateVideo)
 
-      videoEl.addEventListener('click', () => {
-        reelVideos.forEach((reel) => {
-          if (reel.querySelector("video") && reel !== this) {
-            reel.querySelector("video")?.pause()
-          }
-        })
-      })
+      videoEl.addEventListener('play', pauseVideos)
     }
 
     handleKeyPress(event: KeyboardEvent) {
@@ -87,6 +82,7 @@ const { videoId, image, title, source } = Astro.props
       videoEl.setAttribute("playsinline", "true")
       videoEl.setAttribute("preload", "auto")
       videoEl.setAttribute("controls", "true")
+      videoEl.setAttribute("controlsList", "nodownload")
       videoEl.setAttribute("class", "w-full h-full object-cover rounded-[16px]")
       videoEl.setAttribute("src", this.source!)
 

@@ -14,9 +14,8 @@ interface CarouselProps {
   className?: string;
 }
 
-const { items, className } = Astro.props as CarouselProps;
+const { items } = Astro.props as CarouselProps;
 const hasChildren = Astro.slots.default;
-console.log(hasChildren)
 ---
 <div class="flex flex-col gap-4">
   <div class="flex items-center justify-between gap-2">
