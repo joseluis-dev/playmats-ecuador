@@ -1,0 +1,39 @@
+---
+interface CardProps {
+  class?: string;
+  title: string;
+  subtitle?: string;
+  price: string;
+}
+
+const { class: className, title, subtitle, price } = Astro.props as CardProps;
+---
+
+<div class=`
+  ${className}
+  relative rounded-xl
+  backdrop-blur-md
+  border border-black/10
+  shadow-inner shadow-white/10
+  group
+  overflow-hidden
+`>  
+  <slot name="image"/>
+
+  <div class="select-none flex flex-col gap-1 text-lg z-20 h-full justify-end">
+    <div class="relative bg-[var(--color-surface)]/70 p-4 rounded-md rounded-t-none flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-balance mb-2 dark:text-[var(--color-primary)] text-[var(--color-text)]">
+          {title}
+        </h2>
+        <div class="flex flex-col">
+          <span class="text-sm font-semibold text-[var(--color-primary)]">Desde: </span>
+          <span class="text-xl font-heading">${price}</span>
+        </div>
+      </div>
+      {subtitle && <p class="text-lg font-semibold text-[var(--color-primary)] dark:text-[var(--color-text)]">{subtitle}</p>}
+
+      <slot name="content"/>
+    </div>
+  </div>
+</div>

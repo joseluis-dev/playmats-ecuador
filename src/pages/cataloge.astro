@@ -1,7 +1,67 @@
 ---
+import Badge from "@/components/Badge.astro";
+import Card from "@/components/Card.astro";
 import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout title="Playmats EC - Catalogo">
-	catalogo
+	<section
+		class="
+			w-full max-w-screen-xl mx-auto
+			grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
+			auto-rows-[20rem] gap-6
+			p-8 md:p-12
+		"
+	>
+		<Card 
+			class=""
+			title="Vitral de Tierras"
+			subtitle="Catálogo de productos"
+			price="20.00"
+		>
+			<div 
+				slot="image"
+				class="
+					absolute top-0 left-0 bottom-0
+					h-full w-full
+					group-hover:scale-110
+					transition-scale duration-1000 ease-in-out
+					opacity-90 -z-10
+					bg-center bg-cover bg-no-repeat bg-blend-luminosity
+				"
+				style="background-image: url(https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp);"
+			/>
+			<ul slot="content" class="w-full flex flex-wrap gap-2 text-sm">
+				<li class="flex items-center gap-2">
+					<Badge color="gray" label="Nuevoskaldfj" type="outline" />
+				</li>
+				<Badge color="#0048ff" label="Nuevoskaldfj" type="ghost" />
+				<span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset bg-[#00ff44]/10 text-[#00ff44] ring-[#00ff44]/10 dark:bg-[#00ff44]/30 dark:text-[#00ff44] dark:ring-[#00ff44]/30">Nuevoskaldfj</span>
+			</ul>
+		</Card>
+		<Card 
+			class=""
+			title="Vitral de Tierras"
+			subtitle="Catálogo de productos"
+			price="20.00"
+		>
+			<div 
+				slot="image"
+				class="
+					absolute top-0 left-0 bottom-0
+					h-full w-full
+					group-hover:scale-110
+					transition-scale duration-1000 ease-in-out
+					opacity-90 -z-10
+					bg-center bg-cover bg-no-repeat bg-blend-luminosity
+				"
+				style="background-image: url(https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp);"
+			/>
+			<ul slot="content" class="w-full grid-cols-4 md:grid-cols-2 auto-rows-auto gap-2 text-sm">
+				<li class="flex items-center gap-2">
+					<Badge color="yellow" label="Nuevoskaldfj" type="outline" />
+				</li>
+			</ul>
+		</Card>
+	</section>
 </Layout>

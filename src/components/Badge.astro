@@ -1,0 +1,84 @@
+---
+import clsx from "clsx";
+
+interface BadgeProps {
+  color:
+    | "gray"
+    | "red"
+    | "yellow"
+    | "green"
+    | "blue"
+    | "indigo"
+    | "purple"
+    | "pink";
+  label: string;
+  type: "ghost" | "outline";
+}
+const { color, label, type = "ghost" } = Astro.props as BadgeProps;
+
+const isHexColor = (color: string) => {
+  return /^#[0-9A-F]{6}$/i.test(color);
+};
+
+const ghostColor700 = `${color}-700`;
+const ghostColor500 = `${color}-500`;
+const ghostColor400 = `${color}-400`;
+
+const ghostClasses = clsx(
+  `bg-${ghostColor700}/10`,
+  `text-${ghostColor700}`,
+  `ring-${ghostColor700}/10`,
+  `dark:bg-${ghostColor400}/30`,
+  `dark:text-${ghostColor400}`,
+  `dark:ring-${ghostColor400}/30`
+);
+
+const outlineClasses = clsx(
+  `bg-${ghostColor500}`,
+  `dark:bg-${ghostColor400}`
+);
+
+const ghostClasesHex = clsx(
+  `bg-[${color}]/10`,
+  `text-[${color}]`,
+  `ring-[${color}]/10`,
+  `dark:bg-[${color}]/30`,
+  `dark:text-[${color}]`,
+  `dark:ring-[${color}]/30`
+);
+
+const types = {
+  ghost: isHexColor(color) ? ghostClasesHex : ghostClasses,
+  outline: isHexColor(color) ? '' : outlineClasses,
+};
+
+/*
+  Safelist para Tailwind:
+  bg-gray-700 bg-red-700 bg-yellow-700 bg-green-700 bg-blue-700 bg-indigo-700 bg-purple-700 bg-pink-700
+  bg-gray-700/10 bg-red-700/10 bg-yellow-700/10 bg-green-700/10 bg-blue-700/10 bg-indigo-700/10 bg-purple-700/10 bg-pink-700/10
+  bg-gray-700/30 bg-red-700/30 bg-yellow-700/30 bg-green-700/30 bg-blue-700/30 bg-indigo-700/30 bg-purple-700/30 bg-pink-700/30
+  text-gray-700 text-red-700 text-yellow-700 text-green-700 text-blue-700 text-indigo-700 text-purple-700 text-pink-700
+  ring-gray-700 ring-red-700 ring-yellow-700 ring-green-700 ring-blue-700 ring-indigo-700 ring-purple-700 ring-pink-700
+  bg-gray-500 bg-red-500 bg-yellow-500 bg-green-500 bg-blue-500 bg-indigo-500 bg-purple-500 bg-pink-500
+  bg-gray-400 bg-red-400 bg-yellow-400 bg-green-400 bg-blue-400 bg-indigo-400 bg-purple-400 bg-pink-400
+  text-gray-400 text-red-400 text-yellow-400 text-green-400 text-blue-400 text-indigo-400 text-purple-400 text-pink-400
+  ring-gray-400 ring-red-400 ring-yellow-400 ring-green-400 ring-blue-400 ring-indigo-400 ring-purple-400 ring-pink-400
+*/
+---
+
+{
+  type === "ghost" ? (
+    <span
+      class={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${types[type]}`}
+    >
+      {label}
+    </span>
+  ) : (
+    <span
+      class={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-[var(--color-text)] gap-2`}
+    >
+      <span class={`${types[type]} size-2 rounded-full`}></span>
+      {label}
+    </span>
+  )
+}

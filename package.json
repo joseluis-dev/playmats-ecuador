@@ -9,14 +9,15 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/react": "4.2.5",
+    "@astrojs/react": "4.2.7",
     "@astrojs/vercel": "8.1.4",
     "@fontsource/nunito": "5.2.5",
     "@fontsource/orbitron": "5.2.5",
     "@tailwindcss/vite": "4.1.4",
     "@types/react": "19.1.2",
     "@types/react-dom": "19.1.2",
-    "astro": "5.7.5",
+    "astro": "5.7.10",
+    "chroma-js": "3.1.2",
     "playmats-ecuador": "file:",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "0.5.16",
+    "@types/chroma-js": "3.1.1",
     "typescript": "5.8.3"
   },
   "pnpm": {

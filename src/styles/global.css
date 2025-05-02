@@ -20,7 +20,7 @@
     --color-text: #ffffff;
     --color-surface: #1e1e1e;
     --color-border: #2e2e2e;
-    --color-primary: #1e90ff;
+    --color-primary: #3b99f7;
     --color-accent: #ffffffd0;
     --btn-primary-bg: var(--color-accent);
     --btn-primary-text: #000000;
@@ -36,7 +36,7 @@
     --color-text: #000000;
     --color-surface: #e4e4e4;
     --color-border: #d3d3d3;
-    --color-primary: #1e90ff;
+    --color-primary: #0080ff;
     --color-accent: #000000;
     --btn-primary-bg: var(--color-accent);
     --btn-primary-text: #ffffff;
@@ -51,7 +51,7 @@
     --color-text: #ffffff;
     --color-surface: #1e1e1e;
     --color-border: #2e2e2e;
-    --color-primary: #1e90ff;
+    --color-primary: #3b99f7;
     --color-accent: #ffffffd0;
     --btn-primary-bg: var(--color-accent);
     --btn-primary-text: #000000;
@@ -65,7 +65,7 @@
     --color-text: #000000;
     --color-surface: #e4e4e4;
     --color-border: #d3d3d3;
-    --color-primary: #1e90ff;
+    --color-primary: #0080ff;
     --color-accent: #000000;
     --btn-primary-bg: var(--color-accent);
     --btn-primary-text: #ffffff;
