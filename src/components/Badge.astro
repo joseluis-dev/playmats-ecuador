@@ -58,6 +58,20 @@ const getOutlineStyle = (hex: string) => ({
 });
 
 const isHex = isHexColor(color);
+
+/*
+  Safelist para Tailwind:
+  bg-gray-700 bg-red-700 bg-yellow-700 bg-green-700 bg-blue-700 bg-indigo-700 bg-purple-700 bg-pink-700
+  bg-gray-700/10 bg-red-700/10 bg-yellow-700/10 bg-green-700/10 bg-blue-700/10 bg-indigo-700/10 bg-purple-700/10 bg-pink-700/10
+  bg-gray-700/30 bg-red-700/30 bg-yellow-700/30 bg-green-700/30 bg-blue-700/30 bg-indigo-700/30 bg-purple-700/30 bg-pink-700/30
+  text-gray-700 text-red-700 text-yellow-700 text-green-700 text-blue-700 text-indigo-700 text-purple-700 text-pink-700
+  ring-gray-700 ring-red-700 ring-yellow-700 ring-green-700 ring-blue-700 ring-indigo-700 ring-purple-700 ring-pink-700
+  bg-gray-500 bg-red-500 bg-yellow-500 bg-green-500 bg-blue-500 bg-indigo-500 bg-purple-500 bg-pink-500
+  bg-gray-400 bg-red-400 bg-yellow-400 bg-green-400 bg-blue-400 bg-indigo-400 bg-purple-400 bg-pink-400
+  text-gray-400 text-red-400 text-yellow-400 text-green-400 text-blue-400 text-indigo-400 text-purple-400 text-pink-400
+  ring-gray-400 ring-red-400 ring-yellow-400 ring-green-400 ring-blue-400 ring-indigo-400 ring-purple-400 ring-pink-400
+*/
+
 ---
 {type === "ghost" ? (
   <span
@@ -90,5 +104,4 @@ document.querySelectorAll('[data-dark-style]').forEach((el) => {
     Object.assign((el as HTMLElement).style, styles);
   }
 });
-
 </script>

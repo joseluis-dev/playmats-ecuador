@@ -2,6 +2,104 @@
 import Badge from "@/components/Badge.astro";
 import Card from "@/components/Card.astro";
 import Layout from "@/layouts/Layout.astro";
+
+const PRODUCTS = [
+	{
+		id: '1',
+		name: 'Vitral de Tierras',
+		price: 10.00,
+		image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp',
+		title: 'Info 1',
+		categories: [{
+			name: 'Playmats',
+			color: 'blue',
+		}],
+		attributes: [{
+			name: 'Antideslizante',
+			color: 'green',
+		}, {
+			name: 'Impermeable',
+			color: 'purple',
+		}],
+	},
+	{
+		id: '2',
+		name: 'Info 2',
+		price: 20.00,
+		image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp',
+		title: 'Info 2',
+		categories: [
+			{
+				name: 'Logos',
+				color: 'blue',
+			},
+		],
+		attributes: [
+			{
+				name: 'Antideslizante',
+				color: 'green',
+			},
+			{
+				name: 'Impermeable',
+				color: 'purple',
+			},
+		],
+	},
+	{
+		id: '3',
+		name: 'Info 3',
+		price: 25.00,
+		image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Mouspad-Gamer_yau6cl.webp',
+		title: 'Info 3',
+		categories: [{
+			name: 'Mouspad Gamer',
+			color: 'blue',
+		}],
+		attributes: [{
+			name: 'Antideslizante',
+			color: 'yellow',
+		}, {
+			name: 'Impermeable',
+			color: 'pink',
+		}],
+	},
+	{
+		id: '4',
+		name: 'Info 4',
+		price: 30.00,
+		image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Fundas_y8jq2w.webp',
+		title: 'Info 4',
+		categories: [{
+			name: 'Fundas',
+			color: 'green',
+		}],
+		attributes: [{
+			name: 'Antideslizante',
+			color: 'blue',
+		}, {
+			name: 'Impermeable',
+			color: 'purple',
+		}],
+	},
+	{
+		id: '5',
+		name: 'Info 5',
+		price: 60.00,
+		image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Fundas_y8jq2w.webp',
+		title: 'Info 5',
+		categories: [{
+			name: 'Fundas',
+			color: 'green',
+		}],
+		attributes: [{
+			name: 'Antideslizante',
+			color: 'blue',
+		}, {
+			name: 'Impermeable',
+			color: 'purple',
+		}],
+	}
+]
 ---
 
 <Layout title="Playmats EC - Catalogo">
@@ -13,55 +111,37 @@ import Layout from "@/layouts/Layout.astro";
 			p-8 md:p-12
 		"
 	>
-		<Card 
-			class=""
-			title="Vitral de Tierras"
-			subtitle="Catálogo de productos"
-			price="20.00"
-		>
-			<div 
-				slot="image"
-				class="
-					absolute top-0 left-0 bottom-0
-					h-full w-full
-					group-hover:scale-110
-					transition-scale duration-1000 ease-in-out
-					opacity-90 -z-10
-					bg-center bg-cover bg-no-repeat bg-blend-luminosity
-				"
-				style="background-image: url(https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp);"
-			/>
-			<ul slot="content" class="w-full flex flex-wrap gap-2 text-sm">
-				<li class="flex items-center gap-2">
-					<Badge color="gray" label="Nuevoskaldfj" type="outline" />
-				</li>
-				<Badge color="#d905fa" label="Nuevoskaldfj" type="ghost" />
-				<Badge color="yellow" label="Nuevoskaldfj" type="ghost" />
-			</ul>
-		</Card>
-		<Card 
-			class=""
-			title="Vitral de Tierras"
-			subtitle="Catálogo de productos"
-			price="20.00"
-		>
-			<div 
-				slot="image"
-				class="
-					absolute top-0 left-0 bottom-0
-					h-full w-full
-					group-hover:scale-110
-					transition-scale duration-1000 ease-in-out
-					opacity-90 -z-10
-					bg-center bg-cover bg-no-repeat bg-blend-luminosity
-				"
-				style="background-image: url(https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp);"
-			/>
-			<ul slot="content" class="w-full grid-cols-4 md:grid-cols-2 auto-rows-auto gap-2 text-sm">
-				<li class="flex items-center gap-2">
-					<Badge color="yellow" label="Nuevoskaldfj" type="outline" />
-				</li>
-			</ul>
-		</Card>
+		{
+			PRODUCTS.map((product) => (
+			<Card 
+				class=""
+				title={product.name}
+				subtitle="Detalles"
+				price={product.price}
+			>
+				<div 
+					slot="image"
+					class="
+						absolute top-0 left-0 bottom-0
+						h-full w-full
+						group-hover:scale-110
+						transition-scale duration-1000 ease-in-out
+						opacity-90 -z-10
+						bg-center bg-cover bg-no-repeat bg-blend-luminosity
+					"
+					style={`background-image: url(${product.image})`}
+				/>
+				<ul slot="content" class="w-full flex flex-wrap gap-2 text-sm">
+					{product.categories.map((category) => (
+						<Badge color={category.color} label={category.name} type="outline" />
+					))}
+					{
+						product.attributes.map((attribute) => (
+						<Badge color={attribute.color} label={attribute.name} type="outline" />
+					))}
+				</ul>
+			</Card>
+			))
+		}
 	</section>
 </Layout>
