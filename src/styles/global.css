@@ -94,12 +94,11 @@ body {
 }
 
 a {
-  color: var(--link-color);
-  transition: color 0.3s;
+  @apply text-[var(--link-color)] transition-colors duration-300 ease-in-out;
 }
 
 a:hover {
-  color: var(--link-hover-color);
+  @apply text-[var(--link-hover-color)];
 }
 
 button {

@@ -9,7 +9,6 @@ const PRODUCTS = [
 		id: '1',
 		name: 'Vitral de Tierras',
 		price: 10.00,
-		image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp',
 		title: 'Info 1',
 		categories: [{
 			name: 'Playmats',
@@ -20,14 +19,22 @@ const PRODUCTS = [
 			color: 'green',
 		}, {
 			name: 'Impermeable',
-			color: '#fc8803',
+			color: '#d736f7',
 		}],
+		resources: [
+			{
+				name: 'Banner',
+				url: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp',
+				hosting: 'Cloudinary',
+				type: 'image',
+				isBanner: true,
+			}
+		]
 	},
 	{
 		id: '2',
 		name: 'Info 2',
 		price: 20.00,
-		image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp',
 		title: 'Info 2',
 		categories: [
 			{
@@ -45,12 +52,20 @@ const PRODUCTS = [
 				color: 'purple',
 			},
 		],
+		resources: [
+			{
+				name: 'Banner',
+				url: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp',
+				hosting: 'Cloudinary',
+				type: 'image',
+				isBanner: true,
+			}
+		]
 	},
 	{
 		id: '3',
 		name: 'Info 3',
 		price: 25.00,
-		image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Mouspad-Gamer_yau6cl.webp',
 		title: 'Info 3',
 		categories: [{
 			name: 'Mouspad Gamer',
@@ -63,12 +78,18 @@ const PRODUCTS = [
 			name: 'Impermeable',
 			color: 'pink',
 		}],
+		resources: [{
+			name: 'Banner',
+			url: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Mouspad-Gamer_yau6cl.webp',
+			hosting: 'Cloudinary',
+			type: 'image',
+			isBanner: true,
+		}]
 	},
 	{
 		id: '4',
 		name: 'Info 4',
 		price: 30.00,
-		image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Fundas_y8jq2w.webp',
 		title: 'Info 4',
 		categories: [{
 			name: 'Fundas',
@@ -81,12 +102,18 @@ const PRODUCTS = [
 			name: 'Impermeable',
 			color: 'purple',
 		}],
+		resources: [{
+			name: 'Banner',
+			url: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Fundas_y8jq2w.webp',
+			hosting: 'Cloudinary',
+			type: 'image',
+			isBanner: true,
+		}]
 	},
 	{
 		id: '5',
 		name: 'Info 5',
 		price: 60.00,
-		image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Fundas_y8jq2w.webp',
 		title: 'Info 5',
 		categories: [{
 			name: 'Fundas',
@@ -99,6 +126,13 @@ const PRODUCTS = [
 			name: 'Impermeable',
 			color: 'purple',
 		}],
+		resources: [{
+			name: 'Banner',
+			url: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Fundas_y8jq2w.webp',
+			hosting: 'Cloudinary',
+			type: 'image',
+			isBanner: true,
+		}]
 	}
 ]
 ---
@@ -114,42 +148,49 @@ const PRODUCTS = [
 	>
 		{
 			PRODUCTS.map((product) => (
-			<Card 
-				class=""
-				title={product.name}
-				subtitle="Detalles"
-				price={product.price}
-			>
-				<div 
-					slot="image"
-					class="
-						absolute top-0 left-0 bottom-0
-						h-full w-full
-						group-hover:scale-110
-						transition-scale duration-1000 ease-in-out
-						opacity-90 -z-10
-						bg-center bg-cover bg-no-repeat bg-blend-luminosity
-					"
-					style={`background-image: url(${product.image})`}
-				/>
-				<ul slot="content" class="w-full flex flex-wrap gap-2 text-sm">
-					{product.categories.map((category) => (
-						<Badge color={category.color} label={category.name} type="outline" />
-					))}
-					{
-						product.attributes.map((attribute) => (
-						<Badge color={attribute.color} label={attribute.name} type="outline" />
-					))}
-				</ul>
-				<button slot="footer" class="
-					flex items-center justify-center gap-2
-					absolute top-0 right-0 p-4 ring-1 ring-black/20 dark:ring-white/20
-					rounded-rt-lg rounded-bl-lg bg-[var(--color-surface)]/95
-				">
-					<p class="text-sm font-bold text-[var(--color-primary)]">Añadir</p>
-					<CartAddIcon class="text-[var(--color-primary)]"/>
-				</button>
-			</Card>
+			<a href={`/playmats/${product.id}`} class="
+				rounded-xl
+				group
+			">
+				<Card 
+					class="text-[var(--color-text)]"
+					id={product.id}
+					title={product.name}
+					subtitle="Etiquetas"
+					price={product.price}
+				>
+					<div 
+						slot="image"
+						transition:name={`img-${product.id}`}
+						class="
+							absolute top-0 left-0 bottom-0
+							h-full w-full
+							group-hover:scale-110
+							transition-scale duration-1000 ease-in-out
+							opacity-90 -z-10
+							bg-center bg-cover bg-no-repeat bg-blend-luminosity
+						"
+						style={`background-image: url(${product.resources[0].url});`}
+					/>
+					<ul slot="content" class="w-full flex flex-wrap gap-2 text-sm">
+						{product.categories.map((category) => (
+							<Badge color={category.color} label={category.name} type="outline" />
+						))}
+						{
+							product.attributes.map((attribute) => (
+							<Badge color={attribute.color} label={attribute.name} type="outline" />
+						))}
+					</ul>
+					<button slot="footer" class="
+						flex items-center justify-center gap-2
+						absolute top-0 right-0 p-4 ring-1 ring-black/20 dark:ring-white/20
+						rounded-rt-lg rounded-bl-lg bg-[var(--color-surface)]/95
+					">
+						<p class="text-sm font-bold text-[var(--color-primary)]">Añadir</p>
+						<CartAddIcon class="text-[var(--color-primary)]"/>
+					</button>
+				</Card>
+			</a>
 			))
 		}
 	</section>

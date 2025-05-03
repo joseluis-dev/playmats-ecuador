@@ -1,0 +1,117 @@
+---
+import Badge from "@/components/Badge.astro";
+import Galery from "@/components/Galery.astro";
+import Layout from "@/layouts/Layout.astro";
+
+const { id } = Astro.params;
+
+const PRODUCT = {
+  id: "1",
+  name: "Vitral de Tierras",
+  price: 10.0,
+  image:
+    "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+  title: "Info 1",
+  description:
+    "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus.",
+  categories: [
+    {
+      name: "Playmats",
+      color: "blue",
+    },
+  ],
+  attributes: [
+    {
+      name: "Antideslizante",
+      color: "green",
+    },
+    {
+      name: "Impermeable",
+      color: "#d736f7",
+    },
+  ],
+  resources: [
+    {
+      id: "1",
+      name: "Banner",
+      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      hosting: "Cloudinary",
+      type: "image",
+      isBanner: true,
+    },
+    {
+      id: "1",
+      name: "Banner 2",
+      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      hosting: "Cloudinary",
+      type: "image",
+      isBanner: false,
+    },
+    {
+      id: "1",
+      name: "Banner 3",
+      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      hosting: "Cloudinary",
+      type: "image",
+      isBanner: false,
+    },
+  ],
+};
+---
+
+<Layout title=`Playmats EC - ${PRODUCT.name}`>
+  <section class="w-full max-w-screen-xl mx-auto
+      p-8 md:p-12">
+    <div
+      class="absolute top-0 left-0 bottom-0
+        h-full w-full bg-[var(--color-background)]
+        transition-scale duration-1000 ease-in-out
+        opacity-30 -z-10
+        bg-center bg-cover bg-no-repeat bg-blend-luminosity"
+      style={`background-image: url(${PRODUCT.image});`}
+    >
+    </div>
+    <h2
+      transition:name={`title-${PRODUCT.id}`}
+      class="text-xl font-semibold text-balance mb-2 dark:text-[var(--color-primary)] text-[var(--color-text)]"
+    >
+      {PRODUCT.name}
+    </h2>
+
+    <div class="flex flex-wrap gap-2">
+      <Galery resources={PRODUCT.resources}/>
+      <div class="flex flex-wrap md:flex-nowrap gap-4">
+        <img
+          src={PRODUCT.resources.filter((image) => image.isBanner)[0].url}
+          transition:name={`img-${id}`}
+          alt="Banner Image"
+          class="rounded-lg hidden md:block md:w-[250px] md:h-[150px] object-cover"
+          loading="lazy"
+        />
+        <div class="flex flex-col gap-2">
+          <p class="text-pretty">{PRODUCT.description}</p>
+          <div class="flex flex-wrap gap-2 h-full items-end">
+            {
+              PRODUCT.categories.map((category) => (
+                <Badge
+                  color={category.color}
+                  label={category.name}
+                  type="outline"
+                />
+              ))
+            }
+            {
+              PRODUCT.attributes.map((attribute) => (
+                <Badge
+                  color={attribute.color}
+                  label={attribute.name}
+                  type="outline"
+                />
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

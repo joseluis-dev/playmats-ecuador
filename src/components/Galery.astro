@@ -1,0 +1,13 @@
+---
+interface Props {
+  resources: Array<{
+    id: string;
+    name: string;
+    url: string;
+    type: string;
+    hosting: string;
+  }>;
+}
+const { resources = [] } = Astro.props;
+---
+
