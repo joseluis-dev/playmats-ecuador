@@ -12,54 +12,44 @@ interface BadgeProps {
     | "indigo"
     | "purple"
     | "pink"
-    | `#${string}`; // Permitir colores hex arbitrarios
+    | `#${string}`;
   label: string;
-  type: "ghost" | "outline";
+  type?: "ghost" | "outline";
 }
 
 const { color, label, type = "ghost" } = Astro.props as BadgeProps;
 
 const isHexColor = (color: string) => /^#[0-9A-F]{6}$/i.test(color);
-
-// Clases para colores de Tailwind conocidos
-const ghostColor700 = `${color}-700`;
-const ghostColor500 = `${color}-500`;
-const ghostColor400 = `${color}-400`;
+const isHex = isHexColor(color);
 
 const ghostClasses = clsx(
-  `bg-${ghostColor700}/10`,
-  `text-${ghostColor700}`,
-  `ring-${ghostColor700}/10`,
-  `dark:bg-${ghostColor400}/30`,
-  `dark:text-${ghostColor400}`,
-  `dark:ring-${ghostColor400}/30`
+  `bg-${color}-700/10`,
+  `text-${color}-700`,
+  `ring-${color}-700/10`,
+  `dark:bg-${color}-400/30`,
+  `dark:text-${color}-400`,
+  `dark:ring-${color}-400/30`
 );
 
 const outlineClasses = clsx(
-  `bg-${ghostColor500}`,
-  `dark:bg-${ghostColor400}`
+  `bg-${color}-500`,
+  `dark:bg-${color}-400`
 );
 
-// Para colores hex arbitrarios, se usarán estilos inline
-const getGhostStyle = (hex: string) => ({
-  backgroundColor: `${hex}1A`, // 10% opacity
-  color: hex,
-  borderColor: `${hex}1A`,
-});
+const style = isHex
+  ? {
+      '--badge-bg': `${color === '#ffffff' ? '#000000' : color}1A`, // 10% opacity
+      '--badge-text': color === '#ffffff' ? '#000000' : color,
+      '--badge-ring': `${color === '#ffffff' ? '#000000' : color}1A`,
+      '--badge-bg-dark': `${color === '#ffffff' ? '#ffffff' : color === '#000000' ? '#ffffff' : getDarkModeVariant(color)}4D`, // 30% opacity
+      '--badge-text-dark': color === '#ffffff' ? '#ffffff' : color === '#000000' ? '#ffffff' : getDarkModeVariant(color),
+      '--badge-ring-dark': `${color === '#ffffff' ? '#ffffff' : color === '#000000' ? '#ffffff' : getDarkModeVariant(color)}4D`,
+      '--badge-bg-dot': color === '#ffffff' ? '#000000' : color,
+      '--badge-bg-dot-dark': color === '#ffffff' ? '#ffffff' : color === '#000000' ? '#ffffff' : getDarkModeVariant(color),
+    }
+  : undefined;
 
-const getGhostDarkStyle = (hex: string) => ({
-  backgroundColor: `${getDarkModeVariant(hex)}4D`, // 30% opacity
-  color: getDarkModeVariant(hex),
-  borderColor: `${getDarkModeVariant(hex)}4D`,
-});
-
-const getOutlineStyle = (hex: string) => ({
-  backgroundColor: hex,
-});
-
-const isHex = isHexColor(color);
-
-/*
+  /*
   Safelist para Tailwind:
   bg-gray-700 bg-red-700 bg-yellow-700 bg-green-700 bg-blue-700 bg-indigo-700 bg-purple-700 bg-pink-700
   bg-gray-700/10 bg-red-700/10 bg-yellow-700/10 bg-green-700/10 bg-blue-700/10 bg-indigo-700/10 bg-purple-700/10 bg-pink-700/10
@@ -71,37 +61,46 @@ const isHex = isHexColor(color);
   text-gray-400 text-red-400 text-yellow-400 text-green-400 text-blue-400 text-indigo-400 text-purple-400 text-pink-400
   ring-gray-400 ring-red-400 ring-yellow-400 ring-green-400 ring-blue-400 ring-indigo-400 ring-purple-400 ring-pink-400
 */
-
 ---
+
+<style is:global>
+.badge-hex {
+  background-color: var(--badge-bg);
+  color: var(--badge-text);
+  border-color: var(--badge-ring);
+}
+.dark .badge-hex {
+  background-color: var(--badge-bg-dark);
+  color: var(--badge-text-dark);
+  border-color: var(--badge-ring-dark);
+}
+
+.dot-hex {
+  background-color: var(--badge-bg-dot);
+}
+.dark .dot-hex {
+  background-color: var(--badge-bg-dot-dark);
+}
+</style>
+
 {type === "ghost" ? (
   <span
     class={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-      isHex ? "" : ghostClasses
+      isHex ? "badge-hex" : ghostClasses
     }`}
-    style={isHex ? getGhostStyle(color) : undefined}
-    data-dark-style={isHex ? JSON.stringify(getGhostDarkStyle(color)) : undefined}
+    style={style}
   >
     {label}
   </span>
 ) : (
-  <span
-    class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-[var(--color-text)] gap-2"
-  >
+  <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-[var(--color-text)] gap-2">
     <span
-      class={`${isHex ? "" : outlineClasses} size-2 rounded-full`}
-      style={isHex ? getOutlineStyle(color) : undefined}
-      data-dark-style={isHex ? JSON.stringify(getOutlineStyle(color)) : undefined}
+      class={clsx(
+        "size-2 rounded-full",
+        isHex ? "dot-hex" : outlineClasses
+      )}
+      style={style}
     ></span>
     {label}
   </span>
 )}
-
-<script>
-document.querySelectorAll('[data-dark-style]').forEach((el) => {
-  const darkMode = document.documentElement.classList.contains('dark');
-  const styles = JSON.parse(el.getAttribute('data-dark-style')!);
-  if (darkMode) {
-    Object.assign((el as HTMLElement).style, styles);
-  }
-});
-</script>

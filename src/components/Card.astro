@@ -3,7 +3,7 @@ interface CardProps {
   class?: string;
   title: string;
   subtitle?: string;
-  price: string;
+  price?: string;
 }
 
 const { class: className, title, subtitle, price } = Astro.props as CardProps;
@@ -13,27 +13,29 @@ const { class: className, title, subtitle, price } = Astro.props as CardProps;
   ${className}
   relative rounded-xl
   backdrop-blur-md
-  border border-black/10
+  border border-black/20 dark:border-white/20
   shadow-inner shadow-white/10
   group
   overflow-hidden
+  cursor-pointer
 `>  
   <slot name="image"/>
-
+  
   <div class="select-none flex flex-col gap-1 text-lg z-20 h-full justify-end">
-    <div class="relative bg-[var(--color-surface)]/80 p-4 rounded-md rounded-t-none flex flex-col gap-2">
+    <div class="bg-[var(--color-surface)]/80 p-4 rounded-md rounded-t-none flex flex-col gap-2">
       <div class="flex items-center justify-between">
         <h2 class="text-xl font-semibold text-balance mb-2 dark:text-[var(--color-primary)] text-[var(--color-text)]">
           {title}
         </h2>
-        <div class="flex flex-col">
+        {price && <div class="flex flex-col">
           <span class="text-sm font-semibold text-[var(--color-primary)]">Desde: </span>
           <span class="text-xl font-heading">${price}</span>
-        </div>
+        </div>}
       </div>
       {subtitle && <p class="text-lg font-semibold text-[var(--color-primary)] dark:text-[var(--color-text)]">{subtitle}</p>}
 
       <slot name="content"/>
+      <slot name="footer"/>
     </div>
   </div>
 </div>

@@ -1,6 +1,7 @@
 ---
 import Badge from "@/components/Badge.astro";
 import Card from "@/components/Card.astro";
+import CartAddIcon from "@/components/icons/CartAddIcon.astro";
 import Layout from "@/layouts/Layout.astro";
 
 const PRODUCTS = [
@@ -19,7 +20,7 @@ const PRODUCTS = [
 			color: 'green',
 		}, {
 			name: 'Impermeable',
-			color: 'purple',
+			color: '#fc8803',
 		}],
 	},
 	{
@@ -37,7 +38,7 @@ const PRODUCTS = [
 		attributes: [
 			{
 				name: 'Antideslizante',
-				color: 'green',
+				color: '#04db48',
 			},
 			{
 				name: 'Impermeable',
@@ -107,7 +108,7 @@ const PRODUCTS = [
 		class="
 			w-full max-w-screen-xl mx-auto
 			grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
-			auto-rows-[20rem] gap-6
+			auto-rows-[25rem] gap-6
 			p-8 md:p-12
 		"
 	>
@@ -140,6 +141,14 @@ const PRODUCTS = [
 						<Badge color={attribute.color} label={attribute.name} type="outline" />
 					))}
 				</ul>
+				<button slot="footer" class="
+					flex items-center justify-center gap-2
+					absolute top-0 right-0 p-4 ring-1 ring-black/20 dark:ring-white/20
+					rounded-rt-lg rounded-bl-lg bg-[var(--color-surface)]/95
+				">
+					<p class="text-sm font-bold text-[var(--color-primary)]">Añadir</p>
+					<CartAddIcon class="text-[var(--color-primary)]"/>
+				</button>
 			</Card>
 			))
 		}

@@ -12,6 +12,6 @@ export function getDarkModeVariant(hexColor: string): string {
 
   const newL = Math.min(0.85, l + 0.15); // +15% brillo
   const newS = Math.min(1, s + 0.1);     // +10% saturación
-
+  
   return chroma.hsl(h, newS, newL).hex();
 }
