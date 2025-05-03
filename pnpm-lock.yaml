@@ -54,6 +54,12 @@ importers:
       '@tailwindcss/typography':
         specifier: 0.5.16
         version: 0.5.16(tailwindcss@4.1.4)
+      '@types/chroma-js':
+        specifier: 3.1.1
+        version: 3.1.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
       typescript:
         specifier: 5.8.3
         version: 5.8.3
@@ -718,6 +724,9 @@ packages:
 
   '@types/babel__traverse@7.20.7':
     resolution: {integrity: sha512-dkO5fhS7+/oos4ciWxyEyjWe48zmG6wbCheo/G2ZnHx4fs3EU6YC6UM8rk56gAjNJ9P3MTH2jo5jb92/K6wbng==}
+
+  '@types/chroma-js@3.1.1':
+    resolution: {integrity: sha512-SFCr4edNkZ1bGaLzGz7rgR1bRzVX4MmMxwsIa3/Bh6ose8v+hRpneoizHv0KChdjxaXyjRtaMq7sCuZSzPomQA==}
 
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
@@ -2759,6 +2768,8 @@ snapshots:
     dependencies:
       '@babel/types': 7.27.0
 
+  '@types/chroma-js@3.1.1': {}
+
   '@types/debug@4.1.12':
     dependencies:
       '@types/ms': 2.1.0
@@ -3917,6 +3928,7 @@ snapshots:
       '@types/react': 19.1.2
       '@types/react-dom': 19.1.2(@types/react@19.1.2)
       astro: 5.7.10(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.0)(typescript@5.8.3)
+      chroma-js: 3.1.2
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
       tailwindcss: 4.1.4
