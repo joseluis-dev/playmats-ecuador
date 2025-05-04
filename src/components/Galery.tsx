@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import clsx from "clsx";
 import './Galery.css';
 import PlayIcon from "./icons/PlayIcon.tsx";
@@ -46,45 +46,45 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
   }
 
   return (
-    <div className="w-full lg:max-w-2xl xl:max-w-3xl flex flex-col gap-4">
-      <div className="relative w-full aspect-video max-w-[calc(100vw-80px)]">
-        {resources.map((resource) => (
-          <div
-            key={resource.id}
-            className={clsx(
-              "absolute top-0 left-0 right-0 bottom-0 inset-0 flex items-center justify-center rounded-lg overflow-hidden",
-              resource.id === prevSelected?.id && "fade-out",
-              resource.id === selected.id && "fade-in"
-            )}
-            style={{
-              opacity: resource.id === selected.id ? 1 : 0,
-              pointerEvents: resource.id === selected.id ? 'auto' : 'none'
-            }}>
-            {resource.type === 'image' ? (
-              <img
-                key={resource.id}
-                data-role="image"
-                id={resource.id}
-                src={resource.watermark}
-                alt={resource.name}
-                className="object-cover aspect-video w-full"
-              />
-            ) : (
-              <video
-                key={resource.id}
-                data-role="video"
-                id={resource.id}
-                src={resource.watermark}
-                className="object-cover aspect-video w-full"
-                controls
-                muted
-              />
-            )}
-          </div>
-        ))}
-      </div>
-      <div className="w-full max-w-[calc(100vw-80px)] overflow-x-auto">
-        <div className="flex flex-nowrap gap-2">
+    <div className="relative w-full flex justify-center sm:justify-baseline gap-4">
+      <div className="flex flex-col gap-4 w-full max-w-[calc(100vw-5rem)] lg:max-w-2xl xl:max-w-3xl">
+        <div className="relative w-full aspect-video">
+          {resources.map((resource) => (
+            <div
+              key={resource.id}
+              className={clsx(
+                "absolute top-0 left-0 right-0 bottom-0 inset-0 flex items-center justify-center rounded-lg overflow-hidden",
+                resource.id === prevSelected?.id && "fade-out",
+                resource.id === selected.id && "fade-in"
+              )}
+              style={{
+                opacity: resource.id === selected.id ? 1 : 0,
+                pointerEvents: resource.id === selected.id ? 'auto' : 'none'
+              }}>
+              {resource.type === 'image' ? (
+                <img
+                  key={resource.id}
+                  data-role="image"
+                  id={resource.id}
+                  src={resource.watermark}
+                  alt={resource.name}
+                  className="object-cover aspect-video w-full"
+                />
+              ) : (
+                <video
+                  key={resource.id}
+                  data-role="video"
+                  id={resource.id}
+                  src={resource.watermark}
+                  className="object-cover aspect-video w-full"
+                  controls
+                  muted
+                />
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2 overflow-x-auto">
           {resources.map((resource) => (
             <div
               key={resource.id}
