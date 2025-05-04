@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import './Galery.css';
+import PlayIcon from "./icons/PlayIcon.tsx";
 
 
 interface Resource {
   id: string;
   name: string;
   url: string;
+  watermark: string;
+  thumbnail: string;
   type: string;
   hosting: string;
 }
@@ -26,31 +29,55 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
         return resource;
       });
     }
+    handlePlay(resource);
   };
+
+  const handlePlay = (resource: Resource) => {
+    const videos = document.querySelectorAll('video[data-role="video"]');
+    videos.forEach((video) => {
+      if (video instanceof HTMLVideoElement) {
+        if (video.id !== resource.id) {
+          video.pause();
+        } else {
+          video.play();
+        }
+      }
+    });
+  }
 
   return (
     <div className="w-full lg:max-w-2xl xl:max-w-3xl flex flex-col gap-4">
-      <div className="relative w-full aspect-video max-w-[calc(100vw-80px)] overflow-x-auto">
+      <div className="relative w-full aspect-video max-w-[calc(100vw-80px)]">
         {resources.map((resource) => (
-          <div key={resource.id} className={clsx(
-            "absolute top-0 left-0 right-0 bottom-0 inset-0 flex items-center justify-center rounded-lg overflow-hidden",
-            resource.id === prevSelected?.id && "fade-out",
-            resource.id === selected.id && "fade-in"
-          )} style={{ opacity: resource.id === selected.id ? 1 : 0 }}>
+          <div
+            key={resource.id}
+            className={clsx(
+              "absolute top-0 left-0 right-0 bottom-0 inset-0 flex items-center justify-center rounded-lg overflow-hidden",
+              resource.id === prevSelected?.id && "fade-out",
+              resource.id === selected.id && "fade-in"
+            )}
+            style={{
+              opacity: resource.id === selected.id ? 1 : 0,
+              pointerEvents: resource.id === selected.id ? 'auto' : 'none'
+            }}>
             {resource.type === 'image' ? (
               <img
                 key={resource.id}
-                src={resource.url}
+                data-role="image"
+                id={resource.id}
+                src={resource.watermark}
                 alt={resource.name}
                 className="object-cover aspect-video w-full"
-                onClick={() => handleSelect(resource)}
               />
             ) : (
               <video
                 key={resource.id}
-                src={resource.url}
-                onClick={() => handleSelect(resource)}
+                data-role="video"
+                id={resource.id}
+                src={resource.watermark}
+                className="object-cover aspect-video w-full"
                 controls
+                muted
               />
             )}
           </div>
@@ -61,10 +88,15 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
           {resources.map((resource) => (
             <div
               key={resource.id}
-              className="flex-none aspect-video w-32 bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+              className="relative flex-none aspect-video w-32 bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
               onClick={() => handleSelect(resource)}
             >
-              <img src={resource.url} alt={resource.name} />
+              <img src={resource.thumbnail} alt={resource.name} />
+              {resource.type === 'video' && (
+                <span className="absolute  top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-surface)] rounded-full p-2 shadow-md">
+                  <PlayIcon className="fill-[var(--color-text)]"/>
+                </span>
+              )}
             </div>
           ))}
         </div>

@@ -4,7 +4,6 @@ import { Galery } from "@/components/Galery.tsx";
 import { AddToCartButton } from "@/components/AddToCartButton.tsx";
 import Layout from "@/layouts/Layout.astro";
 import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon.astro";
-import { fade } from "astro:transitions";
 
 const { id } = Astro.params;
 
@@ -52,6 +51,8 @@ const PRODUCT = {
       id: "1",
       name: "Banner",
       url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
       hosting: "Cloudinary",
       type: "image",
       isBanner: true,
@@ -59,15 +60,19 @@ const PRODUCT = {
     {
       id: "2",
       name: "Banner 2",
-      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
+      url: "https://res.cloudinary.com/dcxt2wrcm/video/upload/v1745801921/Reel_Facebook_as4coi.mp4",
+      watermark: "https://res.cloudinary.com/dcxt2wrcm/video/upload/v1745801921/Reel_Facebook_as4coi.mp4",
+      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Bordados_jiyq3m.webp",
       hosting: "Cloudinary",
-      type: "image",
+      type: "video",
       isBanner: false,
     },
     {
       id: "3",
       name: "Banner 3",
       url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
       hosting: "Cloudinary",
       type: "image",
       isBanner: false,
@@ -76,6 +81,8 @@ const PRODUCT = {
       id: "4",
       name: "Banner 2",
       url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
+      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
+      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
       hosting: "Cloudinary",
       type: "image",
       isBanner: false,
@@ -84,6 +91,8 @@ const PRODUCT = {
       id: "5",
       name: "Banner 3",
       url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
       hosting: "Cloudinary",
       type: "image",
       isBanner: false,
@@ -92,6 +101,8 @@ const PRODUCT = {
       id: "6",
       name: "Banner 2",
       url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
+      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
+      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
       hosting: "Cloudinary",
       type: "image",
       isBanner: false,
@@ -100,6 +111,8 @@ const PRODUCT = {
       id: "7",
       name: "Banner 3",
       url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
       hosting: "Cloudinary",
       type: "image",
       isBanner: false,
