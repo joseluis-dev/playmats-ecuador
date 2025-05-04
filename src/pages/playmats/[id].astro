@@ -1,7 +1,10 @@
 ---
 import Badge from "@/components/Badge.astro";
-import Galery from "@/components/Galery.astro";
+import { Galery } from "@/components/Galery.tsx";
+import { CartAddIcon } from "@/components/icons/CartAddIcon.tsx";
+import { AddToCartButton } from "@/components/AddToCartButton.tsx";
 import Layout from "@/layouts/Layout.astro";
+import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon.astro";
 
 const { id } = Astro.params;
 
@@ -9,8 +12,6 @@ const PRODUCT = {
   id: "1",
   name: "Vitral de Tierras",
   price: 10.0,
-  image:
-    "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
   title: "Info 1",
   description:
     "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus.",
@@ -21,6 +22,22 @@ const PRODUCT = {
     },
   ],
   attributes: [
+    {
+      name: "Antideslizante",
+      color: "green",
+    },
+    {
+      name: "Impermeable",
+      color: "#d736f7",
+    },
+    {
+      name: "Antideslizante",
+      color: "green",
+    },
+    {
+      name: "Impermeable",
+      color: "#d736f7",
+    },
     {
       name: "Antideslizante",
       color: "green",
@@ -40,15 +57,47 @@ const PRODUCT = {
       isBanner: true,
     },
     {
-      id: "1",
+      id: "2",
       name: "Banner 2",
+      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
+      hosting: "Cloudinary",
+      type: "image",
+      isBanner: false,
+    },
+    {
+      id: "3",
+      name: "Banner 3",
       url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
       hosting: "Cloudinary",
       type: "image",
       isBanner: false,
     },
     {
-      id: "1",
+      id: "4",
+      name: "Banner 2",
+      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
+      hosting: "Cloudinary",
+      type: "image",
+      isBanner: false,
+    },
+    {
+      id: "5",
+      name: "Banner 3",
+      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+      hosting: "Cloudinary",
+      type: "image",
+      isBanner: false,
+    },
+    {
+      id: "6",
+      name: "Banner 2",
+      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
+      hosting: "Cloudinary",
+      type: "image",
+      isBanner: false,
+    },
+    {
+      id: "7",
       name: "Banner 3",
       url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
       hosting: "Cloudinary",
@@ -62,53 +111,81 @@ const PRODUCT = {
 <Layout title=`Playmats EC - ${PRODUCT.name}`>
   <section class="w-full max-w-screen-xl mx-auto
       p-8 md:p-12">
+      <a href="/cataloge" class="flex w-fit gap-2 items-center mb-2 font-semibold group lg:hidden">
+        <ArrowLeftIcon class="w-4 h-4 text-[var(--color-text)]/80 group-hover:text-[var(--color-text)]" />
+        <span class="text-[var(--color-text)]/80 group-hover:text-[var(--color-text)]">Volver</span>
+      </a>
     <div
       class="absolute top-0 left-0 bottom-0
         h-full w-full bg-[var(--color-background)]
         transition-scale duration-1000 ease-in-out
         opacity-30 -z-10
         bg-center bg-cover bg-no-repeat bg-blend-luminosity"
-      style={`background-image: url(${PRODUCT.image});`}
+      style={`background-image: url(${PRODUCT.resources[0].url});`}
     >
     </div>
-    <h2
-      transition:name={`title-${PRODUCT.id}`}
-      class="text-xl font-semibold text-balance mb-2 dark:text-[var(--color-primary)] text-[var(--color-text)]"
-    >
-      {PRODUCT.name}
-    </h2>
 
-    <div class="flex flex-wrap gap-2">
-      <Galery resources={PRODUCT.resources}/>
-      <div class="flex flex-wrap md:flex-nowrap gap-4">
+    <div class="flex justify-between items-center w-full mb-2">
+      <h2
+        transition:name={`title-${PRODUCT.id}`}
+        class="text-xl w-full lg:max-w-2xl xl:max-w-3xl font-semibold text-balance dark:text-[var(--color-primary)] text-[var(--color-text)] bg-[var(--color-surface)]/70 p-2 rounded-lg"
+      >
+        {PRODUCT.name}
+      </h2>
+
+      <a href="/cataloge" class="hidden w-fit gap-2 items-center font-semibold group lg:flex">
+        <ArrowLeftIcon class="w-4 h-4 text-[var(--color-text)]/80 group-hover:text-[var(--color-text)]" />
+        <span class="text-[var(--color-text)]/80 group-hover:text-[var(--color-text)]">Volver</span>
+      </a>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-4 w-full">
+      <Galery client:load resources={PRODUCT.resources}/>
+      <div class="flex flex-col gap-4 w-full">
         <img
           src={PRODUCT.resources.filter((image) => image.isBanner)[0].url}
           transition:name={`img-${id}`}
           alt="Banner Image"
-          class="rounded-lg hidden md:block md:w-[250px] md:h-[150px] object-cover"
+          class="rounded-lg hidden lg:block object-cover aspect-video w-full"
           loading="lazy"
         />
-        <div class="flex flex-col gap-2">
-          <p class="text-pretty">{PRODUCT.description}</p>
-          <div class="flex flex-wrap gap-2 h-full items-end">
-            {
-              PRODUCT.categories.map((category) => (
-                <Badge
-                  color={category.color}
-                  label={category.name}
-                  type="outline"
-                />
-              ))
-            }
-            {
-              PRODUCT.attributes.map((attribute) => (
-                <Badge
-                  color={attribute.color}
-                  label={attribute.name}
-                  type="outline"
-                />
-              ))
-            }
+        <div class="flex flex-col gap-4 w-full h-full bg-[var(--color-surface)]/70 rounded-lg p-4">
+          <div class="flex flex-col gap-2 h-full md:max-h-52 overflow-auto">
+            <p class="text-pretty">{PRODUCT.description}</p>
+            <div class="flex flex-wrap gap-2 p-[1px]">
+              {
+                PRODUCT.categories.map((category) => (
+                  <Badge
+                    color={category.color}
+                    label={category.name}
+                    type="outline"
+                  />
+                ))
+              }
+              {
+                PRODUCT.attributes.map((attribute) => (
+                  <Badge
+                    color={attribute.color}
+                    label={attribute.name}
+                    type="outline"
+                  />
+                ))
+              }
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <AddToCartButton
+              client:visible
+              className={`
+                flex items-center justify-center gap-2
+                px-4 py-2 ring-1 ring-blue-500/20 dark:ring-white/20
+                rounded-lg bg-[var(--color-primary)]/90
+                hover:bg-[var(--color-primary)]
+                transition-colors duration-300 ease-in-out
+              `}
+              label="Añadir"
+              product={PRODUCT}
+            />
           </div>
         </div>
       </div>

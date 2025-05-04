@@ -1,4 +1,5 @@
 ---
+import { AddToCartButton } from "@/components/AddToCartButton.tsx";
 import Badge from "@/components/Badge.astro";
 import Card from "@/components/Card.astro";
 import CartAddIcon from "@/components/icons/CartAddIcon.astro";
@@ -181,14 +182,17 @@ const PRODUCTS = [
 							<Badge color={attribute.color} label={attribute.name} type="outline" />
 						))}
 					</ul>
-					<button slot="footer" class="
-						flex items-center justify-center gap-2
-						absolute top-0 right-0 p-4 ring-1 ring-black/20 dark:ring-white/20
-						rounded-rt-lg rounded-bl-lg bg-[var(--color-surface)]/95
-					">
-						<p class="text-sm font-bold text-[var(--color-primary)]">Añadir</p>
-						<CartAddIcon class="text-[var(--color-primary)]"/>
-					</button>
+					<AddToCartButton
+						client:visible
+						className={`
+							flex items-center justify-center gap-2
+							absolute top-0 right-0 p-4 ring-1 ring-black/20 dark:ring-white/20
+							rounded-rt-lg rounded-bl-lg bg-[var(--color-primary)]/90 hover:bg-[var(--color-primary)] transition-colors duration-300
+						`}
+						label="Añadir"
+						product={product}
+						slot="footer"
+					/>
 				</Card>
 			</a>
 			))
