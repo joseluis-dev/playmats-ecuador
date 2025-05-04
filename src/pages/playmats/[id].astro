@@ -1,10 +1,10 @@
 ---
 import Badge from "@/components/Badge.astro";
 import { Galery } from "@/components/Galery.tsx";
-import { CartAddIcon } from "@/components/icons/CartAddIcon.tsx";
 import { AddToCartButton } from "@/components/AddToCartButton.tsx";
 import Layout from "@/layouts/Layout.astro";
 import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon.astro";
+import { fade } from "astro:transitions";
 
 const { id } = Astro.params;
 
@@ -112,8 +112,8 @@ const PRODUCT = {
   <section class="w-full max-w-screen-xl mx-auto
       p-8 md:p-12">
       <a href="/cataloge" class="flex w-fit gap-2 items-center mb-2 font-semibold group lg:hidden">
-        <ArrowLeftIcon class="w-4 h-4 text-[var(--color-text)]/80 group-hover:text-[var(--color-text)]" />
-        <span class="text-[var(--color-text)]/80 group-hover:text-[var(--color-text)]">Volver</span>
+        <ArrowLeftIcon class="w-4 h-4 text-[var(--color-text)]/80 group-hover:text-[var(--color-text)] transition-colors duration-300 ease-in-out" />
+        <span class="text-[var(--color-text)]/80 group-hover:text-[var(--color-text)] transition-colors duration-300 ease-in-out">Volver</span>
       </a>
     <div
       class="absolute top-0 left-0 bottom-0
@@ -134,8 +134,8 @@ const PRODUCT = {
       </h2>
 
       <a href="/cataloge" class="hidden w-fit gap-2 items-center font-semibold group lg:flex">
-        <ArrowLeftIcon class="w-4 h-4 text-[var(--color-text)]/80 group-hover:text-[var(--color-text)]" />
-        <span class="text-[var(--color-text)]/80 group-hover:text-[var(--color-text)]">Volver</span>
+        <ArrowLeftIcon class="w-4 h-4 text-[var(--color-text)]/80 group-hover:text-[var(--color-text)] transition-colors duration-300 ease-in-out" />
+        <span class="text-[var(--color-text)]/80 group-hover:text-[var(--color-text)] transition-colors duration-300 ease-in-out">Volver</span>
       </a>
     </div>
 

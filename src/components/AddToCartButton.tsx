@@ -20,8 +20,7 @@ export const AddToCartButton = ({ className = '', label = '', icon = null, produ
       addToCart({ id: product.id, price: product.price, quantity: 1, subtotal: product.price })
     }
   }
-
-  console.log(cart)
+  
   return (
     <Button
       className={className}
