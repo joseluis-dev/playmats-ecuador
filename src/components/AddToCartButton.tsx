@@ -17,7 +17,7 @@ export const AddToCartButton = ({ className = '', label = '', icon = null, produ
     e.preventDefault()
     e.stopPropagation()
     if (product) {
-      addToCart({ id: product.id, price: product.price, quantity: 1, subtotal: product.price })
+      addToCart({ ...product, quantity: 1, subtotal: product.price })
     }
   }
   

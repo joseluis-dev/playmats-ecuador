@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 // Tipo para un producto en el carrito
-interface CartItem {
+export interface CartItemType {
   id: string;
   price: number;
   quantity: number;
@@ -11,13 +11,13 @@ interface CartItem {
 
 // Tipo para el estado del store
 interface CartState {
-  cart: CartItem[];
+  cart: CartItemType[];
   total: string;
   totalItems: number;
-  addToCart: (item: Omit<CartItem, 'quantity' | 'subtotal'>) => void;
-  removeFromCart: (item: CartItem) => void;
+  addToCart: (item: Omit<CartItemType, 'quantity' | 'subtotal'>) => void;
+  removeFromCart: (item: CartItemType) => void;
   clearCart: () => void;
-  updateCart: (item: CartItem, quantity: number) => void;
+  updateCart: (item: CartItemType, quantity: number) => void;
 }
 
 export const useCartStore = create<CartState>((set) => ({
@@ -26,10 +26,10 @@ export const useCartStore = create<CartState>((set) => ({
   totalItems: 0,
 
   addToCart: (item) => set((state: any) => {
-    const existing = state.cart.find((b: CartItem) => b.id === item.id);
+    const existing = state.cart.find((b: CartItemType) => b.id === item.id);
     if (existing) {
       return {
-        cart: state.cart.map((b: CartItem) =>
+        cart: state.cart.map((b: CartItemType) =>
           b.id === item.id
             ? {
                 ...b,

@@ -1,7 +1,8 @@
 ---
+import CartView from "@/components/CartView";
 import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout title="Playmats EC - Carrito de compra">
-	catalogo
+	<CartView client:visible transition:persist/>
 </Layout>
