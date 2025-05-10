@@ -124,7 +124,7 @@ const PRODUCT = {
 <Layout title=`Playmats EC - ${PRODUCT.name}`>
   <section class="w-full max-w-screen-xl mx-auto
       p-8">
-      <a href="/cataloge" class="flex w-fit gap-2 items-center mb-2 font-semibold group lg:hidden">
+      <a id="back-link" href="#" class="flex w-fit gap-2 items-center mb-2 font-semibold group lg:hidden">
         <ArrowLeftIcon class="w-4 h-4 text-[var(--color-text)]/80 group-hover:text-[var(--color-text)] transition-colors duration-300 ease-in-out" />
         <span class="text-[var(--color-text)]/80 group-hover:text-[var(--color-text)] transition-colors duration-300 ease-in-out">Volver</span>
       </a>
@@ -146,7 +146,7 @@ const PRODUCT = {
         {PRODUCT.name}
       </h2>
 
-      <a href="/cataloge" class="hidden w-fit gap-2 items-center font-semibold group lg:flex">
+      <a id="back-link-desktop" href="#" class="hidden w-fit gap-2 items-center font-semibold group lg:flex">
         <ArrowLeftIcon class="w-4 h-4 text-[var(--color-text)]/80 group-hover:text-[var(--color-text)] transition-colors duration-300 ease-in-out" />
         <span class="text-[var(--color-text)]/80 group-hover:text-[var(--color-text)] transition-colors duration-300 ease-in-out">Volver</span>
       </a>
@@ -205,3 +205,36 @@ const PRODUCT = {
     </div>
   </section>
 </Layout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const backLink = document.querySelector('#back-link');
+    const backLinkDesktop = document.querySelector('#back-link-desktop');
+    backLink?.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      // Si el referrer es del mismo dominio, vuelve atrás
+      const isInternal = document.referrer && document.referrer.startsWith(window.location.origin);
+
+      if (isInternal) {
+        window.history.back();
+      } else {
+        // Si no hay referrer (acceso directo), ir a catálogo
+        window.location.href = '/cataloge';
+      }
+    });
+    backLinkDesktop?.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      // Si el referrer es del mismo dominio, vuelve atrás
+      const isInternal = document.referrer && document.referrer.startsWith(window.location.origin);
+
+      if (isInternal) {
+        window.history.back();
+      } else {
+        // Si no hay referrer (acceso directo), ir a catálogo
+        window.location.href = '/cataloge';
+      }
+    });
+  });
+</script>
