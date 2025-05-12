@@ -1,9 +1,16 @@
 ---
+import { ImageUploader } from "@/components/ImageUploader";
 import Layout from "@/layouts/Layout.astro";
 
 ---
 <Layout title="Playmats EC - Pago">
   <section class="w-full max-w-[1400px] mx-auto p-16 md:p-20">
-    
+    <article class="w-full max-w-lg mx-auto flex flex-col items-center">
+      <h1 class="text-2xl mb-4">Confirmar Pedido</h1>
+      <p class="m-block-1lh">
+        Para que podamos crear tu tapete, necesitamos que subas la imagen del <strong>comprobante de pago.</strong>
+      </p>
+      <ImageUploader client:visible/>
+    </article>
   </section>
 </Layout>
