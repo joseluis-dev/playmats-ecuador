@@ -1,7 +1,6 @@
 import EmptyCart from './EmptyCart';
 import CartItem from './CartItem';
 import { useCart } from '@/hooks/useCart';
-import { Button } from './Button';
 import type { CartItemType } from '@/stores/cartStore';
 
 export default function CartView() {
@@ -14,8 +13,6 @@ export default function CartView() {
   const updateItem = (item: CartItemType, quantity: number) => {
     updateCart(item, quantity);
   };
-
-  console.log(cart);
 
   return (
     <div className='w-full max-w-screen-xl mx-auto p-8 md:p-12'>
@@ -32,14 +29,16 @@ export default function CartView() {
           <div className="text-right w-full md:w-[30%] max-w-[500px] md:max-w-fit mx-auto">
             <div className='md:sticky md:top-[80px] flex flex-col gap-4 w-full'>
               <p className="text-xl font-semibold">Total: ${total}</p>
-              <Button
+              <a
+                href="/payment"
                 className={`flex items-center justify-center gap-2
                   px-4 py-2
                   rounded-lg bg-[var(--color-primary)]/90
                   hover:bg-[var(--color-primary)]
                   transition-colors duration-300 ease-in-out`}
-                label='Proceder al pago'
-              />
+              >
+                <span className='text-[var(--color-text)]'>Proceder al pago</span>
+              </a>
             </div>
           </div>
         </div>
