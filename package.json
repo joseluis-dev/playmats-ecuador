@@ -20,9 +20,12 @@
     "@types/react-dom": "19.1.2",
     "astro": "5.7.10",
     "chroma-js": "3.1.2",
+    "class-variance-authority": "0.7.1",
+    "lucide-react": "0.509.0",
     "playmats-ecuador": "file:",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "tailwind-merge": "3.3.0",
     "tailwindcss": "4.1.4",
     "zustand": "5.0.3"
   },
@@ -30,6 +33,7 @@
     "@tailwindcss/typography": "0.5.16",
     "@types/chroma-js": "3.1.1",
     "clsx": "2.1.1",
+    "tw-animate-css": "1.2.9",
     "typescript": "5.8.3",
     "vitest": "3.1.3"
   },

@@ -4,6 +4,7 @@ import { Galery } from "@/components/Galery.tsx";
 import { AddToCartButton } from "@/components/AddToCartButton.tsx";
 import Layout from "@/layouts/Layout.astro";
 import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon.astro";
+import { Image } from "astro:assets";
 
 const { id } = Astro.params;
 
@@ -155,9 +156,11 @@ const PRODUCT = {
     <div class="flex flex-col lg:flex-row gap-4 w-full">
       <Galery client:load resources={PRODUCT.resources}/>
       <div class="flex flex-col gap-4 w-full">
-        <img
+        <Image
           src={PRODUCT.resources.filter((image) => image.isBanner)[0].url}
           transition:name={`img-${id}`}
+          width={100}
+          height={100}
           alt="Banner Image"
           class="rounded-lg hidden lg:block object-cover aspect-video w-full"
           loading="lazy"

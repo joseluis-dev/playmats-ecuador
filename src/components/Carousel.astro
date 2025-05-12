@@ -1,6 +1,7 @@
 ---
 import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon.astro";
 import ArrowRightIcon from "@/components/icons/ArrowRightIcon.astro";
+import { Image } from "astro:assets";
 
 interface CarouselItem {
   id: string;
@@ -42,7 +43,7 @@ const hasChildren = Astro.slots.default;
             class="shrink-0 snap-start w-[250px] rounded-lg cursor-pointer group overflow-hidden"
           >
             <div class="relative w-full h-[478px] rounded-lg">
-              {image && <img src={image} alt={title} class="w-full h-full object-cover group-hover:scale-105 transition-scale duration-1000 ease-in-out" />}
+              {image && <Image src={image} alt={title} width={100} height={100} class="w-full h-full object-cover group-hover:scale-105 transition-scale duration-1000 ease-in-out" />}
               <div class="absolute bottom-0 left-0 right-0 bg-[var(--color-surface)]/70 p-4 ">
                 <h3 class="text-sm md:text-lg font-semibold">{title}</h3>
               </div>

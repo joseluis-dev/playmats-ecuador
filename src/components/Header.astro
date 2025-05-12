@@ -5,11 +5,12 @@ import SunIcon from "@/components/icons/SunIcon.astro"
 
 import Menu from "@/components/Menu.astro"
 import NavLink from "@/components/NavLink.astro"
+import { Image } from "astro:assets"
 ---
 <div class="relative flex items-center justify-between py-4 px-8 ">
   <a href="/" class="z-100">
     <h1 class="flex items-center gap-2">
-      <img src="/images/Playmats-EC-Logo.png" alt="logo playmats ecuador" class="size-10" />
+      <Image src="/images/Playmats-EC-Logo.png" width={40} height={40} alt="logo playmats ecuador" />
       <span class="text-xs sm:text-sm md:text-lg">PlayMats EC</span>
     </h1>
   </a>
