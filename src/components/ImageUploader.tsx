@@ -3,6 +3,7 @@ import { useForm, type ControllerRenderProps } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Image } from "@unpic/react"
 import {
   Form,
   FormControl,
@@ -93,7 +94,7 @@ export const ImageUploader = () => {
                   onDragOver={handleDragOver}
                 >
                   {url ? (
-                    <img
+                    <Image
                       src={url}
                       alt="Preview"
                       width={100}

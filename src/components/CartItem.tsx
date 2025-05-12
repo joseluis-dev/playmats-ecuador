@@ -33,7 +33,8 @@ export default function CartItem({ item, onRemove, onUpdate }: CartItemProps) {
       ">
         <img
           src={item.resources.find((img: any) => img.isBanner).url}
-          alt={item.name} className="w-full h-fit aspect-video object-cover rounded-md"
+          alt={item.name}
+          className="w-full h-fit aspect-video object-cover rounded-md"
           style={{ viewTransitionName: `img-${item.id}` }}
         />
         <div className="absolute bottom-0 left-0 w-full select-none flex flex-col gap-1 text-lg z-20 justify-end text-[var(--color-text)]">

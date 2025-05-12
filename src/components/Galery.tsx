@@ -2,6 +2,7 @@ import { useState } from "react";
 import clsx from "clsx";
 import './Galery.css';
 import PlayIcon from "./icons/PlayIcon.tsx";
+import { Image } from "@unpic/react"
 
 
 interface Resource {
@@ -62,12 +63,14 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
                 pointerEvents: resource.id === selected.id ? 'auto' : 'none'
               }}>
               {resource.type === 'image' ? (
-                <img
+                <Image
                   key={resource.id}
                   data-role="image"
                   id={resource.id}
                   src={resource.watermark}
                   alt={resource.name}
+                  width={1920}
+                  height={1080}
                   className="object-cover aspect-video w-full"
                 />
               ) : (
@@ -91,7 +94,7 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
               className="relative flex-none aspect-video w-32 bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
               onClick={() => handleSelect(resource)}
             >
-              <img src={resource.thumbnail} alt={resource.name} />
+              <Image src={resource.thumbnail} alt={resource.name} width={128} height={72} />
               {resource.type === 'video' && (
                 <span className="absolute  top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-surface)] rounded-full p-2 shadow-md">
                   <PlayIcon className="fill-[var(--color-text)]"/>
