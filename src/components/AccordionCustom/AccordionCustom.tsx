@@ -7,16 +7,22 @@ interface AccordionCustomProps {
   trigger?: React.ReactNode | ((item: any) => React.ReactNode)
   children?: React.ReactNode | ((item: any) => React.ReactNode)
   value?: string
+  classNames?: {
+    trigger?: string
+    content?: string
+  }
 }
 
-export const AccordionCustom = ({ item = {}, trigger = null, children = null, value = '' }: AccordionCustomProps) => {
+export const AccordionCustom = ({ item = {}, trigger = null, children = null, value = '', classNames = { trigger: '', content: '' } }: AccordionCustomProps) => {
   return (
-    <Accordion type="single" collapsible>
-        <AccordionItem key={item.id} value={`${value}`}>
-          <AccordionTrigger className="flex items-center hover:no-underline hover:bg-[var(--color-surface)] px-4 border border-[var(--color-text)]">{typeof trigger === "function" ? trigger(item) : trigger}</AccordionTrigger>
+    <Accordion type="single" collapsible className="w-full">
+        <AccordionItem key={item?.id || '1'} value={`${value}`}>
+          <AccordionTrigger className={`flex items-center hover:no-underline ${classNames.trigger}`}>{typeof trigger === "function" ? trigger(item) : trigger}</AccordionTrigger>
           <AccordionContent
-            className="px-4 py-2"
-          >{typeof children === 'function' ? children(item) : children}</AccordionContent>
+            className={`px-4 py-2 ${classNames.content}`}
+          >
+            {typeof children === 'function' ? children(item) : children}
+          </AccordionContent>
         </AccordionItem>
     </Accordion>
   )
