@@ -1,16 +1,56 @@
 ---
-import { ImageUploader } from "@/components/ImageUploader";
+import { PaymentForm } from "@/components/PaymentForm";
+import { AccordionWrapper } from "@/components/AccordionCustom/AccordionWrapper";
 import Layout from "@/layouts/Layout.astro";
+
+const SHIPPING_ADDRESSES = [
+  {
+    id: "1",
+    fullname: "Juan Pérez",
+    phone: "+54 9 11 1234-5678",
+    country: {
+      id: "ARG",
+      name: "Argentina",
+    },
+    state: {
+      id: "BUE",
+      name: "Buenos Aires",
+    },
+    city: "Buenos Aires",
+    postal_code: "1234",
+    address_one: "Av. Corrientes 1234",
+    address_two: "Piso 5, Dpto. A",
+  },
+  {
+    id: "2",
+    fullname: "María López",
+    phone: "+54 9 11 9876-5432",
+    country: {
+      id: "ARG",
+      name: "Argentina",
+    },
+    state: {
+      id: "BUE",
+      name: "Buenos Aires",
+    },
+    city: "La Plata",
+    postal_code: "5678",
+    address_one: "Calle 12 3456",
+    address_two: "Piso 2, Dpto. B",
+  }
+]
 
 ---
 <Layout title="Playmats EC - Pago">
   <section class="w-full max-w-[1400px] mx-auto p-16 md:p-20">
-    <article class="w-full max-w-lg mx-auto flex flex-col items-center">
+    <article class="w-full max-w-lg mx-auto flex flex-col gap-2 items-center">
       <h1 class="text-2xl mb-4">Confirmar Pedido</h1>
-      <p class="m-block-1lh">
+      <h2>Dirección de envío:</h2>
+      <AccordionWrapper client:visible items={SHIPPING_ADDRESSES}/>
+      <p class="m-block-1lh mt-5">
         Para que podamos crear tu tapete, necesitamos que subas la imagen del <strong>comprobante de pago.</strong>
       </p>
-      <ImageUploader client:visible/>
+      <PaymentForm client:visible/>
     </article>
   </section>
 </Layout>

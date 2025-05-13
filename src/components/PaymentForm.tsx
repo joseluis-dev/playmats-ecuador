@@ -11,8 +11,8 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form"
-import { Upload } from "lucide-react"
-import { useState } from "react"
+import { Upload, X } from "lucide-react"
+import { useRef, useState } from "react"
 
 const formSchema = z.object({
   comprobante: z
@@ -24,8 +24,9 @@ const formSchema = z.object({
     })
 })
 
-export const ImageUploader = () => {
+export const PaymentForm = () => {
   const [url, setUrl] = useState<string | null>(null)
+  const inputFileRef = useRef<HTMLInputElement>(null)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,6 +36,7 @@ export const ImageUploader = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, field: ControllerRenderProps<{ comprobante: File }, "comprobante">) => {
     const file = e.target.files?.[0]
+    console.log(file)
     field.onChange(file)
     if (file) {
       // Validar con Zod antes de crear la URL
@@ -50,10 +52,10 @@ export const ImageUploader = () => {
     }
   }
 
-  const handleDrop = (e: React.DragEvent<HTMLLabelElement>, field: ControllerRenderProps<{ comprobante: File }, "comprobante">) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, field: ControllerRenderProps<{ comprobante: File }, "comprobante">) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     const file = e.dataTransfer.files[0]
     field.onChange(file)
     if (file) {
@@ -70,9 +72,27 @@ export const ImageUploader = () => {
     }
   }
 
-  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
+
+    if (inputFileRef.current) {
+      inputFileRef.current.click()
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
+  }
+
+  const handleRemoveImage = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>,field: ControllerRenderProps<{ comprobante: File }, "comprobante">) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setUrl(null)
+    field.onChange(undefined)
+    if (inputFileRef.current) {
+      inputFileRef.current.value = ""
+    }
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -88,27 +108,39 @@ export const ImageUploader = () => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <label
-                  className="border-1 border-dashed border-[var(--color-text)] rounded-md p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500/80 dark:hover:border-blue-400 transition-all duration-200 ease-in-out h-52"
+                <div
+                  className="border-1 border-dashed border-[var(--color-text)] rounded-md p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500/80 dark:hover:border-blue-400 transition-all duration-200 ease-in-out h-96"
+                  onClick={(e) => handleClick(e)}
                   onDrop={(e) => handleDrop(e, field)}
                   onDragOver={handleDragOver}
                 >
                   {url ? (
-                    <Image
-                      src={url}
-                      alt="Preview"
-                      width={100}
-                      height={100}
-                      className="w-full h-full object-cover rounded-md"
-                    />
+                    <picture className="relative w-full h-full">
+                      <button
+                        type="button"
+                        className="absolute top-2 right-2 bg-[var(--color-primary)]/80 p-2 rounded-full hover:bg-[var(--color-primary)]/100 transition-all duration-200 ease-in-out cursor-pointer"
+                        onClick={(e) => {
+                          handleRemoveImage(e, field)
+                        }}
+                      >
+                        <X width={16} height={16}/>
+                      </button>
+                      <Image
+                        src={url}
+                        alt="Preview"
+                        width={100}
+                        height={300}
+                        className="w-full h-full object-contain rounded-md"
+                      />
+                    </picture>
                   ) : (
                     <>
-                      <span className="bg-[var(--color-surface)] p-2 rounded-full mb-2">
+                      <span className="bg-[var(--color-surface)] p-2 rounded-full mb-4">
                         <Upload />
                       </span>
-                      <p className="text-sm mb-1">Arrastra y suelta tu comprobante aquí</p>
-                      <p className="text-xs text-[var(--color-text)]/70 mb-1">o haz clic para seleccionar un archivo</p>
-                      <p className="text-xs text-[var(--color-text)]/70 mb-1">Formatos soportados: JPG, PNG, PDF (máx. 5MB)</p>
+                      <p className="mb-1">Arrastra y suelta tu comprobante aquí</p>
+                      <p className="text-sm text-[var(--color-text)]/70 mb-1">o haz clic para seleccionar un archivo</p>
+                      <p className="text-sm text-[var(--color-text)]/70 mb-1">Formatos soportados: JPG, PNG, PDF (máx. 5MB)</p>
                     </>
                   )}
                   <Input
@@ -117,9 +149,9 @@ export const ImageUploader = () => {
                     onChange={(e) => handleChange(e, field)}
                     onBlur={field.onBlur}
                     name={field.name}
-                    ref={field.ref}
+                    ref={inputFileRef}
                   />
-                </label>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
