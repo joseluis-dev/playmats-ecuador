@@ -31,7 +31,7 @@ export const ShippingAddressForm = () => {
   const form = useForm<z.infer<typeof shippingAddressSchema>>({
     resolver: zodResolver(shippingAddressSchema),
     defaultValues: {
-      user_id: "b608ddca-ab7b-4f18-bcc4-31174f7fb5d6",
+      user_id: "",
       fullname: "",
       phone: "",
       country_id: '0',

@@ -28,6 +28,7 @@
     "astro": "5.7.10",
     "chroma-js": "3.1.2",
     "class-variance-authority": "0.7.1",
+    "fabric": "^6.7.0",
     "lucide-react": "0.509.0",
     "playmats-ecuador": "file:",
     "react": "19.1.0",
