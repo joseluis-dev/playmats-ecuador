@@ -30,7 +30,7 @@ export const SelectCustom = ({ classNames = { trigger: '', content: '', group: '
       <SelectContent className="">
         <SelectGroup className="">
           {items.map((item) => (
-            <SelectItem key={item.value} value={item.value} className="">
+            <SelectItem key={item.label} value={item.value} className="">
               {item.label}
             </SelectItem>
           ))}

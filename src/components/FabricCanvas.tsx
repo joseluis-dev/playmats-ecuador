@@ -9,7 +9,7 @@ export interface FabricCanvasProps {
 export const FabricCanvas = ({ width, height }: FabricCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fabricCanvasRef = useRef<Canvas | null>(null);
-  const [imgUrl, setImgUrl] = useState<string>('https://res.cloudinary.com/dcxt2wrcm/image/upload/w_1668,h_938,f_auto,c_lfill/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp');
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -23,6 +23,8 @@ export const FabricCanvas = ({ width, height }: FabricCanvasProps) => {
       height,
     });
     fabricCanvasRef.current = canvas;
+
+    if (!imgUrl) return;
 
     FabricImage.fromURL(imgUrl).then((img) => {
       if (img && fabricCanvasRef.current) {
@@ -53,6 +55,10 @@ export const FabricCanvas = ({ width, height }: FabricCanvasProps) => {
 
   const handleAddImage = () => {
     if (!fabricCanvasRef.current) return;
+    if (!imgUrl) {
+      console.error('No image URL provided');
+      return;
+    }
     FabricImage.fromURL(imgUrl).then((img) => {
       if (img && fabricCanvasRef.current) {
         // Escalar imagen si excede el canvas

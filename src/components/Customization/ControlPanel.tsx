@@ -12,9 +12,10 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AccordionDynamic } from "../AccordionCustom/AccordionDynamic";
 
 const designSchema = z.object({
-  type: z.string().uuid(),
+  type: z.string(),
   size: z.string().optional(),
   img: z.custom<File>((file) => file instanceof File && file.size > 0, {
     message: "Debes subir una imagen",
@@ -24,6 +25,11 @@ const designSchema = z.object({
   seals: z.array(z.string()).optional(),
   borders: z.array(z.string()).optional()
 });
+
+const typesOptions = [
+  { value: "playmat", label: "Playmat" },
+  { value: "mousepad", label: "Mousepad" }
+];
 
 export const ControlPanel = () => {
   const form = useForm<z.infer<typeof designSchema>>({
@@ -37,52 +43,145 @@ export const ControlPanel = () => {
     },
   })
 
-  const handleChange = {
-    type: (value: string) => form.setValue('type', value),
-    size: (value: string) => form.setValue('size', value),
-    img: (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        form.setValue('img', file);
-      }
-    },
-    seals: (value: string[]) => form.setValue('seals', value),
-    borders: (value: string[]) => form.setValue('borders', value),
-  }
-
   function onSubmit(values: z.infer<typeof designSchema>) {
     console.log(values)
   }
 
+  const accordionItems = [
+    {
+      trigger: "Tipo de diseño",
+      children: () => (
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem className="flex flex-col w-full gap-3">
+              <Label>Tipo:</Label>
+              <FormControl>
+                <SelectCustom
+                  placeholder="Selecciona el tipo"
+                  items={typesOptions}
+                  // value={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )
+    },
+    {
+      trigger: "Tamaño",
+      children: () => (
+        <FormField
+          control={form.control}
+          name="size"
+          render={({ field }) => (
+            <FormItem className="flex flex-col w-full gap-3">
+              <Label>Tamaño:</Label>
+              <FormControl>
+                <SelectCustom
+                  placeholder="Selecciona el tamaño"
+                  items={[
+                    { value: "small", label: "Pequeño" },
+                    { value: "medium", label: "Mediano" },
+                    { value: "large", label: "Grande" }
+                  ]}
+                  // value={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )
+    },
+    {
+      trigger: "Subir imagen",
+      children: () => (
+        <FormField
+          control={form.control}
+          name="img"
+          render={({ field }) => (
+            <FormItem className="flex flex-col w-full gap-3">
+              <Label>Imagen:</Label>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      field.onChange(e.target.files[0]);
+                    }
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )
+    },
+    {
+      trigger: "Sellos",
+      children: () => (
+        <FormField
+          control={form.control}
+          name="seals"
+          render={({ field }) => (
+            <FormItem className="flex flex-col w-full gap-3">
+              <Label>Sellos:</Label>
+              <FormControl>
+                <SelectCustom
+                  placeholder="Selecciona los sellos"
+                  items={[
+                    { value: "seal1", label: "Sello 1" },
+                    { value: "seal2", label: "Sello 2" }
+                  ]}
+                  // value={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )
+    },
+    {
+      trigger: "Bordes",
+      children: () => (
+        <FormField
+          control={form.control}
+          name="borders"
+          render={({ field }) => (
+            <FormItem className="flex flex-col w-full gap-3">
+              <Label>Bordes:</Label>
+              <FormControl>
+                <SelectCustom
+                  placeholder="Selecciona los bordes"
+                  items={[
+                    { value: "border1", label: "Borde 1" },
+                    { value: "border2", label: "Borde 2" }
+                  ]}
+                  // value={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )
+    }
+  ];
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3">
-        <div className="flex justify-end text-2xl p-4 w-full">
-          <p className="text-[var(--color-primary)]">Total: $25</p>
-        </div>
-        <div className="flex w-full gap-3">
-          <div className="flex flex-col w-full gap-3">
-            <Label htmlFor="imgUrl">Tipo:</Label>
-            <SelectCustom placeholder="Selecciona el tipo" items={[{ value: 'playmat', label: 'Playmat' }, { value: 'mousepad', label: 'Mousepad' }
-            ]} onChange={handleChange.type} />
-          </div>
-          <div className="flex flex-col w-full gap-3">
-            <Label htmlFor="imgUrl">Tamaño:</Label>
-            <SelectCustom placeholder="Selecciona el tamaño" items={[]} onChange={handleChange.size} />
-          </div>
-        </div>
-        <div className="flex flex-col w-full max-w-sm gap-3">
-          <Label htmlFor="imgUrl">Sube tu imagen:</Label>
-          <Input type="file" id="imgUrl" />
-        </div>
-        <div className="flex flex-col w-full gap-3">
-          <Label htmlFor="imgUrl">Sellos:</Label>
-          <SelectCustom placeholder="Selecciona el sellos" items={[]} />
-        </div>
-        <div className="flex flex-col w-full max-w-sm gap-3">
-          <Label htmlFor="imgUrl">Bordes:</Label>
-          <SelectCustom placeholder="Selecciona el bordes" items={[]} />
-        </div>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3 w-full">
+        <AccordionDynamic items={accordionItems} />
         <Button type="submit">
           Comprar
         </Button>
