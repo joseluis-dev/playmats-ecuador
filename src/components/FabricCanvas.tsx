@@ -80,8 +80,6 @@ export const FabricCanvas = ({ width, height }: FabricCanvasProps) => {
   }
 
   return (
-    <div>
-      <canvas ref={canvasRef} className='border border-[var(--color-text)] rounded-xl'/>
-    </div>
+    <canvas ref={canvasRef} className='border border-[var(--color-text)] rounded-xl'/>
   )
 }

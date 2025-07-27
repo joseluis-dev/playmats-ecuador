@@ -17,7 +17,7 @@ import { ControlPanel } from "@/components/Customization/ControlPanel";
 			<p class="text-[var(--color-primary)]">Total: $25</p>
 		</div>
 		<div class="flex flex-col md:flex-row gap-4">
-			<div class="w-full max-w-[800px] h-full flex justify-center items-center">
+			<div class="w-full max-w-[800px] flex sticky top-24 self-start">
 				<FabricCanvas client:only width={610} height={355} />
 			</div>
 			<ControlPanel client:only/>

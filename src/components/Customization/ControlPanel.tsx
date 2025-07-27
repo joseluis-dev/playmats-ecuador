@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccordionDynamic } from "../AccordionCustom/AccordionDynamic";
+import { CarouselSize } from "../Carousel";
+import { Image } from "@unpic/react";
 
 const designSchema = z.object({
   type: z.string(),
@@ -27,8 +29,183 @@ const designSchema = z.object({
 });
 
 const typesOptions = [
-  { value: "playmat", label: "Playmat" },
-  { value: "mousepad", label: "Mousepad" }
+  {
+    name: "Playmat",
+    url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+    thumbnail:
+      "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
+    watermark: "",
+    hosting: "cloudinary",
+    type: "image",
+    isBanner: false,
+    categories: [
+      {
+        name: "Tipo de diseño",
+        description: "",
+        color: "bg-purple-500",
+      }
+    ],
+  },
+  {
+    name: "Mousepad",
+    url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Mouspad-Gamer_yau6cl.webp",
+    thumbnail:
+      "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Mouspad-Gamer_yau6cl.webp",
+    watermark: "",
+    hosting: "cloudinary",
+    type: "image",
+    isBanner: false,
+    categories: [
+      {
+        name: "Tipo de diseño",
+        description: "",
+        color: "bg-purple-500",
+      }
+    ],
+  },
+];
+
+const sizesOptions = [
+  {
+    name: "Mediano",
+    url: "",
+    thumbnail:
+      "",
+    watermark: "",
+    hosting: "cloudinary",
+    type: "image",
+    isBanner: false,
+    attribute: [
+      {
+        name: "ancho",
+        value: "61 cm",
+        color: "bg-blue-500",
+      },
+      {
+        name: "alto",
+        value: "22.5 cm",
+        color: "bg-blue-500",
+      }
+    ]
+  },
+  {
+    name: "Grande",
+    url: "",
+    thumbnail:
+      "",
+    watermark: "",
+    hosting: "cloudinary",
+    type: "image",
+    isBanner: false,
+    attribute: [
+      {
+        name: "ancho",
+        value: "61 cm",
+        color: "bg-blue-500",
+      },
+      {
+        name: "alto",
+        value: "35.5 cm",
+        color: "bg-blue-500",
+      }
+    ]
+  },
+  {
+    name: "Doble",
+    url: "",
+    thumbnail:
+      "",
+    watermark: "",
+    hosting: "cloudinary",
+    type: "image",
+    isBanner: false,
+    attribute: [
+      {
+        name: "ancho",
+        value: "61 cm",
+        color: "bg-blue-500",
+      },
+      {
+        name: "alto",
+        value: "71 cm",
+        color: "bg-blue-500",
+      }
+    ]
+  },
+];
+
+const sealsOptions = [
+  {
+    name: "Sello 1",
+    url: "",
+    thumbnail:
+      "",
+    watermark: "",
+    hosting: "cloudinary",
+    type: "image",
+    isBanner: false,
+    categories: [
+      {
+        name: "Sellos",
+        description: "",
+        color: "bg-green-500",
+      }
+    ],
+  },
+  {
+    name: "Sello 2",
+    url: "",
+    thumbnail:
+      "",
+    watermark: "",
+    hosting: "cloudinary",
+    type: "image",
+    isBanner: false,
+    categories: [
+      {
+        name: "Sellos",
+        description: "",
+        color: "bg-green-500",
+      }
+    ],
+  },
+]
+
+const bordersOptions = [
+  {
+    name: "Borde 1",
+    url: "",
+    thumbnail:
+      "",
+    watermark: "",
+    hosting: "cloudinary",
+    type: "image",
+    isBanner: false,
+    categories: [
+      {
+        name: "Bordes",
+        description: "",
+        color: "bg-red-500",
+      }
+    ],
+  },
+  {
+    name: "Borde 2",
+    url: "",
+    thumbnail:
+      "",
+    watermark: "",
+    hosting: "cloudinary",
+    type: "image",
+    isBanner: false,
+    categories: [
+      {
+        name: "Bordes",
+        description: "",
+        color: "bg-red-500",
+      }
+    ],
+  },
 ];
 
 export const ControlPanel = () => {
@@ -55,15 +232,21 @@ export const ControlPanel = () => {
           control={form.control}
           name="type"
           render={({ field }) => (
-            <FormItem className="flex flex-col w-full gap-3">
-              <Label>Tipo:</Label>
+            <FormItem className="flex flex-col w-full gap-3 items-center">
               <FormControl>
-                <SelectCustom
-                  placeholder="Selecciona el tipo"
-                  items={typesOptions}
-                  // value={field.value}
-                  onChange={field.onChange}
-                />
+                <CarouselSize items={typesOptions}>
+                  {(item, index) => (
+                    <div
+                      className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
+                      onClick={() => field.onChange(item.name)}
+                    >
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
+                        {item.name}
+                      </div>
+                    </div>
+                  )}
+                </CarouselSize>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -78,19 +261,21 @@ export const ControlPanel = () => {
           control={form.control}
           name="size"
           render={({ field }) => (
-            <FormItem className="flex flex-col w-full gap-3">
-              <Label>Tamaño:</Label>
+            <FormItem className="flex flex-col w-full gap-3 items-center">
               <FormControl>
-                <SelectCustom
-                  placeholder="Selecciona el tamaño"
-                  items={[
-                    { value: "small", label: "Pequeño" },
-                    { value: "medium", label: "Mediano" },
-                    { value: "large", label: "Grande" }
-                  ]}
-                  // value={field.value}
-                  onChange={field.onChange}
-                />
+                <CarouselSize items={sizesOptions}>
+                  {(item, index) => (
+                    <div
+                      className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
+                      onClick={() => field.onChange(item.name)}
+                    >
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
+                        {item.name}
+                      </div>
+                    </div>
+                  )}
+                </CarouselSize>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -131,18 +316,28 @@ export const ControlPanel = () => {
           control={form.control}
           name="seals"
           render={({ field }) => (
-            <FormItem className="flex flex-col w-full gap-3">
-              <Label>Sellos:</Label>
+            <FormItem className="flex flex-col w-full gap-3 items-center">
               <FormControl>
-                <SelectCustom
-                  placeholder="Selecciona los sellos"
-                  items={[
-                    { value: "seal1", label: "Sello 1" },
-                    { value: "seal2", label: "Sello 2" }
-                  ]}
-                  // value={field.value}
-                  onChange={field.onChange}
-                />
+                <CarouselSize items={sealsOptions}>
+                  {(item, index) => (
+                    <div
+                      className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
+                      onClick={() => {
+                        const currentSeals = field.value || [];
+                        if (currentSeals.includes(item.name)) {
+                          field.onChange(currentSeals.filter(seal => seal !== item.name));
+                        } else {
+                          field.onChange([...currentSeals, item.name]);
+                        }
+                      }}
+                    >
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
+                        {item.name}
+                      </div>
+                    </div>
+                  )}
+                </CarouselSize>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -157,18 +352,28 @@ export const ControlPanel = () => {
           control={form.control}
           name="borders"
           render={({ field }) => (
-            <FormItem className="flex flex-col w-full gap-3">
-              <Label>Bordes:</Label>
+            <FormItem className="flex flex-col w-full gap-3 items-center">
               <FormControl>
-                <SelectCustom
-                  placeholder="Selecciona los bordes"
-                  items={[
-                    { value: "border1", label: "Borde 1" },
-                    { value: "border2", label: "Borde 2" }
-                  ]}
-                  // value={field.value}
-                  onChange={field.onChange}
-                />
+                <CarouselSize items={bordersOptions}>
+                  {(item, index) => (
+                    <div
+                      className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
+                      onClick={() => {
+                        const currentBorders = field.value || [];
+                        if (currentBorders.includes(item.name)) {
+                          field.onChange(currentBorders.filter(border => border !== item.name));
+                        } else {
+                          field.onChange([...currentBorders, item.name]);
+                        }}
+                      }
+                    >
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
+                        {item.name}
+                      </div>
+                    </div>
+                  )}
+                </CarouselSize>
               </FormControl>
               <FormMessage />
             </FormItem>
