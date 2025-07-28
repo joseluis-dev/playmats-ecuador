@@ -78,12 +78,12 @@ const sizesOptions = [
     attribute: [
       {
         name: "ancho",
-        value: "61 cm",
+        value: 61,
         color: "bg-blue-500",
       },
       {
         name: "alto",
-        value: "22.5 cm",
+        value: 22.5,
         color: "bg-blue-500",
       }
     ]
@@ -100,12 +100,12 @@ const sizesOptions = [
     attribute: [
       {
         name: "ancho",
-        value: "61 cm",
+        value: 61,
         color: "bg-blue-500",
       },
       {
         name: "alto",
-        value: "35.5 cm",
+        value: 35.5,
         color: "bg-blue-500",
       }
     ]
@@ -122,12 +122,12 @@ const sizesOptions = [
     attribute: [
       {
         name: "ancho",
-        value: "61 cm",
+        value: 61,
         color: "bg-blue-500",
       },
       {
         name: "alto",
-        value: "71 cm",
+        value: 71,
         color: "bg-blue-500",
       }
     ]
@@ -209,7 +209,7 @@ const bordersOptions = [
 ];
 
 export const ControlPanel = () => {
-  const { setImgUrl } = useFabricCanvasStore()
+  const { addLayers, setSize } = useFabricCanvasStore()
   const form = useForm<z.infer<typeof designSchema>>({
     resolver: zodResolver(designSchema),
     defaultValues: {
@@ -242,7 +242,7 @@ export const ControlPanel = () => {
                       style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
                       onClick={() => {
                         field.onChange(item.name)
-                        setImgUrl(item.url);
+                        // addLayers('background', item);
                       }}
                     >
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
@@ -272,7 +272,13 @@ export const ControlPanel = () => {
                     <div
                       className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
                       style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
-                      onClick={() => field.onChange(item.name)}
+                      onClick={() => {
+                        field.onChange(item.name)
+                        setSize(
+                          item.attribute?.find((attr: any) => attr.name === 'ancho')?.value * 10 || 610,
+                          item.attribute?.find((attr: any) => attr.name === 'alto')?.value * 10 || 355
+                        )
+                      }}
                     >
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
                         {item.name}
@@ -295,7 +301,6 @@ export const ControlPanel = () => {
           name="img"
           render={({ field }) => (
             <FormItem className="flex flex-col w-full gap-3">
-              <Label>Imagen:</Label>
               <FormControl>
                 <Input
                   type="file"
@@ -303,6 +308,18 @@ export const ControlPanel = () => {
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
                       field.onChange(e.target.files[0]);
+                      const file = e.target.files[0];
+                      if (!file || !file.type.startsWith("image/")) {
+                        console.error("El archivo debe ser una imagen");
+                        return;
+                      }
+                      const objectUrl = URL.createObjectURL(file);
+                      addLayers('background', {
+                        url: objectUrl,
+                        name: file.name,
+                        type: 'image',
+                      });
+                      // URL.revokeObjectURL(objectUrl);
                     }
                   }}
                 />
@@ -334,6 +351,7 @@ export const ControlPanel = () => {
                         } else {
                           field.onChange([...currentSeals, item.name]);
                         }
+                        addLayers('seals', item);
                       }}
                     >
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
@@ -369,8 +387,9 @@ export const ControlPanel = () => {
                           field.onChange(currentBorders.filter(border => border !== item.name));
                         } else {
                           field.onChange([...currentBorders, item.name]);
-                        }}
-                      }
+                        }
+                        addLayers('borders', item);
+                      }}
                     >
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
                         {item.name}

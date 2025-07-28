@@ -177,6 +177,14 @@ function CarouselPrevious({
 }: React.ComponentProps<typeof Button>) {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel()
 
+  const onScrollPrev = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      scrollPrev()
+    },
+    [scrollPrev]
+  )
+
   return (
     <Button
       data-slot="carousel-previous"
@@ -190,7 +198,7 @@ function CarouselPrevious({
         className
       )}
       disabled={!canScrollPrev}
-      onClick={scrollPrev}
+      onClick={onScrollPrev}
       {...props}
     >
       <ArrowLeft />
@@ -207,6 +215,14 @@ function CarouselNext({
 }: React.ComponentProps<typeof Button>) {
   const { orientation, scrollNext, canScrollNext } = useCarousel()
 
+  const onScrollNext = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      scrollNext()
+    },
+    [scrollNext]
+  )
+
   return (
     <Button
       data-slot="carousel-next"
@@ -220,7 +236,7 @@ function CarouselNext({
         className
       )}
       disabled={!canScrollNext}
-      onClick={scrollNext}
+      onClick={onScrollNext}
       {...props}
     >
       <ArrowRight />
