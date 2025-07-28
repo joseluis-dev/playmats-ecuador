@@ -14,7 +14,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccordionDynamic } from "../AccordionCustom/AccordionDynamic";
 import { CarouselSize } from "../Carousel";
-import { Image } from "@unpic/react";
+import { useFabricCanvasStore } from "@/stores/fabricCanvasStore";
 
 const designSchema = z.object({
   type: z.string(),
@@ -209,6 +209,7 @@ const bordersOptions = [
 ];
 
 export const ControlPanel = () => {
+  const { setImgUrl } = useFabricCanvasStore()
   const form = useForm<z.infer<typeof designSchema>>({
     resolver: zodResolver(designSchema),
     defaultValues: {
@@ -239,7 +240,10 @@ export const ControlPanel = () => {
                     <div
                       className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
                       style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
-                      onClick={() => field.onChange(item.name)}
+                      onClick={() => {
+                        field.onChange(item.name)
+                        setImgUrl(item.url);
+                      }}
                     >
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
                         {item.name}
