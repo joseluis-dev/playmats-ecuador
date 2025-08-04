@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AccordionDynamic } from "../AccordionCustom/AccordionDynamic";
 import { CarouselSize } from "../Carousel";
 import { useFabricCanvasStore } from "@/stores/fabricCanvasStore";
+import { useEffect, useRef } from "react";
 
 const designSchema = z.object({
   type: z.string(),
@@ -137,7 +138,7 @@ const sizesOptions = [
 const sealsOptions = [
   {
     name: "Sello 1",
-    url: "",
+    url: "https://www.biodegradablesecuador.com/producto/madera/sellos-de-caucho/",
     thumbnail:
       "",
     watermark: "",
@@ -154,7 +155,7 @@ const sealsOptions = [
   },
   {
     name: "Sello 2",
-    url: "",
+    url: "https://www.biodegradablesecuador.com/wp-content/uploads/2020/08/sello-de-madera.png",
     thumbnail:
       "",
     watermark: "",
@@ -209,7 +210,8 @@ const bordersOptions = [
 ];
 
 export const ControlPanel = () => {
-  const { addLayers, setSize } = useFabricCanvasStore()
+  const { addLayers, setSize, layers } = useFabricCanvasStore()
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const form = useForm<z.infer<typeof designSchema>>({
     resolver: zodResolver(designSchema),
     defaultValues: {
@@ -220,6 +222,15 @@ export const ControlPanel = () => {
       borders: []
     },
   })
+
+  useEffect(() => {
+    if (!layers.background || layers.background.length === 0) {
+      form.setValue("img", undefined);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset file input
+      }
+    }
+  }, [layers]);
 
   function onSubmit(values: z.infer<typeof designSchema>) {
     console.log(values)
@@ -275,8 +286,8 @@ export const ControlPanel = () => {
                       onClick={() => {
                         field.onChange(item.name)
                         setSize(
-                          item.attribute?.find((attr: any) => attr.name === 'ancho')?.value * 10 || 610,
-                          item.attribute?.find((attr: any) => attr.name === 'alto')?.value * 10 || 355
+                          parseFloat(item.attribute?.find((attr: any) => attr.name === 'ancho')?.value) * 10 || 610,
+                          parseFloat(item.attribute?.find((attr: any) => attr.name === 'alto')?.value) * 10 || 355
                         )
                       }}
                     >
@@ -305,6 +316,7 @@ export const ControlPanel = () => {
                 <Input
                   type="file"
                   accept="image/*"
+                  ref={fileInputRef}
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
                       field.onChange(e.target.files[0]);
