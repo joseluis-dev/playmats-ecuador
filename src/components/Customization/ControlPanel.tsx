@@ -86,6 +86,11 @@ const sizesOptions = [
         name: "alto",
         value: 22.5,
         color: "bg-blue-500",
+      },
+      {
+        name: "price",
+        value: 20,
+        color: "bg-blue-500",
       }
     ]
   },
@@ -107,6 +112,11 @@ const sizesOptions = [
       {
         name: "alto",
         value: 35.5,
+        color: "bg-blue-500",
+      },
+      {
+        name: "price",
+        value: 30,
         color: "bg-blue-500",
       }
     ]
@@ -130,6 +140,11 @@ const sizesOptions = [
         name: "alto",
         value: 71,
         color: "bg-blue-500",
+      },
+      {
+        name: "price",
+        value: 50,
+        color: "bg-blue-500",
       }
     ]
   },
@@ -152,6 +167,13 @@ const sealsOptions = [
         color: "bg-green-500",
       }
     ],
+    attributes: [
+      {
+        name: "price",
+        value: 1,
+        color: "bg-green-500",
+      }
+    ]
   },
   {
     name: "Sello 2",
@@ -169,6 +191,13 @@ const sealsOptions = [
         color: "bg-green-500",
       }
     ],
+    attributes: [
+      {
+        name: "price",
+        value: 2,
+        color: "bg-green-500",
+      }
+    ]
   },
 ]
 
@@ -210,7 +239,7 @@ const bordersOptions = [
 ];
 
 export const ControlPanel = () => {
-  const { addLayers, setSize, layers } = useFabricCanvasStore()
+  const { addLayers, setSize, layers, modifyItems } = useFabricCanvasStore()
   const fileInputRef = useRef<HTMLInputElement>(null);
   const form = useForm<z.infer<typeof designSchema>>({
     resolver: zodResolver(designSchema),
@@ -289,6 +318,7 @@ export const ControlPanel = () => {
                           parseFloat(item.attribute?.find((attr: any) => attr.name === 'ancho')?.value) * 10 || 610,
                           parseFloat(item.attribute?.find((attr: any) => attr.name === 'alto')?.value) * 10 || 355
                         )
+                        modifyItems('size', item.attribute?.find((attr: any) => attr.name === 'price')?.value || 0);
                       }}
                     >
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">

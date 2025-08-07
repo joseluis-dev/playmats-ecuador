@@ -1,6 +1,9 @@
 import { create } from "zustand";
 
 interface FabricCanvasState {
+  total: number;
+  items: Record<string, any>;
+  modifyItems: (name: string, item: number | any[]) => void;
   imgSrc: Record<string, any> | null;
   layers: Record<string, any[]>;
   size: {
@@ -14,6 +17,8 @@ interface FabricCanvasState {
 }
 
 export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
+  total: 20,
+  items: {},
   imgSrc: {
     url: null,
     layer: null,
@@ -22,7 +27,7 @@ export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
   layers: {},
   size: {
     width: 610,
-    height: 355,
+    height: 225,
   },
   setSize: (width: number, height: number) => set((state) => ({
     ...state,
@@ -34,6 +39,7 @@ export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
     return ({
       ...state,
       imgSrc: {
+        ...object,
         url: object.url,
         layer: name,
         action: 'add',
@@ -61,4 +67,26 @@ export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
       },
     };
   }),
+  modifyItems: (name: string, item: number | any[]) => set((state) => {
+    const currentItems = { ...state.items };
+    let total = 0;
+    currentItems[name] = item;
+    for (let key in currentItems) {
+      if (Array.isArray(currentItems[key])) {
+        currentItems[key].forEach((el, index) => {
+          if (el.price) {
+            total += parseFloat(el.price);
+          }
+        })
+      }
+      if (typeof currentItems[key] === 'number') {
+        total += currentItems[key];
+      }
+    }
+    return {
+      ...state,
+      items: currentItems,
+      total: total,
+    };
+  })
 }));

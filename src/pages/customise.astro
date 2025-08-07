@@ -2,22 +2,25 @@
 import { FabricCanvas } from "@/components/FabricCanvas";
 import Layout from "@/layouts/Layout.astro";
 import { ControlPanel } from "@/components/Customization/ControlPanel";
+import { TotalPrice } from "@/components/Customization/TotalPrice";
 
 ---
 
 <Layout title="Playmats EC - Personaliza tu producto">
-	<h1>Personaliza tu producto</h1>
 	<section 
 		class="
 			flex flex-col gap-4
 			w-full max-w-screen-xl mx-auto
 			p-8 md:p-12
 		">
-		<div class="flex justify-end text-2xl p-4 w-full">
-			<p class="text-[var(--color-primary)]">Total: $25</p>
+		<div class="flex w-full justify-evenly items-center sticky top-16 z-50 bg-[var(--color-background)]">
+			<h1 class="w-full">Personaliza tu producto</h1>
+			<div class="flex justify-end text-2xl p-4 w-full">
+				<TotalPrice client:visible />
+			</div>
 		</div>
 		<div class="flex flex-col md:flex-row gap-4">
-			<div class="w-full max-w-[800px] flex sticky top-24 self-start">
+			<div class="w-full max-w-[800px] flex sticky top-32 self-start">
 				<FabricCanvas client:only />
 			</div>
 			<ControlPanel client:only/>
