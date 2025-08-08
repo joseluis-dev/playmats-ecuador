@@ -218,6 +218,13 @@ const bordersOptions = [
         color: "bg-red-500",
       }
     ],
+    attribute: [
+      {
+        name: "price",
+        value: 0,
+        color: "bg-red-500",
+      }
+    ]
   },
   {
     name: "Borde 2",
@@ -235,6 +242,13 @@ const bordersOptions = [
         color: "bg-red-500",
       }
     ],
+    attribute: [
+      {
+        name: "price",
+        value: 5,
+        color: "bg-red-500",
+      }
+    ]
   },
 ];
 
@@ -431,6 +445,7 @@ export const ControlPanel = () => {
                           field.onChange([...currentBorders, item.name]);
                         }
                         addLayers('borders', item);
+                        modifyItems('borders', item.attribute?.find((attr: any) => attr.name === 'price')?.value || 0);
                       }}
                     >
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">

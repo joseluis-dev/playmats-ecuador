@@ -16,9 +16,9 @@ interface CarouselSizeProps {
 
 const numberOfItems = {
   1: "",
-  2: "md:basis-1/2",
-  3: "md:basis-1/3",
-  4: "md:basis-1/4",
+  2: "sm:basis-1/2",
+  3: "sm:basis-1/3",
+  4: "sm:basis-1/4",
 };
 
 export function CarouselSize({ opts, className, items = [], children }: CarouselSizeProps) {

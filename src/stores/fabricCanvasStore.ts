@@ -18,7 +18,9 @@ interface FabricCanvasState {
 
 export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
   total: 20,
-  items: {},
+  items: {
+    size: 20
+  },
   imgSrc: {
     url: null,
     layer: null,
@@ -69,18 +71,42 @@ export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
   }),
   modifyItems: (name: string, item: number | any[]) => set((state) => {
     const currentItems = { ...state.items };
-    let total = 0;
-    currentItems[name] = item;
-    for (let key in currentItems) {
-      if (Array.isArray(currentItems[key])) {
-        currentItems[key].forEach((el, index) => {
+    let total = state.total;
+    if (currentItems[name] !== undefined) {
+      if (Array.isArray(item)) {
+        for (let i = 0; i < currentItems[name].length; i++) {
+          const el = currentItems[name][i];
+          if (el.price) {
+            total -= parseFloat(el.price);
+          }
+        }
+        currentItems[name] = item;
+        for (let i = 0; i < currentItems[name].length; i++) {
+          const el = currentItems[name][i];
           if (el.price) {
             total += parseFloat(el.price);
           }
-        })
+        }
       }
-      if (typeof currentItems[key] === 'number') {
-        total += currentItems[key];
+
+      if (typeof item === 'number') {
+        total -= currentItems[name];
+        currentItems[name] = [item];
+        total += item;
+      }
+    } else {
+      if (Array.isArray(item)) {
+        currentItems[name] = item;
+        for (let i = 0; i < item.length; i++) {
+          const el = item[i];
+          if (el.price) {
+            total += parseFloat(el.price);
+          }
+        }
+      }
+      if (typeof item === 'number') {
+        currentItems[name] = [item];
+        total += item;
       }
     }
     return {
