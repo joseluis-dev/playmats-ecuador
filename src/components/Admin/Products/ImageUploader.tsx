@@ -1,0 +1,102 @@
+import { useCallback } from 'react'
+import { Button } from '@/components/ui/button'
+import { useDropzone } from 'react-dropzone'
+import { Image as ImageIcon, X } from 'lucide-react'
+import { toast } from 'sonner'
+import type { Resource } from '@/types'
+
+interface ImageUploaderProps {
+  value: string[]
+  onChange: (value: string[]) => void
+  resources: Resource[]
+  onUpload: (file: File) => Promise<string>
+}
+
+export const ImageUploader = ({
+  value,
+  onChange,
+  resources,
+  onUpload
+}: ImageUploaderProps) => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0]
+    if (!file) return
+
+    try {
+      const resourceId = await onUpload(file)
+      onChange([...value, resourceId])
+    } catch (error) {
+      console.error('Error al subir la imagen:', error)
+      toast.error('Error al subir la imagen')
+    }
+  }, [onUpload, onChange, value])
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.png', '.gif', '.jpeg', '.jpg']
+    },
+    maxFiles: 1
+  })
+
+  return (
+    <div className="space-y-4">
+      <div
+        {...getRootProps()}
+        className={`
+          border-2 border-dashed rounded-lg p-6
+          flex flex-col items-center justify-center
+          cursor-pointer
+          transition-colors
+          ${isDragActive
+            ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10'
+            : 'border-[var(--color-text)]/20 hover:border-[var(--color-text)]/40'
+          }
+        `}
+      >
+        <input {...getInputProps()} />
+        <ImageIcon className="w-8 h-8 mb-2 text-[var(--color-text)]/60" />
+        <p className="text-sm text-center text-[var(--color-text)]/60">
+          {isDragActive
+            ? 'Suelta la imagen aquí'
+            : 'Arrastra y suelta una imagen aquí, o haz clic para seleccionar'
+          }
+        </p>
+      </div>
+
+      {value.length > 0 && (
+        <div className="grid grid-cols-2 gap-4">
+          {value.map(id => {
+            const resource = resources.find(r => String(r.id) === id)
+            if (!resource) return null
+
+            return (
+              <div
+                key={resource.id}
+                className="relative aspect-square rounded-lg overflow-hidden group"
+              >
+                {resource.thumbnail && (
+                  <img
+                    src={resource.thumbnail}
+                    alt={resource.name || ''}
+                    className="w-full h-full object-cover"
+                  />
+                )}
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => {
+                    onChange(value.filter(v => v !== id))
+                  }}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}

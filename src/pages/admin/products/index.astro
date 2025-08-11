@@ -1,0 +1,12 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { ProductsManager } from "@/components/Admin/Products/ProductsManager";
+
+// TODO: Agregar protección de ruta para administradores
+---
+
+<Layout title="Administración de Productos - Playmats Ecuador">
+  <main class="container mx-auto p-4">
+    <ProductsManager client:load />
+  </main>
+</Layout>

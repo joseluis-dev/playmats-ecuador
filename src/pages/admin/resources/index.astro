@@ -1,0 +1,12 @@
+---
+import { ResourcesManager } from "@/components/Admin/ResourcesManager";
+import Layout from "@/layouts/Layout.astro";
+
+// TODO: Agregar protección de ruta para administradores
+---
+
+<Layout title="Administración de Recursos - Playmats Ecuador">
+  <main class="container mx-auto p-4">
+    <ResourcesManager client:load />
+  </main>
+</Layout>
