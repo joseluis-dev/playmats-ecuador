@@ -24,6 +24,18 @@ export const api = {
     const data = await response.json()
     return data
   },
+  postForm: async (endpoint: string, formData: FormData) => {
+    const response = await fetch(`${API_URL}/${endpoint}`, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      body: formData
+    })
+    const data = await response.json()
+    return data
+  },
   put: async (endpoint: string, body: any) => {
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: 'PUT',

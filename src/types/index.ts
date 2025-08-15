@@ -41,7 +41,7 @@ export interface Resource {
   watermark?: string
   hosting?: string
   type?: ResourceType
-  is_banner?: boolean
+  isBanner?: boolean
 }
 
 export interface Category {

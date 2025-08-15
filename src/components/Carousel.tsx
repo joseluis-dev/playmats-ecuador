@@ -25,7 +25,7 @@ export function CarouselSize({ opts, className, items = [], children }: Carousel
   return (
     <Carousel
       opts={opts}
-      className="w-full max-w-md"
+      className="w-full"
     >
       {items && items.length > 0 && <CarouselContent>
         {items.map((item, index) => (

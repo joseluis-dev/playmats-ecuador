@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { api } from '@/services/api'
 import type { Product, Category, Attribute, Resource } from '@/types'
+import { MultiSelect } from '@/components/ui/multi-select'
 
 const productFormSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
@@ -30,10 +31,11 @@ const productFormSchema = z.object({
 
 interface ProductFormProps {
   product?: Product | null
+  setProduct: (product: Product | null) => void
   onSave: (data: z.infer<typeof productFormSchema>) => Promise<void>
 }
 
-export const ProductForm = ({ product, onSave }: ProductFormProps) => {
+export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) => {
   const [categories, setCategories] = useState<Category[]>([])
   const [attributes, setAttributes] = useState<Attribute[]>([])
   const [resources, setResources] = useState<Resource[]>([])
@@ -51,19 +53,17 @@ export const ProductForm = ({ product, onSave }: ProductFormProps) => {
       resources: product?.resources?.map(r => String(r.id)) || []
     }
   })
-
+  console.log({ resources, resourcesIds: form.watch('resources') })
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const [categoriesData, attributesData, resourcesData] = await Promise.all([
+        const [categoriesData, attributesData] = await Promise.all([
           api.get('categories'),
-          api.get('attributes'),
-          api.get('resources')
+          api.get('attributes')
         ])
         setCategories(categoriesData)
         setAttributes(attributesData)
-        setResources(resourcesData)
       } catch (error) {
         console.error('Error al cargar datos:', error)
       } finally {
@@ -75,6 +75,7 @@ export const ProductForm = ({ product, onSave }: ProductFormProps) => {
 
   useEffect(() => {
     if (product) {
+      setResources(product.resources || [])
       form.reset({
         name: product.name,
         description: product.description || '',
@@ -99,6 +100,32 @@ export const ProductForm = ({ product, onSave }: ProductFormProps) => {
       attributes: [],
       resources: []
     })
+  }
+
+  // Convertir las categorías y atributos al formato requerido por MultiSelect
+  const categoryOptions = categories.map(c => ({
+    id: c.id,
+    name: c.name || '',
+    color: c.color
+  }))
+
+  const attributeOptions = attributes.map(a => ({
+    id: a.id,
+    name: a.name || '',
+    color: a.color
+  }))
+
+  const handleReset = () => {
+    form.reset({
+      name: '',
+      description: '',
+      price: 0,
+      isCustomizable: false,
+      categories: [],
+      attributes: [],
+      resources: []
+    })
+    setProduct(null)
   }
 
   return (
@@ -162,7 +189,7 @@ export const ProductForm = ({ product, onSave }: ProductFormProps) => {
                 control={form.control}
                 name="isCustomizable"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 pt-6">
+                  <FormItem className="flex flex-row items-center space-x-3 space-y-0 pt-6">
                     <FormControl>
                       <Checkbox
                         checked={field.value}
@@ -187,7 +214,7 @@ export const ProductForm = ({ product, onSave }: ProductFormProps) => {
           </TabsList>
 
           <TabsContent value="images" className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 w-full">
               <ImageUploader
                 value={form.watch('resources')}
                 onChange={(ids) => form.setValue('resources', ids)}
@@ -197,9 +224,19 @@ export const ProductForm = ({ product, onSave }: ProductFormProps) => {
                     setIsLoading(true)
                     const formData = new FormData()
                     formData.append('file', file)
-                    const response = await api.post('resources', formData)
-                    setResources(prev => [...prev, response])
-                    return response.id
+                    const url = URL.createObjectURL(file)
+                    const newResource = {
+                      id: resources.length + 1,
+                      name: file.name,
+                      url: url,
+                      thumbnail: url,
+                      watermark: url,
+                      hosting: "cloudinary",
+                      type: 'image' as const,
+                      isBanner: false
+                    }
+                    setResources(prev => [...prev, newResource])
+                    return newResource.id.toString()
                   } catch (error) {
                     console.error('Error al subir imagen:', error)
                     throw error
@@ -207,68 +244,62 @@ export const ProductForm = ({ product, onSave }: ProductFormProps) => {
                     setIsLoading(false)
                   }
                 }}
+                onRemove={(id) => {
+                  setResources(prev => prev.filter(r => r.id.toString() !== id))
+                }}
               />
             </div>
           </TabsContent>
 
           <TabsContent value="categories" className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              {categories.map(category => (
-                <label key={category.id} className="flex items-center gap-2">
-                  <Checkbox
-                    checked={form.watch('categories').includes(String(category.id))}
-                    onCheckedChange={(checked) => {
-                      const current = form.watch('categories')
-                      const value = String(category.id)
-                      if (checked) {
-                        form.setValue('categories', [...current, value])
-                      } else {
-                        form.setValue('categories', current.filter(v => v !== value))
-                      }
-                    }}
-                  />
-                  <span className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: category.color }}
+            <FormField
+              control={form.control}
+              name="categories"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categorías</FormLabel>
+                  <FormControl>
+                    <MultiSelect
+                      options={categoryOptions}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      placeholder="Seleccionar categorías..."
                     />
-                    {category.name}
-                  </span>
-                </label>
-              ))}
-            </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </TabsContent>
 
           <TabsContent value="attributes" className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              {attributes.map(attribute => (
-                <label key={attribute.id} className="flex items-center gap-2">
-                  <Checkbox
-                    checked={form.watch('attributes').includes(String(attribute.id))}
-                    onCheckedChange={(checked) => {
-                      const current = form.watch('attributes')
-                      const value = String(attribute.id)
-                      if (checked) {
-                        form.setValue('attributes', [...current, value])
-                      } else {
-                        form.setValue('attributes', current.filter(v => v !== value))
-                      }
-                    }}
-                  />
-                  <span className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: attribute.color }}
+            <FormField
+              control={form.control}
+              name="attributes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Atributos</FormLabel>
+                  <FormControl>
+                    <MultiSelect
+                      options={attributeOptions}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      placeholder="Seleccionar atributos..."
                     />
-                    {attribute.name}
-                  </span>
-                </label>
-              ))}
-            </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </TabsContent>
         </Tabs>
 
         <div className="flex justify-end gap-2 pt-4">
+          {product && (
+            <Button onClick={() => handleReset()} variant="secondary" type='button'>
+              Cancelar
+            </Button>
+          )}
           <Button type="submit" disabled={isLoading}>
             {isLoading
               ? 'Guardando...'

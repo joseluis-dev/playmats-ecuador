@@ -19,7 +19,7 @@ interface BadgeProps {
 
 const { color, label, type = "ghost" } = Astro.props as BadgeProps;
 
-const isHexColor = (color: string) => /^#[0-9A-F]{6}$/i.test(color);
+const isHexColor = (color: string) => /^#(?:[0-9a-f]{3}){1,2}$/i.test(color)
 const isHex = isHexColor(color);
 
 const ghostClasses = clsx(

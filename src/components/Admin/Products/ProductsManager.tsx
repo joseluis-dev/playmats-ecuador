@@ -15,7 +15,8 @@ export const ProductsManager = () => {
   const fetchProducts = async () => {
     try {
       setIsLoading(true)
-      const data = await api.get('products')
+      const data = await api.get('products?include=categories,attributes,resources')
+      console.log('Productos cargados:', data)
       setProducts(data)
     } catch (error) {
       console.error('Error al cargar productos:', error)
@@ -33,10 +34,6 @@ export const ProductsManager = () => {
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Productos</h1>
-        <Button onClick={() => setSelectedProduct(null)}>
-          <PlusIcon className="w-4 h-4 mr-2" />
-          Nuevo Producto
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-6">
@@ -64,6 +61,7 @@ export const ProductsManager = () => {
         <div className="bg-[var(--color-surface)]/80 p-6 rounded-lg">
           <ProductForm
             product={selectedProduct}
+            setProduct={setSelectedProduct}
             onSave={async (product) => {
               const newProduct = {
                 name: product.name,
@@ -73,13 +71,32 @@ export const ProductsManager = () => {
               }
               try {
                 setIsLoading(true)
+                let productId: string;
+                
                 if (selectedProduct) {
                   await api.put(`products/${selectedProduct.id}`, newProduct)
+                  productId = selectedProduct.id
                   toast.success('Producto actualizado correctamente')
                 } else {
-                  await api.post('products', newProduct)
+                  const createdProduct = await api.post('products', newProduct)
+                  productId = createdProduct.id
                   toast.success('Producto creado correctamente')
                 }
+
+                // Actualizar categorías y atributos
+                if (product.categories.length > 0) {
+                  await api.post(`products/${productId}/categories`, {
+                    categoryIds: product.categories
+                  })
+                }
+                
+                if (product.attributes.length > 0) {
+                  await api.post(`products/${productId}/attributes`, {
+                    attributeIds: product.attributes
+                  })
+                }
+
+                // Recargar productos
                 fetchProducts()
               } catch (error) {
                 console.error('Error al guardar el producto:', error)

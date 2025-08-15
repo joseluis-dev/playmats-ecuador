@@ -4,19 +4,22 @@ import { useDropzone } from 'react-dropzone'
 import { Image as ImageIcon, X } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Resource } from '@/types'
+import { CarouselSize } from '@/components/Carousel'
 
 interface ImageUploaderProps {
   value: string[]
   onChange: (value: string[]) => void
   resources: Resource[]
   onUpload: (file: File) => Promise<string>
+  onRemove: (id: string) => void
 }
 
 export const ImageUploader = ({
   value,
   onChange,
   resources,
-  onUpload
+  onUpload,
+  onRemove
 }: ImageUploaderProps) => {
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
@@ -88,6 +91,7 @@ export const ImageUploader = ({
                   className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                   onClick={() => {
                     onChange(value.filter(v => v !== id))
+                    onRemove(id)
                   }}
                 >
                   <X className="w-4 h-4" />
@@ -97,6 +101,21 @@ export const ImageUploader = ({
           })}
         </div>
       )}
+      <CarouselSize items={resources}>
+        {(item, index) => (
+          <div
+            className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+            style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
+            onClick={() => {
+              // addLayers('background', item);
+            }}
+          >
+            <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
+              {item.name}
+            </div>
+          </div>
+        )}
+      </CarouselSize>
     </div>
   )
 }

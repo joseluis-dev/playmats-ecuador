@@ -6,7 +6,11 @@ import { ProductsManager } from "@/components/Admin/Products/ProductsManager";
 ---
 
 <Layout title="Administración de Productos - Playmats Ecuador">
-  <main class="container mx-auto p-4">
+  <main class="
+			flex flex-col gap-4
+			w-full max-w-screen-xl mx-auto
+			p-8 md:p-12
+		">
     <ProductsManager client:load />
   </main>
 </Layout>
