@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Button } from '../../ui/button'
-import { PlusIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { api } from '@/services/api'
-import { ProductsList } from '@/components/Admin/Products/ProductsList'
+import { DataList } from '@/components/DataList'
 import { ProductForm } from '@/components/Admin/Products/ProductForm'
 import type { Product } from '@/types'
 
@@ -15,9 +13,9 @@ export const ProductsManager = () => {
   const fetchProducts = async () => {
     try {
       setIsLoading(true)
-      const data = await api.get('products?include=categories,attributes,resources')
-      console.log('Productos cargados:', data)
-      setProducts(data)
+      const response = await api.get('products?include=categories,attributes,resources')
+      console.log('Productos cargados:', response)
+      setProducts(response as Product[])
     } catch (error) {
       console.error('Error al cargar productos:', error)
       toast.error('Error al cargar los productos')
@@ -38,10 +36,11 @@ export const ProductsManager = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-6">
         {/* Lista de productos */}
-        <ProductsList
-          products={products}
+        <DataList<Product>
+          items={products}
+          selectedId={selectedProduct?.id}
           onSelect={setSelectedProduct}
-          onDelete={async (id) => {
+          onDelete={async (id: string) => {
             try {
               setIsLoading(true)
               await api.delete(`products/${id}`)
@@ -54,7 +53,20 @@ export const ProductsManager = () => {
               setIsLoading(false)
             }
           }}
-          selectedId={selectedProduct?.id}
+          keyExtractor={(product) => product.id}
+          renderItem={(product) => (
+            <>
+              <h3 className="font-medium">{product.name}</h3>
+              <p className="text-sm text-[var(--color-text)]/70">
+                ${product.price?.toFixed(2)} - {product.isCustomizable ? 'Personalizable' : 'No personalizable'}
+              </p>
+            </>
+          )}
+          emptyListComponent={
+            <div className="text-center p-4 text-[var(--color-text)]/70">
+              No hay productos disponibles
+            </div>
+          }
         />
 
         {/* Panel de edición */}
@@ -78,7 +90,8 @@ export const ProductsManager = () => {
                   productId = selectedProduct.id
                   toast.success('Producto actualizado correctamente')
                 } else {
-                  const createdProduct = await api.post('products', newProduct)
+                  const response = await api.post('products', newProduct)
+                  const createdProduct = response as Product
                   productId = createdProduct.id
                   toast.success('Producto creado correctamente')
                 }

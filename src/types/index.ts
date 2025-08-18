@@ -44,22 +44,23 @@ export interface Resource {
   isBanner?: boolean
 }
 
-export interface Category {
+export interface BaseModel {
   id: number
-  name?: string
-  description?: string
-  color?: string
-  created_at?: Date
-  updated_at?: Date
+  status: Status
+  createdAt?: Date
+  updatedAt?: Date
 }
 
-export interface Attribute {
-  id: number
-  name?: string
-  value?: string
-  color?: string
-  created_at?: Date
-  updated_at?: Date
+export interface Category extends BaseModel {
+  name: string
+  description: string
+  color: string
+}
+
+export interface Attribute extends BaseModel {
+  name: string
+  value: string
+  color: string
 }
 
 export interface Country {

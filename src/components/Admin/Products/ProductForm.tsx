@@ -58,12 +58,14 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const [categoriesData, attributesData] = await Promise.all([
+        const [categoriesDataResponse, attributesDataResponse] = await Promise.all([
           api.get('categories'),
           api.get('attributes')
         ])
-        setCategories(categoriesData)
-        setAttributes(attributesData)
+        const categoriesData = categoriesDataResponse
+        const attributesData = attributesDataResponse
+        setCategories(categoriesData as Category[])
+        setAttributes(attributesData as Attribute[])
       } catch (error) {
         console.error('Error al cargar datos:', error)
       } finally {
@@ -206,15 +208,16 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
           </div>
         </div>
 
-        <Tabs defaultValue="images" className="w-full">
+        <Tabs defaultValue="resources" className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-[var(--color-surface)]/70">
-            <TabsTrigger value="images">Imágenes</TabsTrigger>
+            <TabsTrigger value="resources">Recursos</TabsTrigger>
             <TabsTrigger value="categories">Categorías</TabsTrigger>
             <TabsTrigger value="attributes">Atributos</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="images" className="space-y-4">
+          <TabsContent value="resources" className="space-y-4">
             <div className="grid grid-cols-1 gap-4 w-full">
+              <FormLabel>Recursos</FormLabel>
               <ImageUploader
                 value={form.watch('resources')}
                 onChange={(ids) => form.setValue('resources', ids)}

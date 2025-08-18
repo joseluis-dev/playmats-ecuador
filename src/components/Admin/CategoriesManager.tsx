@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '../ui/button'
 import { PlusIcon, Trash2Icon, PencilIcon } from 'lucide-react'
+import { DataList } from '@/components/DataList'
 import {
   Form,
   FormControl,
@@ -14,6 +15,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import type { Category } from '@/types'
+import { api } from '@/services/api'
+import { toast } from 'sonner'
 
 const categoryFormSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
@@ -25,6 +28,7 @@ export const CategoriesManager = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [isEditing, setIsEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof categoryFormSchema>>({
     resolver: zodResolver(categoryFormSchema),
@@ -35,168 +39,192 @@ export const CategoriesManager = () => {
     }
   })
 
-  const handleSubmit = (values: z.infer<typeof categoryFormSchema>) => {
-    if (isEditing && selectedCategory) {
-      // TODO: Actualizar categoría existente
-    } else {
-      // TODO: Crear nueva categoría
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get<Category[]>('categories')
+      setCategories(response)
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+      toast.error('Error al cargar las categorías')
     }
-    form.reset()
-    setIsEditing(false)
-    setSelectedCategory(null)
+  }
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  const handleSubmit = async (values: z.infer<typeof categoryFormSchema>) => {
+    console.log('Submitting category:', values)
+    setIsLoading(true)
+    try {
+      if (isEditing && selectedCategory) {
+        await api.put(`categories/${selectedCategory.id}`, {
+          ...values,
+        })
+        toast.success('Categoría actualizada correctamente')
+      } else {
+        await api.post('categories', {
+          ...values
+        })
+        toast.success('Categoría creada correctamente')
+      }
+      await fetchCategories()
+      form.reset({
+        name: '',
+        description: '',
+        color: '#000000'
+      })
+      setIsEditing(false)
+      setSelectedCategory(null)
+    } catch (error) {
+      console.error('Error submitting category:', error)
+      toast.error(isEditing ? 'Error al actualizar la categoría' : 'Error al crear la categoría')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleEdit = (category: Category) => {
     setSelectedCategory(category)
-    setIsEditing(true)
     form.reset({
-      name: category.name || '',
-      description: category.description || '',
-      color: category.color || '#000000'
+      name: category.name,
+      description: category.description,
+      color: category.color
     })
+    setIsEditing(true)
   }
 
-  const handleDelete = async (categoryId: number) => {
-    // TODO: Implementar eliminación
+  const handleDelete = async (id: number) => {
+    if (!confirm('¿Está seguro de eliminar esta categoría?')) return
+    
+    setIsLoading(true)
+    try {
+      await api.delete(`categories/${id}`)
+      toast.success('Categoría eliminada correctamente')
+      await fetchCategories()
+    } catch (error) {
+      console.error('Error deleting category:', error)
+      toast.error('Error al eliminar la categoría')
+    } finally {
+      setIsLoading(false)
+      form.reset({
+        name: '',
+        description: '',
+        color: '#000000'
+      })
+    }
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Lista de categorías */}
-      <div className="bg-[var(--color-surface)]/80 p-4 rounded-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Categorías</h2>
-          <Button onClick={() => setIsEditing(false)} variant="default" size="sm">
-            <PlusIcon className="w-4 h-4" />
-            Nueva Categoría
-          </Button>
-        </div>
-
-        <div className="space-y-2">
-          {categories.map(category => (
-            <div
-              key={category.id}
-              className="flex items-center justify-between p-3 bg-[var(--color-surface)] rounded-md"
-            >
-              <div className="flex items-center gap-2">
-                <div 
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: category.color }}
-                />
-                <div>
-                  <h3 className="font-medium">{category.name}</h3>
-                  <p className="text-sm text-[var(--color-text)]/70">
-                    {category.description}
-                  </p>
+    <>
+      <h3 className="px-4 text-xl font-semibold">Lista de Categorías</h3>
+      <div className="p-2 space-y-4 flex gap-4 flex-col lg:flex-row">
+        <div className="w-full m-0">
+          <DataList<Category>
+            items={categories}
+            selectedId={selectedCategory?.id?.toString()}
+            onSelect={handleEdit}
+            onDelete={async (id) => handleDelete(Number(id))}
+            keyExtractor={(category) => category.id.toString()}
+            className='h-full'
+            renderItem={(category) => (
+              <div className="space-y-2" style={{ borderColor: category.color }}>
+                <h4 className="font-medium">{category.name}</h4>
+                <p className="text-sm text-[var(--color-text)]/70">{category.description}</p>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 rounded-full" style={{ backgroundColor: category.color }}></div>
+                  <span className="text-sm">{category.color}</span>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEdit(category)}
-                >
-                  <PencilIcon className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(category.id)}
-                >
-                  <Trash2Icon className="w-4 h-4" />
+            )}
+            emptyListComponent={
+              <div className="text-center p-4 text-[var(--color-text)]/70">
+                No hay categorías disponibles
+              </div>
+            }
+          />
+        </div>
+
+        <div className='flex flex-col p-4 gap-2 w-full bg-[var(--color-surface)]/80 rounded-lg'>
+          <h2 className="text-2xl font-bold">Gestión de Categorías</h2>
+        
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nombre de la categoría" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descripción</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Descripción de la categoría" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="color"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Color</FormLabel>
+                    <FormControl>
+                      <Input type="color" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className='flex gap-2 w-full justify-end'>
+                {isEditing && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={isLoading}
+                    onClick={() => {
+                      form.reset({
+                        name: '',
+                        description: '',
+                        color: '#000000',
+                      });
+                      setIsEditing(false);
+                      setSelectedCategory(null);
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                )}
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? (
+                    <span className="loading loading-spinner"></span>
+                  ) : isEditing ? (
+                    'Actualizar Categoría'
+                  ) : (
+                    'Crear Categoría'
+                  )}
                 </Button>
               </div>
-            </div>
-          ))}
+            </form>
+          </Form>
         </div>
       </div>
-
-      {/* Formulario */}
-      <div className="bg-[var(--color-surface)]/80 p-4 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">
-          {isEditing ? 'Editar Categoría' : 'Nueva Categoría'}
-        </h2>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Nombre de la categoría" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descripción</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Descripción de la categoría" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="color"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Color</FormLabel>
-                  <div className="flex gap-2 items-center">
-                    <FormControl>
-                      <Input {...field} type="color" className="w-12 h-12 p-1" />
-                    </FormControl>
-                    <Input 
-                      {...field} 
-                      placeholder="#000000"
-                      className="flex-1"
-                      onChange={(e) => {
-                        const value = e.target.value
-                        if (value.startsWith('#')) {
-                          field.onChange(value)
-                        } else {
-                          field.onChange(`#${value}`)
-                        }
-                      }}
-                    />
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-end gap-2">
-              {isEditing && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setIsEditing(false)
-                    setSelectedCategory(null)
-                    form.reset()
-                  }}
-                >
-                  Cancelar
-                </Button>
-              )}
-              <Button type="submit">
-                {isEditing ? 'Guardar Cambios' : 'Crear Categoría'}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </div>
-    </div>
+    </>
   )
 }

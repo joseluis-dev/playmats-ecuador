@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ResourcesSection from "./Resources/Sections/ResourcesSection";
-import CategoriesSection from "./Resources/Sections/CategoriesSection";
-import AttributesSection from "./Resources/Sections/AttributesSection";
+import { CategoriesManager } from "./CategoriesManager";
+import { AttributesManager } from "./AttributesManager";
 
 export const ResourcesManager = () => {
   return (
@@ -16,10 +16,10 @@ export const ResourcesManager = () => {
           <ResourcesSection />
         </TabsContent>
         <TabsContent value="categories" className="mt-4">
-          <CategoriesSection />
+          <CategoriesManager />
         </TabsContent>
         <TabsContent value="attributes" className="mt-4">
-          <AttributesSection />
+          <AttributesManager />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,7 +1,7 @@
 const API_URL = 'http://localhost:8080'
 
 export const api = {
-  get: async (endpoint: string) => {
+  get: async <T>(endpoint: string): Promise<T> => {
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: 'GET',
       mode: 'cors',
@@ -12,7 +12,7 @@ export const api = {
     const data = await response.json()
     return data
   },
-  post: async (endpoint: string, body: any) => {
+  post: async <T>(endpoint: string, body: any): Promise<T> => {
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: 'POST',
       mode: 'cors',
@@ -36,7 +36,7 @@ export const api = {
     const data = await response.json()
     return data
   },
-  put: async (endpoint: string, body: any) => {
+  put: async <T>(endpoint: string, body: any): Promise<T> => {
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: 'PUT',
       mode: 'cors',
@@ -48,7 +48,7 @@ export const api = {
     const data = await response.json()
     return data
   },
-  patch: async (endpoint: string, body: any) => {
+  patch: async <T>(endpoint: string, body: any): Promise<T> => {
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: 'PATCH',
       mode: 'cors',

@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { ProductsManager } from '@/components/Admin/ProductsManager'
 import { ResourcesManager } from '@/components/Admin/ResourcesManager'
 import { CategoriesManager } from '@/components/Admin/CategoriesManager'
 import { AttributesManager } from '@/components/Admin/AttributesManager'
+import { ProductsManager } from './Products/ProductsManager'
 
 const sections = [
   { id: 'products', name: 'Productos' },
