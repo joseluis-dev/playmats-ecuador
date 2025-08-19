@@ -21,6 +21,7 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ImageUploader } from "@/components/ImageUploader"
 
 // Define the Resource type
 interface Resource {
@@ -38,11 +39,12 @@ interface Resource {
 const resourceTypes = ["image", "video"] as const;
 
 const resourceFormSchema = z.object({
-  name: z.string().min(1, "El nombre es requerido"),
-  url: z.string().url("La URL no es válida"),
-  thumbnail: z.string().url("La URL no es válida").optional(),
-  watermark: z.string().optional(),
-  hosting: z.string().optional(),
+  file: z.custom<File>((file) => file instanceof File && file.size > 0, {
+    message: "Debes subir un comprobante",
+  })
+  .refine(file => file.type.startsWith("image/"), {
+    message: "El archivo debe ser una imagen",
+  }),
   type: z.enum(["image", "video"]).default("image"),
   is_banner: z.boolean().default(false),
 });
@@ -56,11 +58,7 @@ export default function ResourcesSection() {
   const form = useForm({
     resolver: zodResolver(resourceFormSchema),
     defaultValues: {
-      name: "",
-      url: "",
-      thumbnail: "",
-      watermark: "",
-      hosting: "",
+      file: undefined,
       type: "image",
       is_banner: false,
     },
@@ -86,11 +84,7 @@ export default function ResourcesSection() {
     setSelectedResource(resource)
     setIsEditing(true)
     form.reset({
-      name: resource.name || "",
-      url: resource.url || "",
-      thumbnail: resource.thumbnail || "",
-      watermark: resource.watermark || "",
-      hosting: resource.hosting || "",
+      file: undefined,
       type: resource.type || "image",
       is_banner: resource.is_banner || false,
     })
@@ -165,68 +159,19 @@ export default function ResourcesSection() {
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="name"
+              name="file"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Nombre del recurso" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="URL del recurso" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="thumbnail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Miniatura</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="URL de la miniatura" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="watermark"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Marca de agua</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="URL de la marca de agua" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="hosting"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hosting</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Hosting del recurso" />
+                    <ImageUploader
+                      field={field}
+                      validator={resourceFormSchema.shape.file}
+                      placeholderText={{
+                        main: "Arrastra y suelta tu recurso aquí",
+                        sub: "o haz clic para seleccionar un archivo",
+                        formats: "Formatos soportados: JPG, PNG (máx. 5MB)"
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

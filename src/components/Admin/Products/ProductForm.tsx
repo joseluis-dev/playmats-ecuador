@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ImageUploader } from '@/components/Admin/Products/ImageUploader'
+import { MultiImageUploader } from '@/components/Admin/Products/MultiImageUploader'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -218,7 +218,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
           <TabsContent value="resources" className="space-y-4">
             <div className="grid grid-cols-1 gap-4 w-full">
               <FormLabel>Recursos</FormLabel>
-              <ImageUploader
+              <MultiImageUploader
                 value={form.watch('resources')}
                 onChange={(ids) => form.setValue('resources', ids)}
                 resources={resources}

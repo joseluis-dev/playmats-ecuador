@@ -14,7 +14,7 @@ interface ImageUploaderProps {
   onRemove: (id: string) => void
 }
 
-export const ImageUploader = ({
+export const MultiImageUploader = ({
   value,
   onChange,
   resources,
@@ -67,55 +67,36 @@ export const ImageUploader = ({
         </p>
       </div>
 
-      {value.length > 0 && (
-        <div className="grid grid-cols-2 gap-4">
-          {value.map(id => {
-            const resource = resources.find(r => String(r.id) === id)
-            if (!resource) return null
-
-            return (
-              <div
-                key={resource.id}
-                className="relative aspect-square rounded-lg overflow-hidden group"
+      <div className='max-w-[85%] mx-auto'>
+        <CarouselSize items={resources}>
+          {(item, index) => (
+            <div
+              className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden transition-all duration-200 ease-in-out group"
+              style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
+              onClick={() => {
+                // addLayers('background', item);
+              }}
+            >
+              <Button
+                variant="destructive"
+                size="icon"
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-50"
+                onClick={(e) => {
+                  onChange(value.filter(v => v !== item.id.toString()))
+                  onRemove(item.id.toString())
+                  e.stopPropagation()
+                  e.preventDefault()
+                }}
               >
-                {resource.thumbnail && (
-                  <img
-                    src={resource.thumbnail}
-                    alt={resource.name || ''}
-                    className="w-full h-full object-cover"
-                  />
-                )}
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => {
-                    onChange(value.filter(v => v !== id))
-                    onRemove(id)
-                  }}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
+                <X className="w-4 h-4" />
+              </Button>
+              <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-sm p-1">
+                {item.name}
               </div>
-            )
-          })}
-        </div>
-      )}
-      <CarouselSize items={resources}>
-        {(item, index) => (
-          <div
-            className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
-            style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
-            onClick={() => {
-              // addLayers('background', item);
-            }}
-          >
-            <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
-              {item.name}
             </div>
-          </div>
-        )}
-      </CarouselSize>
+          )}
+        </CarouselSize>
+      </div>
     </div>
   )
 }
