@@ -28,9 +28,6 @@ export const api = {
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: 'POST',
       mode: 'cors',
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
       body: formData
     })
     const data = await response.json()
@@ -44,6 +41,16 @@ export const api = {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body)
+    })
+    const data = await response.json()
+    return data
+  },
+  putForm: async (endpoint: string, formData: FormData) => {
+    console.log({ formData })
+    const response = await fetch(`${API_URL}/${endpoint}`, {
+      method: 'PUT',
+      mode: 'cors',
+      body: formData
     })
     const data = await response.json()
     return data

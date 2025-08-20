@@ -50,7 +50,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
       isCustomizable: product?.isCustomizable || false,
       categories: product?.categories?.map(c => String(c.id)) || [],
       attributes: product?.attributes?.map(a => String(a.id)) || [],
-      resources: product?.resources?.map(r => String(r.id)) || []
+      resources: product?.resourceProducts?.map(r => String(r.resource.id)) || []
     }
   })
   console.log({ resources, resourcesIds: form.watch('resources') })
@@ -77,7 +77,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
 
   useEffect(() => {
     if (product) {
-      setResources(product.resources || [])
+      setResources(product.resourceProducts?.map(r => r.resource) || [])
       form.reset({
         name: product.name,
         description: product.description || '',
@@ -85,7 +85,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
         isCustomizable: product.isCustomizable || false,
         categories: product.categories?.map(c => String(c.id)) || [],
         attributes: product.attributes?.map(a => String(a.id)) || [],
-        resources: product.resources?.map(r => String(r.id)) || []
+        resources: product.resourceProducts?.map(r => String(r.resource.id)) || []
       })
     }
   }, [product, form])
@@ -235,7 +235,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
                       thumbnail: url,
                       watermark: url,
                       hosting: "cloudinary",
-                      type: 'image' as const,
+                      type: 'IMAGE' as const,
                       isBanner: false
                     }
                     setResources(prev => [...prev, newResource])

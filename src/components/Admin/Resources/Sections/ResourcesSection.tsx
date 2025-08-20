@@ -8,7 +8,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
 import { PencilIcon, Trash2Icon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -17,22 +16,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { ImageUploader } from "@/components/ImageUploader"
 import { DataList } from "@/components/DataList"
 import { api } from "@/services/api"
-
-// Define the Resource type
-interface Resource {
-  id: number
-  name: string
-  url: string
-  thumbnail?: string
-  watermark?: string
-  hosting?: string
-  type: "IMAGE" | "VIDEO"
-  is_banner: boolean
-}
+import type { Resource } from "@/types"
 
 const resourceFormSchema = z.object({
   name: z.string().min(1, "El nombre es obligatorio"),
-  
   file: z.custom<File>((file) => file instanceof File && file.size > 0, {
       message: "Debes subir un archivo",
     })
@@ -43,8 +30,7 @@ const resourceFormSchema = z.object({
       {
         message: "El archivo debe ser una imagen o un video",
       }
-    ).optional(),
-  is_banner: z.boolean().default(false),
+    ).optional()
 });
 
 export default function ResourcesSection() {
@@ -52,13 +38,12 @@ export default function ResourcesSection() {
   const [isEditing, setIsEditing] = useState(false)
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  console.log({ resources })
+  
   const form = useForm({
     resolver: zodResolver(resourceFormSchema),
     defaultValues: {
       name: "",
-      file: undefined,
-      is_banner: false,
+      file: undefined
     },
   })
 
@@ -78,29 +63,37 @@ export default function ResourcesSection() {
     fetchResources();
   }, []);
 
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const data = await api.get<Resource[]>("resources");
+      setResources(data);
+    } catch (e) {
+      setResources([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (values: z.infer<typeof resourceFormSchema>) => {
+    console.log(values);
     try {
       if (isEditing && selectedResource) {
         // Actualizar recurso existente
         const formData = new FormData();
         formData.append("name", values.name);
-        formData.append("is_banner", String(values.is_banner));
         if (values.file) formData.append("file", values.file);
-        await api.put(`resources/${selectedResource.id}`, formData);
+        await api.putForm(`resources/${selectedResource.id}`, formData);
         // Refrescar lista
-        const data = await api.get<Resource[]>("resources");
-        setResources(data);
+        loadData();
       } else {
         // Crear nuevo recurso
         const formData = new FormData();
         formData.append("name", values.name);
-        formData.append("is_banner", String(values.is_banner));
         if (values.file) formData.append("file", values.file);
         await api.postForm("resources", formData);
         // Refrescar lista
-        const data = await api.get<Resource[]>("resources");
-        setResources(data);
+        loadData()
       }
     } catch (e) {
       // TODO: mostrar error
@@ -108,7 +101,6 @@ export default function ResourcesSection() {
       form.reset({
         name: "",
         file: undefined,
-        is_banner: false,
       });
       setIsEditing(false);
       setSelectedResource(null);
@@ -116,13 +108,11 @@ export default function ResourcesSection() {
   };
 
   const handleEdit = (resource: Resource) => {
-    console.log("Edit resource:", resource);
     setSelectedResource(resource)
     setIsEditing(true)
     form.reset({
       name: resource.name,
       file: undefined,
-      is_banner: resource.is_banner || false,
     })
   }
 
@@ -130,7 +120,12 @@ export default function ResourcesSection() {
   const handleDelete = async (resourceId: number) => {
     try {
       await api.delete(`resources/${resourceId}`);
-      setResources(resources => resources.filter(r => r.id !== resourceId));
+      loadData();
+      form.reset({
+        name: "",
+        file: undefined,
+      });
+      setIsEditing(false);
     } catch (e) {
       // TODO: mostrar error
     }
@@ -150,7 +145,7 @@ export default function ResourcesSection() {
           <div>
             <h3 className="font-medium">{item.name}</h3>
             <p className="text-sm text-[var(--color-text)]/70">
-              {item.type} {item.is_banner ? "- Banner" : ""}
+              {item.type}
             </p>
           </div>
         )}
@@ -208,30 +203,12 @@ export default function ResourcesSection() {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="is_banner"
-              render={({ field }) => (
-                <FormItem className="flex items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none flex items-center">
-                    <FormLabel>Es banner</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
-
             {/* Vista previa del recurso en una altura fija */}
             <div className="w-full h-[250px] flex items-center justify-center overflow-hidden rounded border border-dashed">
               {isEditing && selectedResource && selectedResource.thumbnail ? (
                 <div className="relative w-full h-full flex flex-col items-center">
                   <span className="text-xs text-muted-foreground mb-1 absolute top-1 left-0 right-0 text-center">
-                    Vista previa actual
+                    Vista previa
                   </span>
                   {selectedResource.type === 'IMAGE' ? (
                     <img
@@ -285,7 +262,10 @@ export default function ResourcesSection() {
                   onClick={() => {
                     setIsEditing(false)
                     setSelectedResource(null)
-                    form.reset()
+                    form.reset({
+                      name: "",
+                      file: undefined
+                    })
                   }}
                 >
                   Cancelar

@@ -1,6 +1,6 @@
 // Enums
 export type Status = 'active' | 'suspended'
-export type ResourceType = 'video' | 'image' | 'pdf' | 'docx'
+export type ResourceType = 'VIDEO' | 'IMAGE' | 'PDF' | 'DOCX'
 export type OrderStatus = 'pending' | 'delivered' | 'cancelled'
 export type PaymentStatus = 'pending' | 'completed' | 'failed'
 export type PaymentMethod = 'credit_card' | 'paypal' | 'transfer' | 'cash'
@@ -30,7 +30,15 @@ export interface Product {
   isCustomizable?: boolean
   categories?: Category[]
   attributes?: Attribute[]
-  resources?: Resource[]
+  resourceProducts?: ResourceProduct[]
+}
+
+export interface ResourceProduct {
+  id: number
+  resource: Resource
+  isBanner: boolean
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface Resource {
@@ -41,7 +49,6 @@ export interface Resource {
   watermark?: string
   hosting?: string
   type?: ResourceType
-  isBanner?: boolean
 }
 
 export interface BaseModel {

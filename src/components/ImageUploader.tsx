@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input"
 import { Image } from "@unpic/react"
 import { Upload, X } from "lucide-react"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { z } from "zod"
 import type { ControllerRenderProps } from "react-hook-form"
 
@@ -122,6 +122,12 @@ export const ImageUploader = ({
     }
   };
 
+  useEffect(() => {
+    if (!field.value) {
+      setUrl(null);
+      setFileType(null);
+    }
+  }, [field.value])
 
   return (
     <div
