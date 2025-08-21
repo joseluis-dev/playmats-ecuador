@@ -7,17 +7,15 @@ import type { Resource } from '@/types'
 import { CarouselSize } from '@/components/Carousel'
 
 interface ImageUploaderProps {
-  value: string[]
-  onChange: (value: string[]) => void
-  resources: Resource[]
-  onUpload: (file: File) => Promise<string>
-  onRemove: (id: string) => void
+  value: Resource[]
+  onChange: (value: Resource[]) => void
+  onUpload: (file: File) => Promise<Resource>
+  onRemove: (item: Resource) => void
 }
 
 export const MultiImageUploader = ({
   value,
   onChange,
-  resources,
   onUpload,
   onRemove
 }: ImageUploaderProps) => {
@@ -26,8 +24,8 @@ export const MultiImageUploader = ({
     if (!file) return
 
     try {
-      const resourceId = await onUpload(file)
-      onChange([...value, resourceId])
+      const resource = await onUpload(file)
+      onChange([...value, resource])
     } catch (error) {
       console.error('Error al subir la imagen:', error)
       toast.error('Error al subir la imagen')
@@ -68,7 +66,7 @@ export const MultiImageUploader = ({
       </div>
 
       <div className='max-w-[85%] mx-auto'>
-        <CarouselSize items={resources}>
+        <CarouselSize items={value}>
           {(item, index) => (
             <div
               className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden transition-all duration-200 ease-in-out group"
@@ -83,7 +81,7 @@ export const MultiImageUploader = ({
                 className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-50"
                 onClick={(e) => {
                   onChange(value.filter(v => v !== item.id.toString()))
-                  onRemove(item.id.toString())
+                  onRemove(item)
                   e.stopPropagation()
                   e.preventDefault()
                 }}

@@ -32,7 +32,6 @@ export function CustomBadge({
   ...props 
 }: BadgeProps) {
   const isHex = isHexColor(color)
-  console.log({ isHex, color })
 
   if (type === "ghost") {
     const ghostClasses = isHex 

@@ -26,7 +26,7 @@ const productFormSchema = z.object({
   isCustomizable: z.boolean(),
   categories: z.array(z.string()),
   attributes: z.array(z.string()),
-  resources: z.array(z.string())
+  resources: z.array(z.custom<Resource>())
 })
 
 interface ProductFormProps {
@@ -50,10 +50,10 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
       isCustomizable: product?.isCustomizable || false,
       categories: product?.categories?.map(c => String(c.id)) || [],
       attributes: product?.attributes?.map(a => String(a.id)) || [],
-      resources: product?.resourceProducts?.map(r => String(r.resource.id)) || []
+      resources: product?.resourceProducts?.map(r => r.resource) || []
     }
   })
-  console.log({ resources, resourcesIds: form.watch('resources') })
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -85,23 +85,14 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
         isCustomizable: product.isCustomizable || false,
         categories: product.categories?.map(c => String(c.id)) || [],
         attributes: product.attributes?.map(a => String(a.id)) || [],
-        resources: product.resourceProducts?.map(r => String(r.resource.id)) || []
+        resources: product.resourceProducts?.map(r => r.resource) || []
       })
     }
   }, [product, form])
 
   const handleSubmit = async (values: z.infer<typeof productFormSchema>) => {
-    console.log(values)
     await onSave(values)
-    form.reset({
-      name: '',
-      description: '',
-      price: 0,
-      isCustomizable: false,
-      categories: [],
-      attributes: [],
-      resources: []
-    })
+    handleReset()
   }
 
   // Convertir las categorías y atributos al formato requerido por MultiSelect
@@ -128,6 +119,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
       resources: []
     })
     setProduct(null)
+    setResources([])
   }
 
   return (
@@ -146,7 +138,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
                 <FormItem>
                   <FormLabel>Nombre</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Nombre del producto" />
+                    <Input {...field} className='bg-transparent dark:bg-transparent' placeholder="Nombre del producto" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -160,7 +152,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
                 <FormItem>
                   <FormLabel>Descripción</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Descripción del producto" />
+                    <Input {...field} className='bg-transparent dark:bg-transparent' placeholder="Descripción del producto" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -176,6 +168,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
                     <FormLabel>Precio</FormLabel>
                     <FormControl>
                       <Input
+                        className='bg-transparent dark:bg-transparent'
                         type="number"
                         step="0.01"
                         {...field}
@@ -220,26 +213,24 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
               <FormLabel>Recursos</FormLabel>
               <MultiImageUploader
                 value={form.watch('resources')}
-                onChange={(ids) => form.setValue('resources', ids)}
-                resources={resources}
+                onChange={(items) => form.setValue('resources', items)}
                 onUpload={async (file) => {
                   try {
                     setIsLoading(true)
-                    const formData = new FormData()
-                    formData.append('file', file)
                     const url = URL.createObjectURL(file)
                     const newResource = {
-                      id: resources.length + 1,
+                      id: `${file.name}-${Date.now()}`,
                       name: file.name,
                       url: url,
                       thumbnail: url,
                       watermark: url,
                       hosting: "cloudinary",
                       type: 'IMAGE' as const,
-                      isBanner: false
+                      isBanner: false,
+                      file
                     }
                     setResources(prev => [...prev, newResource])
-                    return newResource.id.toString()
+                    return newResource
                   } catch (error) {
                     console.error('Error al subir imagen:', error)
                     throw error
@@ -247,8 +238,10 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
                     setIsLoading(false)
                   }
                 }}
-                onRemove={(id) => {
-                  setResources(prev => prev.filter(r => r.id.toString() !== id))
+                onRemove={(item) => {
+                  const filtered = resources.filter(r => r.id.toString() !== item.id.toString())
+                  form.setValue('resources', filtered)
+                  setResources(filtered)
                 }}
               />
             </div>

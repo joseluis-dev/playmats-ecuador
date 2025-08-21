@@ -157,7 +157,7 @@ export const CategoriesManager = () => {
                   <FormItem>
                     <FormLabel>Nombre</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nombre de la categoría" {...field} />
+                      <Input placeholder="Nombre de la categoría" className='bg-transparent dark:bg-transparent' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -171,7 +171,7 @@ export const CategoriesManager = () => {
                   <FormItem>
                     <FormLabel>Descripción</FormLabel>
                     <FormControl>
-                      <Input placeholder="Descripción de la categoría" {...field} />
+                      <Input placeholder="Descripción de la categoría" className='bg-transparent dark:bg-transparent' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -185,7 +185,7 @@ export const CategoriesManager = () => {
                   <FormItem>
                     <FormLabel>Color</FormLabel>
                     <FormControl>
-                      <Input type="color" {...field} />
+                      <Input type="color" className='bg-transparent dark:bg-transparent' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

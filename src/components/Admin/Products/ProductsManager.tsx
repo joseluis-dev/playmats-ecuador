@@ -14,10 +14,8 @@ export const ProductsManager = () => {
     try {
       setIsLoading(true)
       const response = await api.get('products?include=categories,attributes,resources')
-      console.log('Productos cargados:', response)
       setProducts(response as Product[])
     } catch (error) {
-      console.error('Error al cargar productos:', error)
       toast.error('Error al cargar los productos')
     } finally {
       setIsLoading(false)
@@ -94,6 +92,24 @@ export const ProductsManager = () => {
                   const createdProduct = response as Product
                   productId = createdProduct.id
                   toast.success('Producto creado correctamente')
+                }
+
+                const newResources = product.resources.filter(r => r.file)
+                const toDeleteResources = (selectedProduct?.resourceProducts ?? []).filter(({ resource }) => !product.resources.some(r => r.id === resource.id)).map(({ resource }) => resource)
+                
+                if (newResources.length > 0) {
+                  await Promise.all(newResources.map(async (r) => {
+                    const formData = new FormData()
+                    if (r.file) formData.append('file', r.file)
+                    formData.append('isBanner', r.isBanner ? 'true' : 'false')
+                    return api.postForm(`products/${productId}/resources`, formData)
+                  }))
+                }
+
+                if (toDeleteResources.length > 0) {
+                  await Promise.all(toDeleteResources.map(async (r) => {
+                    return api.delete(`products/${productId}/resources/${r.id}`)
+                  }))
                 }
 
                 // Actualizar categorías y atributos

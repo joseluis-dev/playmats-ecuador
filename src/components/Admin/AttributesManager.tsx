@@ -160,7 +160,7 @@ export const AttributesManager = () => {
                   <FormItem>
                     <FormLabel>Nombre</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nombre del atributo" {...field} />
+                      <Input placeholder="Nombre del atributo" className='bg-transparent dark:bg-transparent' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -174,7 +174,7 @@ export const AttributesManager = () => {
                   <FormItem>
                     <FormLabel>Valor</FormLabel>
                     <FormControl>
-                      <Input placeholder="Valor del atributo" {...field} />
+                      <Input placeholder="Valor del atributo" className='bg-transparent dark:bg-transparent' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -188,7 +188,7 @@ export const AttributesManager = () => {
                   <FormItem>
                     <FormLabel>Color</FormLabel>
                     <FormControl>
-                      <Input type="color" {...field} />
+                      <Input type="color" className='bg-transparent dark:bg-transparent' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

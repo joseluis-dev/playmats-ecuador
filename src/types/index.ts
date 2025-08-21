@@ -42,13 +42,15 @@ export interface ResourceProduct {
 }
 
 export interface Resource {
-  id: number
+  id: number | string
   name?: string
   url?: string
   thumbnail?: string
   watermark?: string
   hosting?: string
   type?: ResourceType
+  file?: File
+  isBanner?: boolean
 }
 
 export interface BaseModel {
