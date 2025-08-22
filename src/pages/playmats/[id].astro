@@ -5,121 +5,20 @@ import { AddToCartButton } from "@/components/AddToCartButton.tsx";
 import Layout from "@/layouts/Layout.astro";
 import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon.astro";
 import { Image } from "astro:assets";
+import type { Product, Resource } from "@/types";
+import { api } from "@/services/api";
 
 const { id } = Astro.params;
 
-const PRODUCT = {
-  id: "1",
-  name: "Vitral de Tierras",
-  price: 10.0,
-  title: "Info 1",
-  description:
-    "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus.",
-  categories: [
-    {
-      name: "Playmats",
-      color: "blue",
-    },
-  ],
-  attributes: [
-    {
-      name: "Antideslizante",
-      color: "green",
-    },
-    {
-      name: "Impermeable",
-      color: "#d736f7",
-    },
-    {
-      name: "Antideslizante",
-      color: "green",
-    },
-    {
-      name: "Impermeable",
-      color: "#d736f7",
-    },
-    {
-      name: "Antideslizante",
-      color: "green",
-    },
-    {
-      name: "Impermeable",
-      color: "#d736f7",
-    },
-  ],
-  resources: [
-    {
-      id: "1",
-      name: "Banner",
-      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      hosting: "Cloudinary",
-      type: "image",
-      isBanner: true,
-    },
-    {
-      id: "2",
-      name: "Banner 2",
-      url: "https://res.cloudinary.com/dcxt2wrcm/video/upload/v1745801921/Reel_Facebook_as4coi.mp4",
-      watermark: "https://res.cloudinary.com/dcxt2wrcm/video/upload/v1745801921/Reel_Facebook_as4coi.mp4",
-      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Bordados_jiyq3m.webp",
-      hosting: "Cloudinary",
-      type: "video",
-      isBanner: false,
-    },
-    {
-      id: "3",
-      name: "Banner 3",
-      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      hosting: "Cloudinary",
-      type: "image",
-      isBanner: false,
-    },
-    {
-      id: "4",
-      name: "Banner 2",
-      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
-      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
-      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
-      hosting: "Cloudinary",
-      type: "image",
-      isBanner: false,
-    },
-    {
-      id: "5",
-      name: "Banner 3",
-      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      hosting: "Cloudinary",
-      type: "image",
-      isBanner: false,
-    },
-    {
-      id: "6",
-      name: "Banner 2",
-      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
-      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
-      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp",
-      hosting: "Cloudinary",
-      type: "image",
-      isBanner: false,
-    },
-    {
-      id: "7",
-      name: "Banner 3",
-      url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      watermark: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      thumbnail: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-      hosting: "Cloudinary",
-      type: "image",
-      isBanner: false,
-    },
-  ],
+const PRODUCT = await api.get(`products/${id}`) as Product & {
+  productResources: {
+    resource: Resource;
+    isBanner: boolean;
+  }[];
 };
+
+const resources = PRODUCT.productResources.map(({ resource }) => resource) as Resource[];
+
 ---
 
 <Layout title=`Playmats EC - ${PRODUCT.name}`>
@@ -135,7 +34,7 @@ const PRODUCT = {
         transition-scale duration-1000 ease-in-out
         opacity-30 -z-10
         bg-center bg-cover bg-no-repeat bg-blend-luminosity"
-      style={`background-image: url(${PRODUCT.resources[0].url});`}
+      style={`background-image: url(${resources[0].url});`}
     >
     </div>
 
@@ -154,10 +53,10 @@ const PRODUCT = {
     </div>
 
     <div class="flex flex-col lg:flex-row gap-4 w-full">
-      <Galery client:load resources={PRODUCT.resources}/>
-      <div class="flex flex-col gap-4 w-full">
+      <Galery client:load resources={resources}/>
+      <div class="flex flex-col gap-4 w-full lg:max-w-[35%]">
         <Image
-          src={PRODUCT.resources.filter((image) => image.isBanner)[0].url}
+          src={PRODUCT.productResources.filter((image) => image.isBanner)[0]?.resource?.url || resources[0]?.url || ''}
           transition:name={`img-${id}`}
           width={100}
           height={100}
@@ -170,7 +69,7 @@ const PRODUCT = {
             <p class="text-pretty">{PRODUCT.description}</p>
             <div class="flex flex-wrap gap-2 p-[1px]">
               {
-                PRODUCT.categories.map((category) => (
+                PRODUCT.categories?.map((category) => (
                   <Badge
                     color={category.color}
                     label={category.name}
@@ -179,7 +78,7 @@ const PRODUCT = {
                 ))
               }
               {
-                PRODUCT.attributes.map((attribute) => (
+                PRODUCT.attributes?.map((attribute) => (
                   <Badge
                     color={attribute.color}
                     label={attribute.name}

@@ -3,138 +3,17 @@ import { AddToCartButton } from "@/components/AddToCartButton.tsx";
 import Badge from "@/components/Badge.astro";
 import Card from "@/components/Card.astro";
 import Layout from "@/layouts/Layout.astro";
+import { api } from "@/services/api.ts";
+import type { Product, Category, Attribute, ResourceProduct, Resource } from "@/types";
 
-const PRODUCTS = [
-	{
-		id: '1',
-		name: 'Vitral de Tierras',
-		price: 10.00,
-		title: 'Info 1',
-		categories: [{
-			name: 'Playmats',
-			color: 'blue',
-		}],
-		attributes: [{
-			name: 'Antideslizante',
-			color: 'green',
-		}, {
-			name: 'Impermeable',
-			color: '#d736f7',
-		}],
-		resources: [
-			{
-				name: 'Banner',
-				url: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp',
-				hosting: 'Cloudinary',
-				type: 'image',
-				isBanner: true,
-			}
-		]
-	},
-	{
-		id: '2',
-		name: 'Info 2',
-		price: 20.00,
-		title: 'Info 2',
-		categories: [
-			{
-				name: 'Logos',
-				color: 'blue',
-			},
-		],
-		attributes: [
-			{
-				name: 'Antideslizante',
-				color: '#04db48',
-			},
-			{
-				name: 'Impermeable',
-				color: 'purple',
-			},
-		],
-		resources: [
-			{
-				name: 'Banner',
-				url: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Logos_piizxy.webp',
-				hosting: 'Cloudinary',
-				type: 'image',
-				isBanner: true,
-			}
-		]
-	},
-	{
-		id: '3',
-		name: 'Info 3',
-		price: 25.00,
-		title: 'Info 3',
-		categories: [{
-			name: 'Mouspad Gamer',
-			color: 'blue',
-		}],
-		attributes: [{
-			name: 'Antideslizante',
-			color: 'yellow',
-		}, {
-			name: 'Impermeable',
-			color: 'pink',
-		}],
-		resources: [{
-			name: 'Banner',
-			url: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Mouspad-Gamer_yau6cl.webp',
-			hosting: 'Cloudinary',
-			type: 'image',
-			isBanner: true,
-		}]
-	},
-	{
-		id: '4',
-		name: 'Info 4',
-		price: 30.00,
-		title: 'Info 4',
-		categories: [{
-			name: 'Fundas',
-			color: 'green',
-		}],
-		attributes: [{
-			name: 'Antideslizante',
-			color: 'blue',
-		}, {
-			name: 'Impermeable',
-			color: 'purple',
-		}],
-		resources: [{
-			name: 'Banner',
-			url: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Fundas_y8jq2w.webp',
-			hosting: 'Cloudinary',
-			type: 'image',
-			isBanner: true,
-		}]
-	},
-	{
-		id: '5',
-		name: 'Info 5',
-		price: 60.00,
-		title: 'Info 5',
-		categories: [{
-			name: 'Fundas',
-			color: 'green',
-		}],
-		attributes: [{
-			name: 'Antideslizante',
-			color: 'blue',
-		}, {
-			name: 'Impermeable',
-			color: 'purple',
-		}],
-		resources: [{
-			name: 'Banner',
-			url: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Fundas_y8jq2w.webp',
-			hosting: 'Cloudinary',
-			type: 'image',
-			isBanner: true,
-		}]
-	}
-]
+// Fetch products from the API
+const fetchData = async (): Promise<Product[]> => {
+	const res = await api.get<Product[]>('products');
+	return res;
+}
+
+const PRODUCTS = await fetchData();
+
 ---
 
 <Layout title="Playmats EC - Catálogo">
@@ -147,54 +26,74 @@ const PRODUCTS = [
 		"
 	>
 		{
-			PRODUCTS.map((product) => (
-			<a href={`/playmats/${product.id}`} class="
-				rounded-xl
-				group
-			">
-				<Card 
-					class="text-[var(--color-text)]"
-					id={product.id}
-					title={product.name}
-					subtitle="Etiquetas"
-					price={product.price}
-				>
-					<div 
-						slot="image"
-						transition:name={`img-${product.id}`}
-						class="
-							absolute top-0 left-0 bottom-0
-							h-full w-full
-							group-hover:scale-110
-							transition-scale duration-1000 ease-in-out
-							opacity-90 -z-10
-							bg-center bg-cover bg-no-repeat bg-blend-luminosity
-						"
-						style={`background-image: url(${product.resources[0].url});`}
-					/>
-					<ul slot="content" class="w-full flex flex-wrap gap-2 text-sm">
-						{product.categories.map((category) => (
-							<Badge color={category.color} label={category.name} type="outline" />
-						))}
-						{
-							product.attributes.map((attribute) => (
-							<Badge color={attribute.color} label={attribute.name} type="outline" />
-						))}
-					</ul>
-					<AddToCartButton
-						client:visible
-						className={`
-							flex items-center justify-center gap-2
-							absolute top-0 right-0 p-4 ring-1 ring-black/20 dark:ring-white/20
-							rounded-rt-lg rounded-bl-lg bg-[var(--color-primary)]/90 hover:bg-[var(--color-primary)] transition-colors duration-300
-						`}
-						label="Añadir"
-						product={product}
-						slot="footer"
-					/>
-				</Card>
-			</a>
-			))
+			PRODUCTS.map((product) => {
+				// Define additional interface for the API response structure
+				type ApiProduct = Product & {
+					productResources?: {
+						resource: Resource;
+						isBanner: boolean;
+					}[];
+				};
+				
+				const apiProduct = product as ApiProduct;
+
+				// Find banner image from resourceProducts or use first image if available
+				const bannerResource = product.resourceProducts?.find((rp: ResourceProduct) => rp.isBanner)?.resource || 
+									product.resourceProducts?.[0]?.resource ||
+									apiProduct.productResources?.find(pr => pr.isBanner)?.resource || 
+									apiProduct.productResources?.[0]?.resource;
+				
+				const imageUrl = bannerResource?.url || '';
+				
+				return (
+					<a href={`/playmats/${product.id}`} class="
+						rounded-xl
+						group
+					">
+						<Card 
+							class="text-[var(--color-text)]"
+							id={product.id}
+							title={product.name}
+							subtitle="Etiquetas"
+							price={product.price}
+						>
+							<div 
+								slot="image"
+								transition:name={`img-${product.id}`}
+								class="
+									absolute top-0 left-0 bottom-0
+									h-full w-full
+									group-hover:scale-110
+									transition-scale duration-1000 ease-in-out
+									opacity-90 -z-10
+									bg-center bg-cover bg-no-repeat bg-blend-luminosity
+								"
+								style={`background-image: url(${imageUrl});`}
+							/>
+							<ul slot="content" class="w-full flex flex-wrap gap-2 text-sm">
+								{product.categories?.map((category: Category) => (
+									<Badge color={category.color} label={category.name} type="outline" />
+								))}
+								{
+									product.attributes?.map((attribute: Attribute) => (
+									<Badge color={attribute.color} label={attribute.name} type="outline" />
+								))}
+							</ul>
+							<AddToCartButton
+								client:visible
+								className={`
+									flex items-center justify-center gap-2
+									absolute top-0 right-0 p-4 ring-1 ring-black/20 dark:ring-white/20
+									rounded-rt-lg rounded-bl-lg bg-[var(--color-primary)]/90 hover:bg-[var(--color-primary)] transition-colors duration-300
+								`}
+								label="Añadir"
+								product={product}
+								slot="footer"
+							/>
+						</Card>
+					</a>
+				);
+			})
 		}
 	</section>
 </Layout>

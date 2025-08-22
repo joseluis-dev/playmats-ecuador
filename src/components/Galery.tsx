@@ -3,17 +3,7 @@ import clsx from "clsx";
 import './Galery.css';
 import PlayIcon from "./icons/PlayIcon.tsx";
 import { Image } from "@unpic/react"
-
-
-interface Resource {
-  id: string;
-  name: string;
-  url: string;
-  watermark: string;
-  thumbnail: string;
-  type: string;
-  hosting: string;
-}
+import type { Resource } from "@/types/index.ts";
 
 interface GaleryProps {
   resources: Resource[];
@@ -62,12 +52,12 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
                 opacity: resource.id === selected.id ? 1 : 0,
                 pointerEvents: resource.id === selected.id ? 'auto' : 'none'
               }}>
-              {resource.type === 'image' ? (
+              {resource.type === 'IMAGE' ? (
                 <Image
                   key={resource.id}
                   data-role="image"
-                  id={resource.id}
-                  src={resource.watermark}
+                  id={resource.id as string}
+                  src={resource.url as string}
                   alt={resource.name}
                   width={1920}
                   height={1080}
@@ -77,8 +67,8 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
                 <video
                   key={resource.id}
                   data-role="video"
-                  id={resource.id}
-                  src={resource.watermark}
+                  id={resource.id as string}
+                  src={resource.url as string}
                   className="object-cover aspect-video w-full"
                   controls
                   muted
@@ -94,8 +84,8 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
               className="relative flex-none aspect-video w-32 bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
               onClick={() => handleSelect(resource)}
             >
-              <Image src={resource.thumbnail} alt={resource.name} width={128} height={72} />
-              {resource.type === 'video' && (
+              <Image src={resource.thumbnail as string} alt={resource.name} width={128} height={72} />
+              {resource.type === 'VIDEO' && (
                 <span className="absolute  top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-surface)] rounded-full p-2 shadow-md">
                   <PlayIcon className="fill-[var(--color-text)]"/>
                 </span>
