@@ -13,6 +13,7 @@
   "dependencies": {
     "@astrojs/react": "4.2.7",
     "@astrojs/vercel": "8.1.4",
+    "@clerk/astro": "2.11.6",
     "@fontsource/nunito": "5.2.5",
     "@fontsource/orbitron": "5.2.5",
     "@hookform/resolvers": "5.0.1",

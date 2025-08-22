@@ -14,6 +14,9 @@ importers:
       '@astrojs/vercel':
         specifier: 8.1.4
         version: 8.1.4(astro@5.7.10(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.2)(typescript@5.8.3))(react@19.1.0)(rollup@4.40.2)
+      '@clerk/astro':
+        specifier: 2.11.6
+        version: 2.11.6(astro@5.7.10(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.2)(typescript@5.8.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@fontsource/nunito':
         specifier: 5.2.5
         version: 5.2.5
@@ -82,7 +85,7 @@ importers:
         version: 0.509.0(react@19.1.0)
       playmats-ecuador:
         specifier: 'file:'
-        version: file:(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.2)(typescript@5.8.3)(vite@6.3.5(jiti@2.4.2)(lightningcss@1.29.2))
+        version: file:(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.2)(typescript@5.8.3)(use-sync-external-store@1.5.0(react@19.1.0))(vite@6.3.5(jiti@2.4.2)(lightningcss@1.29.2))
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -109,7 +112,7 @@ importers:
         version: 3.24.4
       zustand:
         specifier: 5.0.3
-        version: 5.0.3(@types/react@19.1.2)(react@19.1.0)
+        version: 5.0.3(@types/react@19.1.2)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0))
     devDependencies:
       '@tailwindcss/typography':
         specifier: 0.5.16
@@ -248,6 +251,32 @@ packages:
 
   '@capsizecss/unpack@2.4.0':
     resolution: {integrity: sha512-GrSU71meACqcmIUxPYOJvGKF0yryjN/L1aCuE9DViCTJI7bfkjgYDPD1zbNDcINJwSSP6UaBZY9GAbYDO7re0Q==}
+
+  '@clerk/astro@2.11.6':
+    resolution: {integrity: sha512-P0exzmYn4ZILPytX+DUUafMSXx/woXVXYVu2tzfQRrOD7YJBAc7LTC+tTFIc5lA4QpYo/qTBlXiWyNktLktAGQ==}
+    engines: {node: '>=18.17.0'}
+    peerDependencies:
+      astro: ^4.15.0 || ^5.0.0
+
+  '@clerk/backend@2.9.4':
+    resolution: {integrity: sha512-2FpeEeDopQ0fLCuvq5m7p31juR8qIqrRAnf9NzCnAtHt0uwYqpxNhIxQrRGQ8dElsMQshItkf1pYngVRNsODLQ==}
+    engines: {node: '>=18.17.0'}
+
+  '@clerk/shared@3.22.0':
+    resolution: {integrity: sha512-qBtWjnqST0a+sYRArkFwyCwlAM5NxyZvbicz6uvQnq0ZuFQwoGzYiZ0V47kJ+rc6c2jz3qAd8GR1h0hUtfI5cg==}
+    engines: {node: '>=18.17.0'}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-0
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
+  '@clerk/types@4.81.0':
+    resolution: {integrity: sha512-uSVAKUmYiFy2POXP3jNh7iCqdbEpzQe+IjY6MWiI5eYjMXR1l+TwYbU0r3IqnTzAzwm8TlklkpTaeR5ZXKW1Gw==}
+    engines: {node: '>=18.17.0'}
 
   '@emnapi/runtime@1.4.3':
     resolution: {integrity: sha512-pBPWdu6MLKROBX05wSNKcNb++m5Er+KQ9QkB+WVM+pW2Kx9hoSrVTnu3BdkI5eBLZoKu/J6mW/B6i6bJB2ytXQ==}
@@ -1174,6 +1203,9 @@ packages:
   '@shikijs/vscode-textmate@10.0.2':
     resolution: {integrity: sha512-83yeghZ2xxin3Nj8z1NMd/NCuca+gsYXswywDy5bHvwlWL8tpTQmzGeUuHd9FC3E/SBEMvzJRwWEOz5gGes9Qg==}
 
+  '@stablelib/base64@1.0.1':
+    resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
+
   '@standard-schema/utils@0.3.0':
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
 
@@ -1913,6 +1945,9 @@ packages:
   fast-json-stable-stringify@2.1.0:
     resolution: {integrity: sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==}
 
+  fast-sha256@1.3.0:
+    resolution: {integrity: sha512-n11RGP/lrWEFI/bWdygLxhI+pVeo1ZYIVwvvPkW7azl/rOy+F3HYRZ2K5zeE9mmkhQppyv9sQFx0JM9UabnpPQ==}
+
   fdir@6.4.4:
     resolution: {integrity: sha512-1NZP+GK4GfuAv3PqKvxQRDMjdSRZjnkq7KfhlNrCNNlZ0ygQFpebfrnfnq/W7fpUnAv9aGWmY1zKx7FYL3gwhg==}
     peerDependencies:
@@ -1985,6 +2020,9 @@ packages:
 
   github-slugger@2.0.0:
     resolution: {integrity: sha512-IaOQ9puYtjrkq7Y0Ygl9KDZnrf/aiUJYUpVf89y8kyaxbRG7Y1SrX/jaumrv81vc61+kiMempujsM3Yw7w5qcw==}
+
+  glob-to-regexp@0.4.1:
+    resolution: {integrity: sha512-lkX1HJXwyMcprw/5YUZc2s7DrpAiHB21/V+E1rHUrVNokkvB6bqMzT0VfV6/86ZNabt1k14YOIaT7nDvOX3Iiw==}
 
   glob@10.4.5:
     resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
@@ -2132,6 +2170,10 @@ packages:
   jiti@2.4.2:
     resolution: {integrity: sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==}
     hasBin: true
+
+  js-cookie@3.0.5:
+    resolution: {integrity: sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==}
+    engines: {node: '>=14'}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -2470,6 +2512,15 @@ packages:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  nanoid@5.1.5:
+    resolution: {integrity: sha512-Ir/+ZpE9fDsNH0hQ3C68uyThDXzYcim2EqcZ8zn8Chtt1iylPT9xXJB0kPCnqzgcEGikO9RxSrh63MsmVCU7Fw==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+
+  nanostores@1.0.1:
+    resolution: {integrity: sha512-kNZ9xnoJYKg/AfxjrVL4SS0fKX++4awQReGqWnwTRHxeHGZ1FJFVgTqr/eMrNQdp0Tz7M7tG/TDaX8QfHDwVCw==}
+    engines: {node: ^20.0.0 || >=22.0.0}
 
   neotraverse@0.6.18:
     resolution: {integrity: sha512-Z4SmBUweYa09+o6pG+eASabEpP6QkQ70yHj351pQoEXIs8uHbaU2DWVmzBANKgflPa47A50PtB2+NgRpQvr7vA==}
@@ -2865,6 +2916,9 @@ packages:
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
 
+  standardwebhooks@1.0.0:
+    resolution: {integrity: sha512-BbHGOQK9olHPMvQNHWul6MYlrRTAOKn03rOe4A8O3CLWhNf4YHBqq2HJKKC+sfqpxiBY52pNeesD6jIiLDz8jg==}
+
   std-env@3.9.0:
     resolution: {integrity: sha512-UGvjygr6F6tpH7o2qyqR6QYpwraIjKSdtzyBdyytFOHmPZY917kwdwLG0RbOjWOnKmnm3PeHjaoLLMie7kPLQw==}
 
@@ -2893,6 +2947,11 @@ packages:
   strip-ansi@7.1.0:
     resolution: {integrity: sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==}
     engines: {node: '>=12'}
+
+  swr@2.3.4:
+    resolution: {integrity: sha512-bYd2lrhc+VarcpkgWclcUi92wYCpOgMws9Sd1hG1ntAu0NEy+14CbotuFjshBU2kt9rYj9TSmDcybpxpeTU1fg==}
+    peerDependencies:
+      react: ^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
@@ -3127,6 +3186,11 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  use-sync-external-store@1.5.0:
+    resolution: {integrity: sha512-Rb46I4cGGVBmjamjphe8L/UnvJD+uPPtTkNvX5mZgqdbavhI4EbgIWJiIHXJ8bc/i9EQGPRh4DwEURJ552Do0A==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
@@ -3584,6 +3648,45 @@ snapshots:
       fontkit: 2.0.4
     transitivePeerDependencies:
       - encoding
+
+  '@clerk/astro@2.11.6(astro@5.7.10(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.2)(typescript@5.8.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@clerk/backend': 2.9.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/shared': 3.22.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/types': 4.81.0
+      astro: 5.7.10(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.2)(typescript@5.8.3)
+      nanoid: 5.1.5
+      nanostores: 1.0.1
+    transitivePeerDependencies:
+      - react
+      - react-dom
+
+  '@clerk/backend@2.9.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@clerk/shared': 3.22.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/types': 4.81.0
+      cookie: 1.0.2
+      standardwebhooks: 1.0.0
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - react
+      - react-dom
+
+  '@clerk/shared@3.22.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@clerk/types': 4.81.0
+      dequal: 2.0.3
+      glob-to-regexp: 0.4.1
+      js-cookie: 3.0.5
+      std-env: 3.9.0
+      swr: 2.3.4(react@19.1.0)
+    optionalDependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
+  '@clerk/types@4.81.0':
+    dependencies:
+      csstype: 3.1.3
 
   '@emnapi/runtime@1.4.3':
     dependencies:
@@ -4383,6 +4486,8 @@ snapshots:
       '@types/hast': 3.0.4
 
   '@shikijs/vscode-textmate@10.0.2': {}
+
+  '@stablelib/base64@1.0.1': {}
 
   '@standard-schema/utils@0.3.0': {}
 
@@ -5204,6 +5309,8 @@ snapshots:
   fast-json-stable-stringify@2.1.0:
     optional: true
 
+  fast-sha256@1.3.0: {}
+
   fdir@6.4.4(picomatch@4.0.2):
     optionalDependencies:
       picomatch: 4.0.2
@@ -5296,6 +5403,8 @@ snapshots:
     optional: true
 
   github-slugger@2.0.0: {}
+
+  glob-to-regexp@0.4.1: {}
 
   glob@10.4.5:
     dependencies:
@@ -5520,6 +5629,8 @@ snapshots:
       '@pkgjs/parseargs': 0.11.0
 
   jiti@2.4.2: {}
+
+  js-cookie@3.0.5: {}
 
   js-tokens@4.0.0: {}
 
@@ -6030,6 +6141,10 @@ snapshots:
 
   nanoid@3.3.11: {}
 
+  nanoid@5.1.5: {}
+
+  nanostores@1.0.1: {}
+
   neotraverse@0.6.18: {}
 
   nlcst-to-string@4.0.0:
@@ -6147,10 +6262,11 @@ snapshots:
 
   picomatch@4.0.2: {}
 
-  playmats-ecuador@file:(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.2)(typescript@5.8.3)(vite@6.3.5(jiti@2.4.2)(lightningcss@1.29.2)):
+  playmats-ecuador@file:(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.2)(typescript@5.8.3)(use-sync-external-store@1.5.0(react@19.1.0))(vite@6.3.5(jiti@2.4.2)(lightningcss@1.29.2)):
     dependencies:
       '@astrojs/react': 4.2.7(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(jiti@2.4.2)(lightningcss@1.29.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@astrojs/vercel': 8.1.4(astro@5.7.10(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.2)(typescript@5.8.3))(react@19.1.0)(rollup@4.40.2)
+      '@clerk/astro': 2.11.6(astro@5.7.10(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.2)(typescript@5.8.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@fontsource/nunito': 5.2.5
       '@fontsource/orbitron': 5.2.5
       '@hookform/resolvers': 5.0.1(react-hook-form@7.56.3(react@19.1.0))
@@ -6181,7 +6297,7 @@ snapshots:
       tailwind-merge: 3.3.0
       tailwindcss: 4.1.4
       zod: 3.24.4
-      zustand: 5.0.3(@types/react@19.1.2)(react@19.1.0)
+      zustand: 5.0.3(@types/react@19.1.2)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0))
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -6570,6 +6686,11 @@ snapshots:
 
   stackback@0.0.2: {}
 
+  standardwebhooks@1.0.0:
+    dependencies:
+      '@stablelib/base64': 1.0.1
+      fast-sha256: 1.3.0
+
   std-env@3.9.0: {}
 
   string-width@4.2.3:
@@ -6607,6 +6728,12 @@ snapshots:
   strip-ansi@7.1.0:
     dependencies:
       ansi-regex: 6.1.0
+
+  swr@2.3.4(react@19.1.0):
+    dependencies:
+      dequal: 2.0.3
+      react: 19.1.0
+      use-sync-external-store: 1.5.0(react@19.1.0)
 
   symbol-tree@3.2.4:
     optional: true
@@ -6804,6 +6931,10 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.1.2
+
+  use-sync-external-store@1.5.0(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   util-deprecate@1.0.2: {}
 
@@ -7011,9 +7142,10 @@ snapshots:
 
   zod@3.24.4: {}
 
-  zustand@5.0.3(@types/react@19.1.2)(react@19.1.0):
+  zustand@5.0.3(@types/react@19.1.2)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0)):
     optionalDependencies:
       '@types/react': 19.1.2
       react: 19.1.0
+      use-sync-external-store: 1.5.0(react@19.1.0)
 
   zwitch@2.0.4: {}

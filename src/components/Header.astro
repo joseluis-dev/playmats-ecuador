@@ -2,7 +2,13 @@
 import { Cart } from "@/components/Cart.tsx"
 import MoonStarIcon from "@/components/icons/MoonStarIcon.astro"
 import SunIcon from "@/components/icons/SunIcon.astro"
-
+import { 
+  SignInButton, 
+  SignUpButton, 
+  SignedIn, 
+  SignedOut, 
+  UserButton 
+} from '@clerk/astro/components';
 import Menu from "@/components/Menu.astro"
 import NavLink from "@/components/NavLink.astro"
 import { Image } from "astro:assets"
@@ -28,6 +34,23 @@ import { Image } from "astro:assets"
       <span class="sr-only">Toggle theme</span>
     </button>
     <Menu />
+    <SignedIn>
+      <UserButton />
+    </SignedIn>
+    <SignedOut>
+      <div class="flex items-center gap-2">
+        <SignInButton mode="modal">
+          <button class="text-sm hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md py-1 px-2">
+            Iniciar sesión
+          </button>
+        </SignInButton>
+        <SignUpButton mode="modal">
+          <button class="text-sm bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white transition-all duration-300 ease-in-out rounded-md py-1 px-2">
+            Registrarse
+          </button>
+        </SignUpButton>
+      </div>
+    </SignedOut>
   </div>
 </div>
 
