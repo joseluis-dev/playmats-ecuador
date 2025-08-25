@@ -6,7 +6,10 @@ import Social from '@/components/Landing/Social.astro';
 import Video from '@/components/Landing/Video.astro';
 import Layout from '@/layouts/Layout.astro';
 
-export const prerender = true;
+export const prerender = false;
+
+const user = await Astro.locals.currentUser()
+console.log(user?.emailAddresses.map(email => email.emailAddress))
 ---
 
 <Layout title="Playmats EC">

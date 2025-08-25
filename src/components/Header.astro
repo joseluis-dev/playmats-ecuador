@@ -26,31 +26,33 @@ import { Image } from "astro:assets"
     <li><NavLink href="/customise">Personalizar</NavLink></li>
     <li><NavLink href="#contact">Contacto</NavLink></li>
   </ul>
-  <div class="flex items-center">
+  <div class="flex items-center gap-2 md:gap-0">
     <Cart client:load transition:persist/>
-    <button id="theme-button" class="hidden gap-4 ml-4 hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2 md:flex">
-      <span class="dark:hidden"><MoonStarIcon /></span>
-      <span class="hidden dark:inline"><SunIcon /></span>
-      <span class="sr-only">Toggle theme</span>
-    </button>
-    <Menu />
-    <SignedIn>
-      <UserButton />
-    </SignedIn>
-    <SignedOut>
-      <div class="flex items-center gap-2">
-        <SignInButton mode="modal">
-          <button class="text-sm hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md py-1 px-2">
-            Iniciar sesión
-          </button>
-        </SignInButton>
-        <SignUpButton mode="modal">
-          <button class="text-sm bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white transition-all duration-300 ease-in-out rounded-md py-1 px-2">
-            Registrarse
-          </button>
-        </SignUpButton>
-      </div>
-    </SignedOut>
+    <div class="flex gap-2">
+      <button id="theme-button" class="hidden hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2 md:flex">
+        <span class="dark:hidden"><MoonStarIcon /></span>
+        <span class="hidden dark:inline"><SunIcon /></span>
+        <span class="sr-only">Toggle theme</span>
+      </button>
+      <Menu />
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+      <SignedOut>
+        <div class="flex items-center gap-2">
+          <SignInButton mode="modal">
+            <button class="text-sm hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md py-1 px-2">
+              Iniciar sesión
+            </button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <button class="text-sm bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white transition-all duration-300 ease-in-out rounded-md py-1 px-2">
+              Registrarse
+            </button>
+          </SignUpButton>
+        </div>
+      </SignedOut>
+    </div>
   </div>
 </div>
 
