@@ -21,7 +21,7 @@ export default function CartView() {
         <EmptyCart />
       ) : (
         <div className="flex flex-col md:flex-row space-y-4 justify-center gap-4">
-          <div className='flex flex-col gap-2 w-full items-center'>
+          <div className='flex flex-col gap-4 w-full items-center'>
             {cart.map((item) => (
               <CartItem key={item.id} item={item} onRemove={removeItem} onUpdate={updateItem} />
             ))}

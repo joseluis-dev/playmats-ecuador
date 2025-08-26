@@ -145,7 +145,7 @@ export const CategoriesManager = () => {
           />
         </div>
 
-        <div className='flex flex-col p-4 gap-2 w-full bg-[var(--color-surface)]/80 rounded-lg'>
+        <div className='flex flex-col p-4 gap-2 w-full bg-[var(--color-surface)]/90 rounded-lg'>
           <h2 className="text-2xl font-bold">Gestión de Categorías</h2>
         
           <Form {...form}>

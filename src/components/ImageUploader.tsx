@@ -131,7 +131,7 @@ export const ImageUploader = ({
 
   return (
     <div
-      className={`border-1 border-dashed border-[var(--color-text)] rounded-md p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500/80 dark:hover:border-blue-400 transition-all duration-200 ease-in-out h-96 ${className}`}
+      className={`border-1 border-dashed border-[var(--color-text)] rounded-md p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500/90 dark:hover:border-blue-400 transition-all duration-200 ease-in-out h-96 ${className}`}
       onClick={handleClick}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -143,7 +143,7 @@ export const ImageUploader = ({
         <div className="relative w-full h-full flex items-center justify-center">
           <button
             type="button"
-            className="absolute top-2 right-2 bg-[var(--color-primary)]/80 p-2 rounded-full hover:bg-[var(--color-primary)]/100 transition-all duration-200 ease-in-out cursor-pointer z-40"
+            className="absolute top-2 right-2 bg-[var(--color-primary)]/90 p-2 rounded-full hover:bg-[var(--color-primary)]/100 transition-all duration-200 ease-in-out cursor-pointer z-40"
             onClick={handleRemoveFile}
             aria-label="Eliminar archivo"
           >

@@ -34,14 +34,14 @@ export const DataList = <T,>({
 }: DataListProps<T>) => {
   if (items.length === 0 && emptyListComponent) {
     return (
-      <div className={`bg-[var(--color-surface)]/80 rounded-lg overflow-hidden ${className}`}>
+      <div className={`bg-[var(--color-surface)]/90 rounded-lg overflow-hidden ${className}`}>
         {emptyListComponent}
       </div>
     )
   }
 
   return (
-    <div className={`bg-[var(--color-surface)]/80 rounded-lg overflow-hidden ${className}`}>
+    <div className={`bg-[var(--color-surface)]/90 rounded-lg overflow-hidden ${className}`}>
       {listHeaderComponent}
       <div className="flex flex-col divide-y divide-[var(--color-text)]/10">
         {items.map(item => {

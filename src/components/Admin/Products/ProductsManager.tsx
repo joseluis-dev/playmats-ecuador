@@ -68,7 +68,7 @@ export const ProductsManager = () => {
         />
 
         {/* Panel de edición */}
-        <div className="bg-[var(--color-surface)]/80 p-6 rounded-lg">
+        <div className="bg-[var(--color-surface)]/90 p-6 rounded-lg">
           <ProductForm
             product={selectedProduct}
             setProduct={setSelectedProduct}

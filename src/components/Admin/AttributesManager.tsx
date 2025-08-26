@@ -149,7 +149,7 @@ export const AttributesManager = () => {
           />
         </div>
 
-        <div className="bg-[var(--color-surface)]/80 p-4 rounded-lg w-full flex flex-col gap-2">
+        <div className="bg-[var(--color-surface)]/90 p-4 rounded-lg w-full flex flex-col gap-2">
           <h2 className="text-2xl font-bold">{isEditing ? 'Editar Atributo' : 'Nuevo Atributo'}</h2>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">

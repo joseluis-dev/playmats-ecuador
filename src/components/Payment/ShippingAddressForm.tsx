@@ -71,7 +71,7 @@ export const ShippingAddressForm = () => {
               <FormControl>
                 <div className="flex flex-col gap-2">
                   <Label className="text-[var(--color-text)]">Nombre Completo</Label>
-                  <Input  placeholder="Nombre Completo" {...field} className="bg-[var(--color-surface)]/80 dark:bg-[var(--color-surface)]/80 dark:outline-none"/>
+                  <Input  placeholder="Nombre Completo" {...field} className="bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none"/>
                 </div>
               </FormControl>
               <FormMessage />
@@ -86,7 +86,7 @@ export const ShippingAddressForm = () => {
               <FormControl>
                 <div className="flex flex-col gap-2">
                   <Label className="text-[var(--color-text)]">Teléfono</Label>
-                  <Input type="tel" placeholder="Ej. 0999999999" {...field} className="bg-[var(--color-surface)]/80 dark:bg-[var(--color-surface)]/80 dark:outline-none"/>
+                  <Input type="tel" placeholder="Ej. 0999999999" {...field} className="bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none"/>
                 </div>
               </FormControl>
               <FormMessage />
@@ -103,7 +103,7 @@ export const ShippingAddressForm = () => {
                   <Label className="text-[var(--color-text)]">País</Label>
                   <Select onValueChange={field.onChange} defaultValue={field.value} disabled>
                     <FormControl>
-                      <SelectTrigger className="w-full bg-[var(--color-surface)]/80 dark:bg-[var(--color-surface)]/80 dark:outline-none" >
+                      <SelectTrigger className="w-full bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none" >
                         <SelectValue placeholder="Seleccione el país" />
                       </SelectTrigger>
                     </FormControl>
@@ -127,7 +127,7 @@ export const ShippingAddressForm = () => {
                   <Label className="text-[var(--color-text)]">Provincia/Estado</Label>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className="w-full bg-[var(--color-surface)]/80 dark:bg-[var(--color-surface)]/80 dark:outline-none">
+                      <SelectTrigger className="w-full bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none">
                         <SelectValue placeholder="Seleccione la provincia / estado" />
                       </SelectTrigger>
                     </FormControl>
@@ -149,7 +149,7 @@ export const ShippingAddressForm = () => {
               <FormControl>
                 <div className="flex flex-col gap-2">
                   <Label className="text-[var(--color-text)]">Ciudad</Label>
-                  <Input placeholder="Ciudad" {...field} className="bg-[var(--color-surface)]/80 dark:bg-[var(--color-surface)]/80 dark:outline-none"/>
+                  <Input placeholder="Ciudad" {...field} className="bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none"/>
                 </div>
               </FormControl>
               <FormMessage />
@@ -164,7 +164,7 @@ export const ShippingAddressForm = () => {
               <FormControl>
                 <div className="flex flex-col gap-2">
                   <Label className="text-[var(--color-text)]">Código Postal</Label>
-                  <Input placeholder="Código Postal" {...field} className="bg-[var(--color-surface)]/80 dark:bg-[var(--color-surface)]/80 dark:outline-none"/>
+                  <Input placeholder="Código Postal" {...field} className="bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none"/>
                 </div>
               </FormControl>
               <FormMessage />
@@ -179,7 +179,7 @@ export const ShippingAddressForm = () => {
               <FormControl>
                 <div className="flex flex-col gap-2">
                   <Label className="text-[var(--color-text)]">Dirección Principal</Label>
-                  <Input placeholder="Calle Principal" {...field} className="bg-[var(--color-surface)]/80 dark:bg-[var(--color-surface)]/80 dark:outline-none"/>
+                  <Input placeholder="Calle Principal" {...field} className="bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none"/>
                 </div>
               </FormControl>
               <FormMessage />
@@ -194,7 +194,7 @@ export const ShippingAddressForm = () => {
               <FormControl>
                 <div className="flex flex-col gap-2">
                   <Label className="text-[var(--color-text)]">Dirección Secundaria</Label>
-                  <Input placeholder="Calle Secundaria" {...field} className="bg-[var(--color-surface)]/80 dark:bg-[var(--color-surface)]/80 dark:outline-none"/>
+                  <Input placeholder="Calle Secundaria" {...field} className="bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none"/>
                 </div>
               </FormControl>
               <FormMessage />

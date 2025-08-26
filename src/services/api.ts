@@ -1,5 +1,5 @@
 // Use environment variable for API URL
-const API_URL = import.meta.env.API_URL || 'http://localhost:3000'; // Default fallback if env variable is not set
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8080';
 
 export const api = {
   get: async <T>(endpoint: string): Promise<T> => {
