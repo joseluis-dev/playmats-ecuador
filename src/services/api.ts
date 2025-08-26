@@ -1,4 +1,5 @@
-export const API_URL = 'http://localhost:8080'
+// Use environment variable for API URL
+const API_URL = import.meta.env.API_URL || 'http://localhost:3000'; // Default fallback if env variable is not set
 
 export const api = {
   get: async <T>(endpoint: string): Promise<T> => {
