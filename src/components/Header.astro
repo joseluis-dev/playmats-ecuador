@@ -40,15 +40,11 @@ import { Image } from "astro:assets"
       </SignedIn>
       <SignedOut>
         <div class="flex items-center gap-2">
-          <SignInButton mode="modal">
-            <button class="text-sm hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md py-1 px-2">
-              Iniciar sesión
-            </button>
+          <SignInButton mode="modal" class={'text-sm bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] transition-all duration-300 ease-in-out rounded-md py-1 px-2'}>
+            Iniciar sesión
           </SignInButton>
-          <SignUpButton mode="modal">
-            <button class="text-sm bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white transition-all duration-300 ease-in-out rounded-md py-1 px-2">
-              Registrarse
-            </button>
+          <SignUpButton mode="modal" class={'text-sm bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white transition-all duration-300 ease-in-out rounded-md py-1 px-2'}>
+            Registrarse
           </SignUpButton>
         </div>
       </SignedOut>
