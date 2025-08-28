@@ -22,6 +22,7 @@ export const api = {
       },
       body: JSON.stringify(body)
     })
+    console.log({ response })
     const data = await response.json()
     return data
   },

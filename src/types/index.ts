@@ -1,23 +1,23 @@
 // Enums
-export type Status = 'active' | 'suspended'
+export type Status = 'ACTIVE' | 'SUSPENDED'
 export type ResourceType = 'VIDEO' | 'IMAGE' | 'PDF' | 'DOCX'
-export type OrderStatus = 'pending' | 'delivered' | 'cancelled'
-export type PaymentStatus = 'pending' | 'completed' | 'failed'
-export type PaymentMethod = 'credit_card' | 'paypal' | 'transfer' | 'cash'
+export type OrderStatus = 'PENDING' | 'DELIVERED' | 'CANCELLED'
+export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED'
+export type PaymentMethod = 'CREDIT_CARD' | 'PAYPAL' | 'TRANSFER' | 'CASH'
 
 // Base Types
 export interface User {
-  id: string
+  id?: string
   provider?: string
-  provider_id?: string
+  providerId?: string
   email: string
   name?: string
-  avatar_url?: string
-  created_at?: Date
-  last_login?: Date
+  avatarUrl?: string
+  createdAt?: Date
+  lastLogin?: Date
   role?: string
   status?: Status
-  updated_at?: Date
+  updatedAt?: Date
 }
 
 export interface Product {

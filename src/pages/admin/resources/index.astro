@@ -1,8 +1,10 @@
 ---
 import { ResourcesManager } from "@/components/Admin/ResourcesManager";
 import Layout from "@/layouts/Layout.astro";
+import { checkAuthAndRedirect } from "@/utils/authUtils";
 
-// TODO: Agregar protección de ruta para administradores
+const redirectResult = await checkAuthAndRedirect(Astro, 'ADMIN');
+if (redirectResult) return redirectResult;
 ---
 
 <Layout title="Administración de Recursos - Playmats Ecuador">
