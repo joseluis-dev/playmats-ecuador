@@ -12,6 +12,7 @@ import {
 import Menu from "@/components/Menu.astro"
 import NavLink from "@/components/NavLink.astro"
 import { Image } from "astro:assets"
+import AddressIcon from "./icons/AddressIcon.astro";
 ---
 <div class="relative flex items-center justify-between py-4 px-8 ">
   <a href="/" class="z-100">
@@ -36,7 +37,25 @@ import { Image } from "astro:assets"
       </button>
       <Menu />
       <SignedIn>
-        <UserButton />
+        <UserButton>
+          <UserButton.MenuItems>
+            <UserButton.Action label="Dirección" open="direccion">
+              <AddressIcon slot="label-icon" class="w-4 h-4" />
+            </UserButton.Action>
+          </UserButton.MenuItems>
+
+          <UserButton.UserProfilePage label="Dirección" url="direccion">
+            <AddressIcon slot="label-icon" class="w-4 h-4" />
+            <div>
+              <div class="border-b border-gray-200 h-10">
+                <h1 class="mb-3 font-bold text-[17px]">Dirección</h1>
+              </div>
+              <div class="py-4 text-sm">
+                <p>This is the custom address page</p>
+              </div>
+            </div>
+          </UserButton.UserProfilePage>
+        </UserButton>
       </SignedIn>
       <SignedOut>
         <div class="flex items-center gap-2">
