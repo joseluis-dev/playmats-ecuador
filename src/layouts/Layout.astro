@@ -12,25 +12,27 @@ const { title } = Astro.props
 <html lang="es" class="">
 	<head>
 		<script is:inline>
-			try {
-				if (localStorage.theme === "dark") {
-					document.documentElement.classList.remove('light');
-					document.documentElement.classList.add('dark');
-				} else if (localStorage.theme === "light") {
-					document.documentElement.classList.remove('dark');
-					document.documentElement.classList.add('light');
-				} else {
-					if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-						document.documentElement.classList.remove('light');
-						document.documentElement.classList.add('dark');
-						localStorage.setItem('theme', 'dark');
-					} else {
-						document.documentElement.classList.remove('dark');
-						document.documentElement.classList.add('light');
-						localStorage.setItem('theme', 'light');
+			// shadcn recommended inline theme script for Astro
+			const getThemePreference = () => {
+				try {
+					if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+						return localStorage.getItem('theme');
 					}
+				} catch {}
+				return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+			};
+			const isDark = getThemePreference() === 'dark';
+			document.documentElement.classList[isDark ? 'add' : 'remove']('dark');
+
+			try {
+				if (typeof localStorage !== 'undefined') {
+					const observer = new MutationObserver(() => {
+						const isDarkNow = document.documentElement.classList.contains('dark');
+						localStorage.setItem('theme', isDarkNow ? 'dark' : 'light');
+					});
+					observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 				}
-			} catch (e) {}
+			} catch {}
 		</script>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
@@ -53,18 +55,3 @@ const { title } = Astro.props
 		<Toaster richColors closeButton position="top-right" client:only />
 	</body>
 </html>
-
-<script is:inline>
-	function applyTheme() {
-		if (localStorage.theme === "dark") {
-			document.documentElement.classList.remove('light');
-			document.documentElement.classList.add('dark');
-		} else if (localStorage.theme === "light") {
-			document.documentElement.classList.remove('dark');
-			document.documentElement.classList.add('light');
-		}
-		}
-	
-		document.addEventListener("astro:after-swap", applyTheme);
-		applyTheme();
-	</script>

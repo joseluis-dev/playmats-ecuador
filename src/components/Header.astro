@@ -1,7 +1,5 @@
 ---
 import { Cart } from "@/components/Cart.tsx"
-import MoonStarIcon from "@/components/icons/MoonStarIcon.astro"
-import SunIcon from "@/components/icons/SunIcon.astro"
 import { 
   SignInButton, 
   SignUpButton, 
@@ -14,6 +12,7 @@ import NavLink from "@/components/NavLink.astro"
 import { Image } from "astro:assets"
 import AddressIcon from "./icons/AddressIcon.astro";
 import { AddressesClerk } from "@/components/Address/AddressesClerk";
+import { ModeToggle } from "@/components/ModeToggle";
 ---
 <div class="relative flex items-center justify-between py-4 px-8 ">
   <a href="/" class="z-100">
@@ -28,14 +27,10 @@ import { AddressesClerk } from "@/components/Address/AddressesClerk";
     <li><NavLink href="/customise">Personalizar</NavLink></li>
     <li><NavLink href="#contact">Contacto</NavLink></li>
   </ul>
-  <div class="flex items-center gap-2 md:gap-0">
+  <div class="flex items-center gap-2">
     <Cart client:load transition:persist/>
     <div class="flex gap-2">
-      <button id="theme-button" class="hidden hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2 md:flex">
-        <span class="dark:hidden"><MoonStarIcon /></span>
-        <span class="hidden dark:inline"><SunIcon /></span>
-        <span class="sr-only">Toggle theme</span>
-      </button>
+      <ModeToggle client:load />
       <Menu />
       <SignedIn>
         <UserButton>
@@ -66,20 +61,3 @@ import { AddressesClerk } from "@/components/Address/AddressesClerk";
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener("astro:page-load", () => {
-    document.querySelector("#theme-button")?.addEventListener("click", () => {
-      const theme = localStorage.getItem("theme");
-      if (theme === "dark") {
-        document.documentElement.classList.remove("dark");
-        document.documentElement.classList.add("light");
-        localStorage.setItem("theme", "light");
-      } else if (theme === "light") {
-        document.documentElement.classList.add("dark");
-        document.documentElement.classList.remove("light");
-        localStorage.setItem("theme", "dark");
-      }
-    });
-  });
-</script>
