@@ -85,15 +85,15 @@ export interface State {
 
 export interface ShippingAddress {
   id: number
-  user_id?: string
+  user?: { id: string }
   fullname?: string
   phone?: string
-  country_id?: number
-  state_id?: number
+  country?: { id?: number }
+  state?: { id?: number }
   city?: string
-  postal_code?: string
-  address_one?: string
-  address_two?: string
+  postalCode?: string
+  addressOne?: string
+  addressTwo?: string
   current?: boolean
 }
 

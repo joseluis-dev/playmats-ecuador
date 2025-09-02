@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -30,36 +30,19 @@ const addressSchema = z.object({
   current: z.boolean(),
 });
 
-// Datos de ejemplo para los selectores
-const countries = [
-  { id: "1", name: "Ecuador" },
-  { id: "2", name: "Colombia" },
-  { id: "3", name: "Perú" }
-];
-
-const states = {
-  "1": [ // Ecuador
-    { id: "1", name: "Pichincha" },
-    { id: "2", name: "Guayas" },
-    { id: "3", name: "Azuay" },
-    { id: "4", name: "Tungurahua" }
-  ],
-  "2": [ // Colombia
-    { id: "5", name: "Cundinamarca" },
-    { id: "6", name: "Antioquia" }
-  ],
-  "3": [ // Perú
-    { id: "7", name: "Lima" },
-    { id: "8", name: "Arequipa" }
-  ]
-};
+// Datos desde API
+type CountryOption = { id: number; nombre: string, states: StateOption[] }
+type StateOption = { id: number; nombre: string; country_id: number }
 
 interface AddressFormProps {
   initialData: Address | null;
   onSave: (address: Address) => void;
+  countries: CountryOption[];
+  states: StateOption[];
 }
 
-export const AddressForm = ({ initialData, onSave }: AddressFormProps) => {
+export const AddressForm = ({ initialData, onSave, countries, states }: AddressFormProps) => {
+  console.log({ initialData })
   // Configuración del formulario
   const form = useForm<z.infer<typeof addressSchema>>({
     resolver: zodResolver(addressSchema),
@@ -67,8 +50,8 @@ export const AddressForm = ({ initialData, onSave }: AddressFormProps) => {
       id: initialData?.id,
       fullname: initialData?.fullname || "",
       phone: initialData?.phone || "",
-      country: initialData?.country || "",
-      state: initialData?.state || "",
+      country: initialData?.country ? countries.find(c => c.nombre === initialData.country)?.id.toString() || "" : "",
+      state: initialData?.state ? states.find(s => s.nombre === initialData.state)?.id.toString() || "" : "",
       city: initialData?.city || "",
       postal_code: initialData?.postal_code || "",
       address_one: initialData?.address_one || "",
@@ -95,6 +78,20 @@ export const AddressForm = ({ initialData, onSave }: AddressFormProps) => {
     }
   }, [initialData, form]);
 
+  // If initial values are names (not IDs), map them to IDs once options are loaded
+  useEffect(() => {
+    const currentCountry = form.getValues('country')
+    if (currentCountry && isNaN(Number(currentCountry))) {
+      const match = countries.find(c => c.nombre === currentCountry)
+      if (match) form.setValue('country', String(match.id))
+    }
+    const currentState = form.getValues('state')
+    if (currentState && isNaN(Number(currentState))) {
+      const match = states.find(s => s.nombre === currentState)
+      if (match) form.setValue('state', String(match.id))
+    }
+  }, [countries, states])
+
   // Manejador de envío del formulario
   function onSubmit(values: z.infer<typeof addressSchema>) {
     onSave(values as Address);
@@ -102,11 +99,12 @@ export const AddressForm = ({ initialData, onSave }: AddressFormProps) => {
 
   // Obtener el país seleccionado
   const selectedCountry = form.watch("country");
-  
-  // Filtrar estados según el país seleccionado
-  const availableStates = selectedCountry 
-    ? states[selectedCountry as keyof typeof states] || []
-    : [];
+  const availableStates = useMemo(() => {
+    if (!selectedCountry) return []
+    const cid = Number(selectedCountry)
+    console.log(countries.find(c => c.id === cid))
+    return countries.find(c => c.id === cid)?.states
+  }, [selectedCountry, states])
 
   return (
     <Form {...form}>
@@ -175,15 +173,13 @@ export const AddressForm = ({ initialData, onSave }: AddressFormProps) => {
                       onValueChange={field.onChange} 
                       defaultValue={field.value}
                     >
-                      <FormControl>
-                        <SelectTrigger className="w-full bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none" >
-                          <SelectValue placeholder="Seleccione el país" />
-                        </SelectTrigger>
-                      </FormControl>
+                        <SelectTrigger className="w-full z-[100000] bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none" >
+                        <SelectValue placeholder="Seleccione el país" />
+                      </SelectTrigger>
                       <SelectContent>
-                        {countries.map((country) => (
-                          <SelectItem key={country.id} value={country.id}>
-                            {country.name}
+                        {countries && countries.map((country) => (
+                          <SelectItem key={country.id} value={String(country.id)}>
+                            {country.nombre}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -210,14 +206,14 @@ export const AddressForm = ({ initialData, onSave }: AddressFormProps) => {
                       disabled={!selectedCountry}
                     >
                       <FormControl>
-                        <SelectTrigger className="w-full bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none">
+                        <SelectTrigger className="w-full z-[100000] bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none">
                           <SelectValue placeholder="Seleccione la provincia / estado" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {availableStates.map((state) => (
-                          <SelectItem key={state.id} value={state.id}>
-                            {state.name}
+                        {availableStates && availableStates.map((state) => (
+                          <SelectItem key={state.id} value={String(state.id)}>
+                            {state.nombre}
                           </SelectItem>
                         ))}
                       </SelectContent>
