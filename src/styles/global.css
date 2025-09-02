@@ -123,6 +123,37 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Scrollbar base */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Fondo del track */
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+  border-radius: 5px;
+}
+
+/* Thumb (la parte que se mueve) */
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 5px;
+  border: 2px solid var(--color-surface); /* efecto de separación */
+  transition: background 0.3s ease;
+}
+
+/* Hover en el thumb */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--link-hover-color);
+}
+
+/* Firefox */
+/* * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) var(--color-surface);
+} */
+
 body {
   display: grid;
   grid-template-rows: auto 3fr auto;
