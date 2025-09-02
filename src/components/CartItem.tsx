@@ -9,7 +9,6 @@ interface CartItemProps {
 }
 
 export default function CartItem({ item, onRemove, onUpdate }: CartItemProps) {
-  console.log(item)
   const handleRemove = (e: React.MouseEvent) => {
     e.preventDefault();
     onRemove(item);
@@ -27,8 +26,8 @@ export default function CartItem({ item, onRemove, onUpdate }: CartItemProps) {
     onUpdate(item, item.quantity - 1);
   };
 
-  const banner = item.resourceProducts.find((resource: ResourceProduct) => resource.isBanner)?.resource || item.resourceProducts[0]?.resource;
-
+  const banner = item.resourceProducts?.find((resource: ResourceProduct) => resource.isBanner)?.resource || item.resourceProducts?.[0]?.resource;
+  
   return (
       <a href={`/playmats/${item.id}`} className="
         relative flex gap-4 md:max-w-[600px]

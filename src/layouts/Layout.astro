@@ -12,27 +12,51 @@ const { title } = Astro.props
 <html lang="es" class="">
 	<head>
 		<script is:inline>
-			// shadcn recommended inline theme script for Astro
-			const getThemePreference = () => {
-				try {
-					if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-						return localStorage.getItem('theme');
-					}
-				} catch {}
-				return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-			};
-			const isDark = getThemePreference() === 'dark';
-			document.documentElement.classList[isDark ? 'add' : 'remove']('dark');
+			if (!window.__themeInit) {
+				window.__themeInit = true;
 
-			try {
-				if (typeof localStorage !== 'undefined') {
+				const getThemePreference = () => {
+					try {
+						const ls = localStorage.getItem('theme');
+						if (ls === 'dark' || ls === 'light') return ls;
+					} catch {}
+					return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+				};
+
+				const applyTheme = (doc = document) => {
+					const mode = getThemePreference();
+					const root = doc.documentElement;
+					if (mode === 'dark') {
+						root.classList.add('dark');
+						root.style.colorScheme = 'dark';
+					} else {
+						root.classList.remove('dark');
+						root.style.colorScheme = 'light';
+					}
+				};
+
+				// Initial apply
+				applyTheme(document);
+
+				// Keep localStorage and color-scheme synced when user toggles the class
+				try {
 					const observer = new MutationObserver(() => {
 						const isDarkNow = document.documentElement.classList.contains('dark');
-						localStorage.setItem('theme', isDarkNow ? 'dark' : 'light');
+						try { localStorage.setItem('theme', isDarkNow ? 'dark' : 'light'); } catch {}
+						document.documentElement.style.colorScheme = isDarkNow ? 'dark' : 'light';
 					});
 					observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-				}
-			} catch {}
+					window.__themeObserver = observer;
+				} catch {}
+
+				// Ensure theme persists through ClientRouter swaps
+				document.addEventListener('astro:before-swap', (event) => {
+					try { applyTheme(event.newDocument); } catch {}
+				});
+				document.addEventListener('astro:after-swap', () => {
+					applyTheme(document);
+				});
+			}
 		</script>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />

@@ -21,13 +21,22 @@ export const cartService = {
    * { user: { id }, product: { id }, quantity }
    */
   addItem: async (
-    params: { userId: string; productId: string; quantity?: number }
+    params: { userId: string; productId: string; quantity?: number; price: number; subtotal?: number }
   ): Promise<Cart> => {
-    const { userId, productId, quantity = 1 } = params
-    return await api.post<Cart>(`${CARTS_ENDPOINT}` as string, {
+    const { userId, productId, price } = params
+    const quantity = params.quantity ?? 1
+    const subtotal = params.subtotal ?? quantity * price
+    // Payload según backend:
+    // {
+    //   user: { id }, quantity, price, subtotal,
+    //   products: [{ id: productId }]
+    // }
+    return await api.post<Cart>(`${CARTS_ENDPOINT}`, {
       user: { id: userId },
-      product: { id: productId },
       quantity,
+      price,
+      subtotal,
+      products: [{ id: productId }]
     })
   },
 
