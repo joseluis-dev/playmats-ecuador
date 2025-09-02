@@ -160,10 +160,7 @@ export const AddressesClerk = () => {
     try {
       setLoading(true)
       const updated = await addressService.setDefault(id, userId)
-      // Refresh list to ensure only one default
-      const apiAddresses = await addressService.listByUser(userId)
-      const mapped = apiAddresses.map(a => mapFromApi(a, statesById as any, countriesById as any)).sort((a, b) => (a.id ?? 0) - (b.id ?? 0))
-      setAddresses(mapped)
+      setAddresses(prev => prev.map(a => a.id === id ? { ...a, current: true } : { ...a, current: false }))
     } catch (e) {
       setError('No se pudo establecer la dirección predeterminada')
     } finally {
@@ -203,7 +200,11 @@ export const AddressesClerk = () => {
       
       {/* Contenido principal: lista o formulario */}
       <div className="py-2">
-        {activeTab === "list" ? (
+        {loading ? (
+          <div className="w-full min-h-[30vh] flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--color-primary)]" />
+          </div>
+        ) : activeTab === "list" ? (
           <AddressList 
             addresses={addresses} 
             onEdit={handleEditAddress}

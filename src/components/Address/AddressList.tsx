@@ -61,16 +61,16 @@ export const AddressList = ({
             <div className="border-t border-border px-4 py-3 bg-accent/20 flex justify-between items-center">
               <div className="space-x-2">
                 <Button 
-                  variant="outline" 
+                  variant="secondary" 
                   size="sm"
                   onClick={() => onEdit(address)}
                 >
                   Editar
                 </Button>
                 <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-destructive"
+                  variant="ghost"
+                  className="text-red-600 hover:!bg-red-600/10 dark:hover:!bg-red-600/20 hover:!text-red-600"
+                  size="sm"
                   onClick={() => address.id && onDelete(address.id)}
                 >
                   Eliminar
