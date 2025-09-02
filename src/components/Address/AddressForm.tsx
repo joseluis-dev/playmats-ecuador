@@ -345,7 +345,7 @@ export const AddressForm = ({ initialData, onSave }: AddressFormProps) => {
         {/* Botón de guardar */}
         <Button 
           type="submit" 
-          className="bg-[var(--color-accent)] text-[var(--color-accent-text)] hover:bg-[var(--color-accent)]/90 w-full"
+          className="text-[var(--color-text)] w-full"
         >
           {initialData ? "Actualizar Dirección" : "Guardar Dirección"}
         </Button>
