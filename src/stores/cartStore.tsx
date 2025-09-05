@@ -62,18 +62,6 @@ const mapCartApiToItems = (cart: Cart): CartItemType[] => {
   }) ?? [];
 };
 
-const mapItemsToCartApi = (items: CartItemType[], userId: string): Cart => {
-  return {
-    user: { id: userId },
-    cartProducts: items.map((item) => ({
-      product: { id: item.id } as Product,
-      quantity: item.quantity,
-      price: item.price,
-      subtotal: item.subtotal !== undefined ? Number(item.subtotal) : undefined,
-    })),
-  };
-};
-
 const fetchCurrentUserId = async (): Promise<string | null> => {
   try {
     const res = await fetch('/api/me', { credentials: 'include' });

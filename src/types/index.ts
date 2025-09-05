@@ -73,23 +73,23 @@ export interface Attribute extends BaseModel {
 }
 
 export interface Country {
-  id: number
-  nombre: string
+  id?: number
+  nombre?: string
 }
 
 export interface State {
-  id: number
-  nombre: string
-  country_id: number
+  id?: number
+  nombre?: string
+  country_id?: number
 }
 
 export interface ShippingAddress {
-  id: number
-  user?: { id: string }
+  id?: number
+  user?: User
   fullname?: string
   phone?: string
-  country?: { id?: number }
-  state?: { id?: number }
+  country?: Country
+  state?: State
   city?: string
   postalCode?: string
   addressOne?: string

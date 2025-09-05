@@ -14,7 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Address } from "./AddressesClerk";
+import type { ShippingAddress } from "@/types";
+import type { FormValues } from "../Payment/ShippingAddressForm";
 
 // Esquema de validación para el formulario
 const addressSchema = z.object({
@@ -24,9 +25,9 @@ const addressSchema = z.object({
   country: z.string().min(1, "El país es requerido"),
   state: z.string().min(1, "La provincia/estado es requerido"),
   city: z.string().min(1, "La ciudad es requerida"),
-  postal_code: z.string().min(1, "El código postal es requerido"),
-  address_one: z.string().min(1, "La dirección principal es requerida"),
-  address_two: z.string().optional(),
+  postalCode: z.string().min(1, "El código postal es requerido"),
+  addressOne: z.string().min(1, "La dirección principal es requerida"),
+  addressTwo: z.string().optional(),
   current: z.boolean(),
 });
 
@@ -35,8 +36,8 @@ type CountryOption = { id: number; nombre: string, states: StateOption[] }
 type StateOption = { id: number; nombre: string; country_id: number }
 
 interface AddressFormProps {
-  initialData: Address | null;
-  onSave: (address: Address) => void;
+  initialData: ShippingAddress | null;
+  onSave: (address: FormValues) => void;
   countries: CountryOption[];
   states: StateOption[];
 }
@@ -53,9 +54,9 @@ export const AddressForm = ({ initialData, onSave, countries, states }: AddressF
       country: initialData?.country ? countries.find(c => c.nombre === initialData.country)?.id.toString() || "" : "",
       state: initialData?.state ? states.find(s => s.nombre === initialData.state)?.id.toString() || "" : "",
       city: initialData?.city || "",
-      postal_code: initialData?.postal_code || "",
-      address_one: initialData?.address_one || "",
-      address_two: initialData?.address_two || "",
+      postalCode: initialData?.postalCode || "",
+      addressOne: initialData?.addressOne || "",
+      addressTwo: initialData?.addressTwo || "",
       current: initialData?.current || false,
     },
   });
@@ -65,15 +66,15 @@ export const AddressForm = ({ initialData, onSave, countries, states }: AddressF
     if (initialData) {
       form.reset({
         id: initialData.id,
-        fullname: initialData.fullname,
-        phone: initialData.phone,
-        country: initialData.country,
-        state: initialData.state,
-        city: initialData.city,
-        postal_code: initialData.postal_code,
-        address_one: initialData.address_one,
-        address_two: initialData.address_two,
-        current: initialData.current,
+        fullname: initialData.fullname || "",
+        phone: initialData.phone || "",
+        country: initialData.country ? countries.find(c => c.nombre === (typeof initialData.country === "string" ? initialData.country : (initialData.country as any).nombre))?.id.toString() || "" : "",
+        state: initialData.state ? states.find(s => s.nombre === (typeof initialData.state === "string" ? initialData.state : (initialData.state as any).nombre))?.id.toString() || "" : "",
+        city: initialData.city || "",
+        postalCode: initialData.postalCode || "",
+        addressOne: initialData.addressOne || "",
+        addressTwo: initialData.addressTwo || "",
+        current: initialData.current || false,
       });
     }
   }, [initialData, form]);
@@ -94,7 +95,7 @@ export const AddressForm = ({ initialData, onSave, countries, states }: AddressF
 
   // Manejador de envío del formulario
   function onSubmit(values: z.infer<typeof addressSchema>) {
-    onSave(values as Address);
+    onSave(values as FormValues);
   }
 
   // Obtener el país seleccionado
@@ -251,7 +252,7 @@ export const AddressForm = ({ initialData, onSave, countries, states }: AddressF
           {/* Código postal */}
           <FormField
             control={form.control}
-            name="postal_code"
+            name="postalCode"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
@@ -273,7 +274,7 @@ export const AddressForm = ({ initialData, onSave, countries, states }: AddressF
         {/* Dirección principal */}
         <FormField
           control={form.control}
-          name="address_one"
+          name="addressOne"
           render={({ field }) => (
             <FormItem>
               <FormControl>
@@ -294,7 +295,7 @@ export const AddressForm = ({ initialData, onSave, countries, states }: AddressF
         {/* Dirección secundaria */}
         <FormField
           control={form.control}
-          name="address_two"
+          name="addressTwo"
           render={({ field }) => (
             <FormItem>
               <FormControl>

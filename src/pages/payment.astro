@@ -2,55 +2,26 @@
 import { PaymentForm } from "@/components/Payment/PaymentForm";
 import { AccordionWrapper } from "@/components/Payment/AccordionWrapper";
 import Layout from "@/layouts/Layout.astro";
-
-const SHIPPING_ADDRESSES = [
-  {
-    id: "1",
-    fullname: "Juan Pérez",
-    phone: "+54 9 11 1234-5678",
-    country: {
-      id: "ARG",
-      name: "Argentina",
-    },
-    state: {
-      id: "BUE",
-      name: "Buenos Aires",
-    },
-    city: "Buenos Aires",
-    postal_code: "1234",
-    address_one: "Av. Corrientes 1234",
-    address_two: "Piso 5, Dpto. A",
-  },
-  {
-    id: "2",
-    fullname: "María López",
-    phone: "+54 9 11 9876-5432",
-    country: {
-      id: "ARG",
-      name: "Argentina",
-    },
-    state: {
-      id: "BUE",
-      name: "Buenos Aires",
-    },
-    city: "La Plata",
-    postal_code: "5678",
-    address_one: "Calle 12 3456",
-    address_two: "Piso 2, Dpto. B",
-  }
-]
+import PaymentSummary from "@/components/Payment/PaymentSummary";
 
 ---
 <Layout title="Playmats EC - Pago">
-  <section class="w-full max-w-[1400px] mx-auto p-16 md:p-20">
-    <article class="w-full max-w-lg mx-auto flex flex-col gap-2 items-center">
-      <h1 class="text-2xl mb-4">Confirmar Pedido</h1>
-      <h2>Dirección de envío:</h2>
-      <AccordionWrapper client:visible items={SHIPPING_ADDRESSES}/>
-      <p class="m-block-1lh mt-5">
-        Para que podamos crear tu tapete, necesitamos que subas la imagen del <strong>comprobante de pago.</strong>
-      </p>
-      <PaymentForm client:visible/>
-    </article>
+  <section class="w-full max-w-screen-xl mx-auto p-8 md:p-12">
+    <h1 class="text-2xl mb-6">Confirmar Pedido</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+      <div class="order-2 md:order-1 flex self-start sticky top-20">
+        <PaymentSummary client:visible />
+      </div>
+      <div class="order-1 md:order-2">
+        <article class="w-full max-w-lg flex flex-col gap-2">
+          <h2 class="text-base">Dirección de envío:</h2>
+          <AccordionWrapper client:visible />
+          <p class="m-block-1lh mt-5">
+            Para que podamos crear tu tapete, necesitamos que subas la imagen del <strong>comprobante de pago.</strong>
+          </p>
+          <PaymentForm client:visible/>
+        </article>
+      </div>
+    </div>
   </section>
 </Layout>

@@ -65,7 +65,7 @@ export const ProductList = () => {
                 <Card 
                   className="text-[var(--color-text)]"
                   id={product.id}
-                  title={product.name}
+                  title={product.name as string}
                   subtitle="Etiquetas"
                   price={product.price?.toString()}
                   imageSlot={

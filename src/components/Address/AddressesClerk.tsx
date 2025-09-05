@@ -3,105 +3,29 @@ import { AddressList } from "./AddressList";
 import { AddressForm } from "./AddressForm";
 import { addressService } from "@/services/addressService";
 import type { ShippingAddress } from "@/types";
-
-// Interfaces para manejo de datos
-export interface Address {
-  id?: number;
-  fullname: string;
-  phone: string;
-  country: string; // UI-friendly country name or id
-  state: string;   // UI-friendly state name or id
-  city: string;
-  postal_code: string;
-  address_one: string;
-  address_two?: string;
-  current: boolean;
-}
-
-// Helpers to map API ShippingAddress to local Address UI type
-function mapFromApi(a: ShippingAddress, statesById: Record<number, string>, countriesById: Record<number, string>): Address {
-  return {
-    id: a.id,
-    fullname: a.fullname || "",
-    phone: a.phone || "",
-    country: a.country != null ? countriesById[a.country.id as number] ?? String(a.country.id) : "",
-    state: a.state != null ? statesById[a.state.id as number] ?? String(a.state.id) : "",
-    city: a.city || "",
-    postal_code: a.postalCode || "",
-    address_one: a.addressOne || "",
-    address_two: a.addressTwo || "",
-    current: !!a.current,
-  }
-}
-
-function mapToApi(a: Address, countryIdLookup: Record<string, number>, stateIdLookup: Record<string, number>, userId: string): Omit<ShippingAddress, 'id'> {
-  const country_id = countryIdLookup[a.country] ?? Number(a.country)
-  const state_id = stateIdLookup[a.state] ?? Number(a.state)
-  return {
-    user: {
-      id: userId
-    },
-    fullname: a.fullname,
-    phone: a.phone,
-    country: {
-      id: isNaN(Number(country_id)) ? undefined : Number(country_id)
-    },
-    state: {
-      id: isNaN(Number(state_id)) ? undefined : Number(state_id)
-    },
-    city: a.city,
-    postalCode: a.postal_code,
-    addressOne: a.address_one,
-    addressTwo: a.address_two,
-    current: a.current,
-  }
-}
+import { useAddress } from "@/hooks/useAddress";
+import type { FormValues } from "../Payment/ShippingAddressForm";
 
 export const AddressesClerk = () => {
   // Estados para gestionar la interfaz
-  const [addresses, setAddresses] = useState<Address[]>([]);
+  const { addresses, loadAddresses, addAddress, updateAddress, deleteAddress, setCurrent, error, loading } = useAddress();
   const [activeTab, setActiveTab] = useState<"list" | "form">("list");
-  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [userId, setUserId] = useState<string | null>(null)
+  const [editingAddress, setEditingAddress] = useState<ShippingAddress | null>(null);
   const [countries, setCountries] = useState<{ id: number; nombre: string }[]>([])
   const [states, setStates] = useState<{ id: number; nombre: string; country_id: number }[]>([])
 
-  const countriesById = useMemo(() => Object.fromEntries(countries.map(c => [c.id, c.nombre])), [countries])
-  const statesById = useMemo(() => Object.fromEntries(states.map(s => [s.id, s.nombre])), [states])
-  const countryIdLookup = useMemo(() => Object.fromEntries(countries.map(c => [c.nombre, c.id])), [countries])
-  const stateIdLookup = useMemo(() => Object.fromEntries(states.map(s => [s.nombre, s.id])), [states])
-
   useEffect(() => {
-    // Load current backend user, countries, states and addresses
+    loadAddresses();
     (async () => {
       try {
-        setLoading(true)
-        setError(null)
-        const [meRes, fetchedCountries, fetchedStates] = await Promise.all([
-          fetch('/api/me').then(r => r.json() as Promise<{ user: { id: string } | null }>),
+        const [fetchedCountries, fetchedStates] = await Promise.all([
           addressService.getCountries(),
           addressService.getStates().catch(() => [] as any)
         ])
-        const user = meRes.user
-        if (!user?.id) {
-          setAddresses([])
-          setLoading(false)
-          return
-        }
-        setUserId(user.id)
         setCountries(fetchedCountries as any)
         setStates(fetchedStates as any)
-        const statesIndex = Object.fromEntries((fetchedStates as any[]).map((s: any) => [s.id, s.nombre]))
-        const countriesIndex = Object.fromEntries((fetchedCountries as any[]).map((c: any) => [c.id, c.nombre]))
-        const apiAddresses = await addressService.listByUser(user.id)
-        const mapped = apiAddresses.map(a => mapFromApi(a, statesIndex, countriesIndex)).sort((a, b) => (a.id ?? 0) - (b.id ?? 0))
-        setAddresses(mapped)
-      } catch (e) {
-        setError('No se pudieron cargar las direcciones')
-      } finally {
-        setLoading(false)
+      } catch (error) {
+        console.error(error)
       }
     })()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -113,59 +37,27 @@ export const AddressesClerk = () => {
     setActiveTab("form");
   };
 
-  const handleEditAddress = (address: Address) => {
+  const handleEditAddress = (address: ShippingAddress) => {
     setEditingAddress(address);
     setActiveTab("form");
   };
 
-  const handleSaveAddress = async (address: Address) => {
-    if (!userId) return
-    try {
-      setLoading(true)
-      if (address.id) {
-        const payload = mapToApi(address, countryIdLookup, stateIdLookup, userId)
-        console.log('Updating address:', payload)
-        const updated = await addressService.update(address.id, payload)
-      } else {
-        const payload = mapToApi(address, countryIdLookup, stateIdLookup, userId)
-        console.log('Creating address:', payload)
-        const created = await addressService.create(payload)
-      }
-      const apiAddresses = await addressService.listByUser(userId)
-      const mapped = apiAddresses.map(a => mapFromApi(a, statesById as any, countriesById as any)).sort((a, b) => (a.id ?? 0) - (b.id ?? 0))
-      setAddresses(mapped)
-      setActiveTab("list")
-      setEditingAddress(null)
-    } catch (e) {
-      setError('No se pudo guardar la dirección')
-    } finally {
-      setLoading(false)
+  const handleSaveAddress = async (address: FormValues) => {
+    if (address.id) {
+      await updateAddress(address.id, address)
+    } else {
+      await addAddress(address)
     }
+    setActiveTab("list")
+    setEditingAddress(null)
   };
 
   const handleDeleteAddress = async (id: number) => {
-    try {
-      setLoading(true)
-      const ok = await addressService.delete(id)
-      if (ok) setAddresses(prev => prev.filter(a => a.id !== id))
-    } catch (e) {
-      setError('No se pudo eliminar la dirección')
-    } finally {
-      setLoading(false)
-    }
+    await deleteAddress(id)
   };
 
   const handleSetDefaultAddress = async (id: number) => {
-    if (!userId) return
-    try {
-      setLoading(true)
-      const updated = await addressService.setDefault(id, userId)
-      setAddresses(prev => prev.map(a => a.id === id ? { ...a, current: true } : { ...a, current: false }))
-    } catch (e) {
-      setError('No se pudo establecer la dirección predeterminada')
-    } finally {
-      setLoading(false)
-    }
+    setCurrent(id);
   };
 
   return (

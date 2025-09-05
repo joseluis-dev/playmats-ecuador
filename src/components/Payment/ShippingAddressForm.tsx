@@ -13,56 +13,75 @@ import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "../ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { useMemo } from "react"
 
 const shippingAddressSchema = z.object({
-  user_id: z.string().uuid(),
+  id: z.number().optional(),
   fullname: z.string().min(1, "El nombre completo es requerido"),
   phone: z.string().min(7, "El teléfono es requerido"),
-  country_id: z.string(),
-  state_id: z.string(),
+  country: z.string().min(1, "El país es requerido"),
+  state: z.string().min(1, "La provincia/estado es requerido"),
   city: z.string().min(1, "La ciudad es requerida"),
-  postal_code: z.string().min(1, "El código postal es requerido"),
-  address_one: z.string().min(1, "La dirección principal es requerida"),
-  address_two: z.string().optional(),
+  postalCode: z.string().min(1, "El código postal es requerido"),
+  addressOne: z.string().min(1, "La dirección principal es requerida"),
+  addressTwo: z.string().optional(),
   current: z.boolean(),
 });
 
-export const ShippingAddressForm = () => {
-  const form = useForm<z.infer<typeof shippingAddressSchema>>({
+type CountryOption = { id: number; nombre: string, states: StateOption[] }
+type StateOption = { id: number; nombre: string; country_id: number }
+
+interface ShippingAddressFormProps {
+  onSave: (address: z.infer<typeof shippingAddressSchema>) => void;
+  countries: CountryOption[];
+  states: StateOption[];
+}
+
+export interface FormValues extends z.infer<typeof shippingAddressSchema> {}
+
+export const ShippingAddressForm = ({ onSave, countries, states }: ShippingAddressFormProps) => {
+  const form = useForm<FormValues>({
     resolver: zodResolver(shippingAddressSchema),
     defaultValues: {
-      user_id: "",
       fullname: "",
       phone: "",
-      country_id: '0',
-      state_id: '',
+      country: '',
+      state: '',
       city: "",
-      postal_code: "",
-      address_one: "",
-      address_two: "",
+      postalCode: "",
+      addressOne: "",
+      addressTwo: "",
       current: false,
     },
   })
 
   function onSubmit(values: z.infer<typeof shippingAddressSchema>) {
-    console.log(values)
+    onSave && onSave(values)
+    form.reset({
+      fullname: "",
+      phone: "",
+      country: '',
+      state: '',
+      city: "",
+      postalCode: "",
+      addressOne: "",
+      addressTwo: "",
+      current: false,
+    })
   }
+
+  // Obtener el país seleccionado
+  const selectedCountry = form.watch("country");
+  const availableStates = useMemo(() => {
+    if (!selectedCountry) return []
+    const cid = Number(selectedCountry)
+    console.log(countries.find(c => c.id === cid))
+    return countries.find(c => c.id === cid)?.states
+  }, [selectedCountry, states])
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-        <FormField
-          control={form.control}
-          name="user_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input {...field} className="hidden"/>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <FormField
           control={form.control}
           name="fullname"
@@ -95,20 +114,25 @@ export const ShippingAddressForm = () => {
         />
         <FormField
           control={form.control}
-          name="country_id"
+          name="country"
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <div className="flex flex-col gap-2">
-                  <Label className="text-[var(--color-text)]">País</Label>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled>
-                    <FormControl>
-                      <SelectTrigger className="w-full bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none" >
-                        <SelectValue placeholder="Seleccione el país" />
-                      </SelectTrigger>
-                    </FormControl>
+                  <Label className="text-[var(--color-text)] text-sm">País</Label>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    defaultValue={field.value}
+                  >
+                      <SelectTrigger className="w-full z-[100000] bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none" >
+                      <SelectValue placeholder="Seleccione el país" />
+                    </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="0">Ecuador</SelectItem>
+                      {countries && countries.map((country) => (
+                        <SelectItem key={country.id} value={String(country.id)}>
+                          {country.nombre}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -118,29 +142,37 @@ export const ShippingAddressForm = () => {
           )}
         />
         <FormField
-          control={form.control}
-          name="state_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <div className="flex flex-col gap-2">
-                  <Label className="text-[var(--color-text)]">Provincia/Estado</Label>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="w-full bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none">
-                        <SelectValue placeholder="Seleccione la provincia / estado" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="0">Tungurahua</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            control={form.control}
+            name="state"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <div className="flex flex-col gap-2">
+                    <Label className="text-[var(--color-text)] text-sm">Provincia/Estado</Label>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                      disabled={!selectedCountry}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full z-[100000] bg-[var(--color-surface)]/90 dark:bg-[var(--color-surface)]/90 dark:outline-none">
+                          <SelectValue placeholder="Seleccione la provincia / estado" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableStates && availableStates.map((state) => (
+                          <SelectItem key={state.id} value={String(state.id)}>
+                            {state.nombre}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         <FormField
           control={form.control}
           name="city"
@@ -158,7 +190,7 @@ export const ShippingAddressForm = () => {
         />
         <FormField
           control={form.control}
-          name="postal_code"
+          name="postalCode"
           render={({ field }) => (
             <FormItem>
               <FormControl>
@@ -173,7 +205,7 @@ export const ShippingAddressForm = () => {
         />
         <FormField
           control={form.control}
-          name="address_one"
+          name="addressOne"
           render={({ field }) => (
             <FormItem>
               <FormControl>
@@ -188,7 +220,7 @@ export const ShippingAddressForm = () => {
         />
         <FormField
           control={form.control}
-          name="address_two"
+          name="addressTwo"
           render={({ field }) => (
             <FormItem>
               <FormControl>

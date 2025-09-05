@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Address } from "./AddressesClerk";
+import type { ShippingAddress } from "@/types";
 
 interface AddressListProps {
-  addresses: Address[];
-  onEdit: (address: Address) => void;
+  addresses: ShippingAddress[];
+  onEdit: (address: ShippingAddress) => void;
   onDelete: (id: number) => void;
   onSetDefault: (id: number) => void;
 }
@@ -49,12 +49,12 @@ export const AddressList = ({
               </div>
               
               <p className="mt-2 text-sm text-muted-foreground">
-                {address.address_one}
-                {address.address_two && `, ${address.address_two}`},
+                {address.addressOne}
+                {address.addressTwo && `, ${address.addressTwo}`},
                 {` ${address.city}, ${address.state}`}
               </p>
               <p className="text-sm text-muted-foreground">
-                {address.postal_code}, {address.country}
+                {address.postalCode}, {address.country?.nombre}
               </p>
             </div>
             
