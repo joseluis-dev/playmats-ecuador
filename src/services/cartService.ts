@@ -1,5 +1,5 @@
 import { api } from './api'
-import type { Cart } from '@/types'
+import type { Cart, CartProduct } from '@/types'
 
 // Asumimos convención REST similar a otros recursos del backend
 // Si en tu Postman el path difiere (p. ej. "cart" o "cart-items"), ajusta CARTS_ENDPOINT
@@ -20,39 +20,25 @@ export const cartService = {
    * Body esperado (según estilo del backend):
    * { user: { id }, product: { id }, quantity }
    */
-  addItem: async (
-    params: { userId: string; productId: string; quantity?: number; price: number; subtotal?: number }
+  create: async (
+    params: Cart
   ): Promise<Cart> => {
-    const { userId, productId, price } = params
-    const quantity = params.quantity ?? 1
-    const subtotal = params.subtotal ?? quantity * price
-    // Payload según backend:
-    // {
-    //   user: { id }, quantity, price, subtotal,
-    //   products: [{ id: productId }]
-    // }
-    return await api.post<Cart>(`${CARTS_ENDPOINT}`, {
-      user: { id: userId },
-      quantity,
-      price,
-      subtotal,
-      products: [{ id: productId }]
-    })
+    return await api.post<Cart>(`${CARTS_ENDPOINT}`, params)
   },
 
   /**
    * Actualiza la cantidad de un item del carrito
    * PATCH /carts/{id}
    */
-  updateItem: async (id: string | number, quantity: number): Promise<Cart> => {
-    return await api.patch<Cart>(`${CARTS_ENDPOINT}/${id}`, { quantity })
+  update: async (cart: Cart, cartId: string | number): Promise<Cart> => {
+    return await api.patch<Cart>(`${CARTS_ENDPOINT}/${cartId}`, cart)
   },
 
   /**
    * Elimina un item del carrito
    * DELETE /carts/{id}
    */
-  deleteItem: async (id: string | number): Promise<boolean> => {
+  delete: async (id: string | number): Promise<boolean> => {
     return await api.delete(`${CARTS_ENDPOINT}/${id}`)
   },
 

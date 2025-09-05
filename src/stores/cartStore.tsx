@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { cartService } from "@/services/cartService";
-import type { Cart, Product, ResourceProduct } from "@/types";
+import type { Cart, CartProduct, Product, ResourceProduct } from "@/types";
 
 // Tipo para un producto en el carrito
 export interface CartItemType {
@@ -8,7 +8,7 @@ export interface CartItemType {
   id: string;
   price: number;
   quantity: number;
-  subtotal: string; // mantener string para UI
+  subtotal?: string; // mantener string para UI
   // ID del item en el carrito en el backend (para update/delete)
   cartItemId?: string | number;
   // Aceptar enriquecimiento con datos del producto para UI
@@ -26,7 +26,7 @@ interface CartState {
   loading: boolean;
   error: string | null;
   // Sin cambiar la firma pública para los componentes actuales
-  addToCart: (item: Omit<CartItemType, 'quantity' | 'subtotal'>) => Promise<void> | void;
+  addToCart: (item: CartItemType) => Promise<void> | void;
   removeFromCart: (item: CartItemType) => Promise<void> | void;
   clearCart: () => Promise<void> | void;
   updateCart: (item: CartItemType, quantity: number) => Promise<void> | void;
@@ -41,10 +41,10 @@ const computeTotals = (items: CartItemType[]) => {
   return { total: total.toFixed(2), totalItems };
 };
 
-const mapCartApiToItems = (carts: Cart[]): CartItemType[] => {
-  return carts.map((c) => {
-    const product = (c as any).product || (c.products && c.products[0]) || (c as any).product_id || null;
-    const productId = (product && (product.id || product.product_id)) ?? String(c.id);
+const mapCartApiToItems = (cart: Cart): CartItemType[] => {
+  return cart.cartProducts?.map((c) => {
+    const product = (c as any).product || c.product || (c as any).product_id || null;
+    const productId = (product && product.id);
     const price = (c.price ?? (product?.price ?? 0)) as number;
     const quantity = c.quantity ?? 1;
     const subtotalNum = (c.subtotal ?? quantity * price) as number;
@@ -58,9 +58,20 @@ const mapCartApiToItems = (carts: Cart[]): CartItemType[] => {
       cartItemId: c.id,
       name,
       resourceProducts,
-      product: product ?? undefined,
     } as CartItemType;
-  });
+  }) ?? [];
+};
+
+const mapItemsToCartApi = (items: CartItemType[], userId: string): Cart => {
+  return {
+    user: { id: userId },
+    cartProducts: items.map((item) => ({
+      product: { id: item.id } as Product,
+      quantity: item.quantity,
+      price: item.price,
+      subtotal: item.subtotal !== undefined ? Number(item.subtotal) : undefined,
+    })),
+  };
 };
 
 const fetchCurrentUserId = async (): Promise<string | null> => {
@@ -90,9 +101,15 @@ export const useCartStore = create<CartState>((set, get) => ({
       return;
     }
     try {
-      const apiItems = await cartService.listByUser(userId);
-      const mapped = mapCartApiToItems(apiItems);
-      console.log(mapped)
+      const cart = await cartService.listByUser(userId);
+      if (!cart) {
+        set({ cart: [], loading: false });
+        return;
+      }
+      if (cart.length > 1) {
+        throw new Error('Se encontraron múltiples carritos para el usuario. Por favor, contacte al soporte.');
+      }
+      const mapped = mapCartApiToItems(cart[0]);
       const { total, totalItems } = computeTotals(mapped);
       set({ cart: mapped, total, totalItems, loading: false, error: null });
     } catch (e: any) {
@@ -106,7 +123,41 @@ export const useCartStore = create<CartState>((set, get) => ({
       return
     }
     try {
-      await cartService.addItem({ userId, productId: item.id, quantity: 1, price: item.price ?? 0 });
+      const existCart = await cartService.listByUser(userId);
+      if (existCart.length > 1) {
+        throw new Error('Se encontraron múltiples carritos para el usuario. Por favor, contacte al soporte.');
+      }
+
+      const currentItems = get().cart;
+      const exists = currentItems.find((ci) => ci.id === item.id);
+      
+      if (exists) {
+        // Si ya existe, actualizar cantidad
+        await get().updateCart(exists, exists.quantity + 1);
+        return;
+      }
+
+      const newItem: Cart = {
+        user: {
+          id: userId
+        },
+        cartProducts: [
+          {
+            product: {
+              id: item.id
+            },
+            quantity: 1,
+            price: item.price ?? 0,
+          }
+        ]
+      }
+
+      if (!existCart || existCart.length === 0) {
+        await cartService.create(newItem);
+        return
+      }
+      console.log({ existCart })
+      await get().updateCart(item, 1);
     } catch (e) {
       console.error('Error al agregar item al carrito:', e);
     }
@@ -118,16 +169,13 @@ export const useCartStore = create<CartState>((set, get) => ({
       return;
     }
     try {
-      // Borrar primero en backend
-      let cartItemId = item.cartItemId as string | number | undefined;
-      if (!cartItemId) {
-        await get().loadCart();
-        const found = get().cart.find((c) => c.id === item.id);
-        cartItemId = found?.cartItemId;
+      const exists = get().cart.find((ci) => ci.id === item.id);
+      if (!exists) {
+        throw new Error('El item no existe en el carrito');
       }
-      if (cartItemId !== undefined) {
-        await cartService.deleteItem(cartItemId);
-      }
+      console.log({ exists });
+      await get().updateCart(exists, 0);
+      get().loadCart();
     } catch (e) {
       console.error('Error al eliminar item del carrito:', e);
     }
@@ -155,17 +203,61 @@ export const useCartStore = create<CartState>((set, get) => ({
       return;
     }
     try {
-      let cartItemId = item.cartItemId as string | number | undefined;
-      if (!cartItemId) {
-        await get().loadCart();
-        const found = get().cart.find((c) => c.id === item.id);
-        cartItemId = found?.cartItemId;
+      const userCart = await cartService.listByUser(userId);
+      if (userCart.length === 0) {
+        throw new Error('No se encontró un carrito para el usuario.');
       }
-      if (cartItemId !== undefined) {
-        await cartService.updateItem(cartItemId, quantity);
+      const cartId = userCart[0].id;
+      if (cartId === undefined) {
+        throw new Error('El carrito no tiene un id válido');
       }
-      await get().loadCart();
-    } catch {
+      const exists = get().cart.find((ci) => ci.id === item.id);
+      if (!exists && quantity > 0) {
+        console.log('Agregar nuevo item al carrito');
+        const updatedCart = {
+          ...userCart[0],
+          cartProducts: [
+            ...(userCart[0].cartProducts || []),
+            { product: { id: item.id } as Product, quantity }
+          ]
+        }
+        await cartService.update(updatedCart, cartId);
+        return
+      }
+
+      if (exists && quantity <= 0) {
+        console.log('Eliminar item del carrito');
+        const updatedCart = {
+          ...userCart[0],
+          cartProducts: (userCart[0].cartProducts || []).filter((cp) => {
+            const cartProductID = (cp as any).id;
+            return cartProductID !== exists.cartItemId;
+          }),
+        };
+        await cartService.update(updatedCart, cartId);
+        return
+      }
+
+      const updatedCartProducts = userCart[0].cartProducts?.map((cp) => {
+        const cartProductID = (cp as any).id;
+        if (cartProductID === exists?.cartItemId) {
+          return {
+            ...cp,
+            quantity
+          };
+        }
+        return cp;
+      });
+
+      const updatedCart = {
+        ...userCart[0],
+        cartProducts: updatedCartProducts,
+      };
+      console.log({ updatedCart })
+      await cartService.update(updatedCart, cartId);
+    } catch (e) {
+      console.error('Error al actualizar item del carrito:', e);
+    } finally {
       await get().loadCart();
     }
   },

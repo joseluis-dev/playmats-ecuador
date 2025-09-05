@@ -10,7 +10,7 @@ export interface User {
   id?: string
   provider?: string
   providerId?: string
-  email: string
+  email?: string
   name?: string
   avatarUrl?: string
   createdAt?: Date
@@ -22,7 +22,7 @@ export interface User {
 
 export interface Product {
   id: string
-  name: string
+  name?: string
   description?: string
   price?: number
   created_at?: Date
@@ -132,13 +132,21 @@ export interface Payment {
   created_at?: Date
 }
 
-export interface Cart {
-  id: string
-  user_id?: string
+export interface CartProduct {
+  id?: number
+  product: Product
   quantity: number
-  price: number
-  subtotal: number
-  created_at?: Date
-  updated_at?: Date
-  products?: Product[]
+  price?: number
+  subtotal?: number
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface Cart {
+  id?: string
+  user?: User
+  cartProducts?: CartProduct[]
+  total?: number
+  createdAt?: Date
+  updatedAt?: Date
 }
