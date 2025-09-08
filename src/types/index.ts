@@ -122,14 +122,14 @@ export interface OrderProduct {
 
 export interface Payment {
   id: string
-  order_id?: string
+  orderId?: string
   amount?: number
-  provider_payment_id?: string
+  providerPaymentId?: string
   method?: PaymentMethod
   status?: PaymentStatus
-  image_url?: string
-  paid_at?: Date
-  created_at?: Date
+  imageUrl?: string
+  paidAt?: Date
+  createdAt?: Date
 }
 
 export interface CartProduct {

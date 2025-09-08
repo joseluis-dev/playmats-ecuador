@@ -10,6 +10,11 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { ImageUploader } from "@/components/ImageUploader"
+import { useAddress } from "@/hooks/useAddress"
+import { useEffect } from "react"
+import { orderService } from "@/services/orderService"
+import { useCart } from "@/hooks/useCart"
+import type { ShippingAddress } from "@/types"
 
 const formSchema = z.object({
   comprobante: z
@@ -18,20 +23,41 @@ const formSchema = z.object({
     })
     .refine(file => file.type.startsWith("image/"), {
       message: "El archivo debe ser una imagen",
-    })
+    }),
+    shippingAddress: z.custom<ShippingAddress | null>((val) => {
+      return val === null || (typeof val === 'object' && (val.id === undefined || typeof val.id === 'number'));
+    }),
 })
 
+export interface PaymentFormValues extends z.infer<typeof formSchema> {}
+
 export const PaymentForm = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const { selected } = useAddress()
+  const { cart, clearCart } = useCart()
+  const form = useForm<PaymentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       comprobante: undefined,
+      shippingAddress: selected ?? null,
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log('Submitting with values:', values);
+    await orderService.createFromCart(cart, values)
+    await clearCart()
+    form.reset({
+      comprobante: undefined,
+      shippingAddress: selected ?? null,
+    })
+    window.location.assign('/orders')
   }
+
+  useEffect(() => {
+    if (selected && typeof selected.id === "number") {
+      form.setValue("shippingAddress", selected)
+    }
+  }, [selected])
 
   return (
     <Form {...form}>
@@ -56,7 +82,9 @@ export const PaymentForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="text-[var(--color-text)] w-full">Subir comprobante</Button>
+        <Button type="submit" className="text-[var(--color-text)] w-full">
+          Crear Orden
+        </Button>
       </form>
     </Form>
   )

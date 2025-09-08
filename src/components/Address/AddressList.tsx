@@ -51,7 +51,7 @@ export const AddressList = ({
               <p className="mt-2 text-sm text-muted-foreground">
                 {address.addressOne}
                 {address.addressTwo && `, ${address.addressTwo}`},
-                {` ${address.city}, ${address.state}`}
+                {` ${address.city}, ${address.state?.nombre}`}
               </p>
               <p className="text-sm text-muted-foreground">
                 {address.postalCode}, {address.country?.nombre}

@@ -1,0 +1,165 @@
+import type { PaymentFormValues } from '@/components/Payment/PaymentForm'
+import { api } from './api'
+import type { Order, OrderProduct, OrderStatus, Payment, PaymentMethod, Cart, ShippingAddress } from '@/types'
+import type { CartItemType } from '@/stores/cartStore'
+
+// Convención base (ajusta si en tu backend difiere, revisa tu Postman):
+//  - Listar /orders
+//  - Listar por usuario: /orders?user={userId}
+//  - CRUD producto dentro de orden vía sub‑recurso: /orders/{orderId}/products
+//  - Pago: /orders/{orderId}/payments
+//  - Evidencia (comprobante): /orders/{orderId}/payments/proof  (multipart)
+// Si en el collection JSON los paths cambian (ej: /order-products, /payments),
+// solo modifica las constantes/paths aquí conservando las firmas públicas.
+
+const ORDERS_ENDPOINT = 'orders'
+
+// Helpers internos de mapeo (puedes ajustarlos si la API espera otras llaves)
+interface CreateOrderParams {
+  user: { id: string }
+  shippingAddress: { id: number }
+  billingAddress?: string
+  totalAmount?: number
+  status?: OrderStatus
+  // Permitir crear con productos directamente
+  orderProducts?: Array<{ product: { id: string }; quantity: number; }>,
+  payments?: Omit<Payment, 'id' | 'orderId' | 'createdAt' | 'paidAt'>[]
+}
+
+interface AddProductParams {
+  product: { id: string }
+  quantity: number
+}
+
+interface AttachPaymentParams {
+  amount: number
+  method: PaymentMethod
+  providerPaymentId?: string
+  imageUrl?: string
+}
+
+const fetchCurrentUserId = async (): Promise<string | null> => {
+  try {
+    const res = await fetch('/api/me', { credentials: 'include' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.user?.id ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const userId = await fetchCurrentUserId();
+
+export const orderService = {
+  // Listado general (admin)
+  list: async (): Promise<Order[]> => {
+    return await api.get<Order[]>(`${ORDERS_ENDPOINT}`)
+  },
+
+  // Listado por usuario autenticado
+  listByUser: async (): Promise<Order[]> => {
+    return await api.get<Order[]>(`${ORDERS_ENDPOINT}?user=${userId}`)
+  },
+
+  // Obtener una orden
+  get: async (orderId: string): Promise<Order> => {
+    return await api.get<Order>(`${ORDERS_ENDPOINT}/${orderId}`)
+  },
+
+  // Crear una orden (opcionalmente con productos incluidos)
+  create: async (params: CreateOrderParams, comprobante?: File): Promise<Order> => {
+    console.log('Creating order with params:', params);
+    const formData = new FormData();
+      formData.append('order', JSON.stringify(params));
+      formData.append('paymentImage', comprobante as Blob);
+    return await api.postForm(`${ORDERS_ENDPOINT}`, formData)
+  },
+
+  // Crear una orden a partir del carrito local
+  createFromCart: async (cart: CartItemType[], values: PaymentFormValues): Promise<Order> => {
+    try {
+      if (!userId) {
+        throw new Error('Usuario no autenticado')
+      }
+      const shippingAddress = values.shippingAddress;
+      if (!cart || cart.length === 0) {
+        throw new Error('El carrito está vacío')
+      }
+      if (!shippingAddress || typeof shippingAddress.id !== 'number') {
+        throw new Error('Se requiere una dirección de envío para crear la orden')
+      }
+      interface OrderProductInput {
+        product: { id: string };
+        quantity: number;
+      }
+      console.log({ cart, values });
+      const orderProducts: OrderProductInput[] = cart.map((cp: CartItemType): OrderProductInput => ({
+        product: { id: cp.id },
+        quantity: cp.quantity,
+      }))
+      return await orderService.create({
+        user: { id: userId },
+        shippingAddress: { id: shippingAddress.id },
+        billingAddress: shippingAddress.addressOne + ' y ' + (shippingAddress.addressTwo ?? ''),
+        status: 'PENDING',
+        orderProducts,
+        payments: values.comprobante ? [{
+          amount: 0,
+          providerPaymentId: 'N/A',
+          method: 'CASH',
+          status: 'PENDING',
+          imageUrl: ''
+        }] : undefined
+      }, values.comprobante)
+    } catch (e) {
+      console.error('Error creando orden desde carrito:', e);
+      throw e;
+    }
+  },
+
+  // Agregar un producto a la orden
+  addProduct: async (orderId: string, payload: AddProductParams): Promise<OrderProduct> => {
+    return await api.post<OrderProduct>(`${ORDERS_ENDPOINT}/${orderId}/products`, payload)
+  },
+
+  // Actualizar un producto (cantidad / precio unitario)
+  updateProduct: async (orderId: string, orderProductId: number, payload: Partial<AddProductParams>): Promise<OrderProduct> => {
+    return await api.patch<OrderProduct>(`${ORDERS_ENDPOINT}/${orderId}/products/${orderProductId}`, payload)
+  },
+
+  // Eliminar un producto de una orden
+  removeProduct: async (orderId: string, orderProductId: number): Promise<boolean> => {
+    return await api.delete(`${ORDERS_ENDPOINT}/${orderId}/products/${orderProductId}`)
+  },
+
+  // Actualizar estado de la orden (PENDING, DELIVERED, CANCELLED)
+  updateStatus: async (orderId: string, status: OrderStatus): Promise<Order> => {
+    return await api.patch<Order>(`${ORDERS_ENDPOINT}/${orderId}`, { status })
+  },
+
+  // Adjuntar un pago (sin archivo)
+  attachPayment: async (orderId: string, payload: AttachPaymentParams): Promise<Payment> => {
+    return await api.post<Payment>(`${ORDERS_ENDPOINT}/${orderId}/payments`, payload)
+  },
+
+  // Subir comprobante de pago (si el backend lo soporta como multipart)
+  uploadPaymentProof: async (orderId: string, file: File): Promise<Payment> => {
+    const formData = new FormData()
+    formData.append('file', file)
+    // Ajusta el path si tu API usa otro segmento (ej: /proof o /receipt)
+    return await api.postForm(`${ORDERS_ENDPOINT}/${orderId}/payments/proof`, formData)
+  },
+
+  // Obtener pagos de una orden
+  listPayments: async (orderId: string): Promise<Payment[]> => {
+    return await api.get<Payment[]>(`${ORDERS_ENDPOINT}/${orderId}/payments`)
+  },
+
+  // Marcar pago como completado (o actualizar estado de pago)
+  updatePaymentStatus: async (orderId: string, paymentId: string, status: string): Promise<Payment> => {
+    return await api.patch<Payment>(`${ORDERS_ENDPOINT}/${orderId}/payments/${paymentId}`, { status })
+  }
+}
+
+export type { CreateOrderParams, AddProductParams, AttachPaymentParams }
