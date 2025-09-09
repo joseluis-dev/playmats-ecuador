@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { ApiOrder, ApiPayment, ApiOrderProduct } from '@/types/api-order'
+import { paymentService } from '@/services/paymentService'
 
 const orderStatusStyles: Record<ApiOrder['status'], string> = {
   PENDING: 'bg-amber-500/15 text-amber-600 border border-amber-500/30',
@@ -13,7 +14,9 @@ const orderStatusStyles: Record<ApiOrder['status'], string> = {
 const paymentStatusStyles: Record<ApiPayment['status'], string> = {
   PENDING: 'bg-amber-500/15 text-amber-600 border border-amber-500/30',
   COMPLETED: 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/30',
-  FAILED: 'bg-red-500/15 text-red-600 border border-red-500/30'
+  APPROVED: 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/30',
+  FAILED: 'bg-red-500/15 text-red-600 border border-red-500/30',
+  REJECTED: 'bg-red-500/15 text-red-600 border border-red-500/30'
 }
 
 function formatDate(value?: string) {
@@ -46,16 +49,45 @@ function ResourcePreview({ op }: { op: ApiOrderProduct }) {
   )
 }
 
-export const AdminOrderRow: React.FC<{ order: ApiOrder }> = ({ order }) => {
+export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatch<React.SetStateAction<ApiOrder[]>> }> = ({ order, setOrders }) => {
   const [open, setOpen] = useState(false)
   const payment = order.payments?.[0]
   const totalItems = order.orderProducts?.reduce((a, p) => a + (p.quantity || 0), 0)
+
+  const handleApprovePayment = async (payment: ApiPayment) => {
+    if (!payment) return
+    const paymentUpdated = await paymentService.update(payment.id, { ...payment, status: 'APPROVED' })
+    console.log({ paymentUpdated })
+    setOrders(prev => prev.map(o => {
+      if (o.id === order.id) {
+        return { ...o, payments: o.payments?.map(p => p.id === payment.id ? paymentUpdated : p) }
+      }
+      return o
+    }))
+  }
+
+  const handleRejectPayment = async (payment: ApiPayment) => {
+    if (!payment) return
+    const paymentUpdated = await paymentService.update(payment.id, { ...payment, status: 'REJECTED' })
+    console.log({ paymentUpdated })
+    setOrders(prev => prev.map(o => {
+      if (o.id === order.id) {
+        return { ...o, payments: o.payments?.map(p => p.id === payment.id ? paymentUpdated : p) }
+      }
+      return o
+    }))
+  }
+
+  const handleCancelOrder = async (order: ApiOrder) => {
+    if (!order) return
+    // Lógica para cancelar la orden
+  }
 
   return (
     <Card className={cn('overflow-hidden', open && 'ring-1 ring-primary/30')}>      
       <CardHeader className='pb-4 border-b'>
         <div className='flex items-start justify-between gap-4 flex-wrap'>
-          <div className='flex items-center gap-3'>
+          <div className='flex items-center gap-3 flex-wrap'>
             <CardTitle className='text-base text-[var(--color-primary)]'>Orden</CardTitle>
             <span className='font-mono text-xs px-2 py-1 rounded bg-muted text-muted-foreground tracking-tight'>#{order.id.slice(0,8)}</span>
             <CardDescription className='flex flex-wrap gap-2'>
@@ -136,9 +168,9 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder }> = ({ order }) => {
                       </div>
                     )}
                     <div className='flex flex-wrap gap-2 pt-2'>
-                      <Button size='sm' className='pointer-events-none opacity-60'>Aprobar pago</Button>
-                      <Button size='sm' variant='destructive' className='pointer-events-none opacity-60'>Rechazar pago</Button>
-                      <Button size='sm' variant='outline' className='pointer-events-none opacity-60'>Cancelar orden</Button>
+                      <Button size='sm' className='text-[var(--color-text)]' onClick={() => handleApprovePayment(payment)}>Aprobar pago</Button>
+                      <Button size='sm' className='border border-red-500/50 bg-transparent hover:bg-red-600/60 dark:bg-transparent dark:hover:bg-red-600/60 text-[var(--color-text)]' onClick={() => handleRejectPayment(payment)}>Rechazar pago</Button>
+                      <Button size='sm' variant='outline' className='text-[var(--color-text)]' onClick={() => handleCancelOrder(order)}>Cancelar orden</Button>
                     </div>
                   </>
                 ) : (

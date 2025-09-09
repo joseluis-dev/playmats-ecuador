@@ -19,6 +19,8 @@ const orderStatusStyles: Record<ApiOrder['status'], string> = {
 const paymentStatusStyles: Record<ApiPayment['status'], string> = {
   PENDING: 'bg-amber-500/15 text-amber-600 border border-amber-500/30',
   COMPLETED: 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/30',
+  APPROVED: 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/30',
+  REJECTED: 'bg-red-500/15 text-red-600 border border-red-500/30',
   FAILED: 'bg-red-500/15 text-red-600 border border-red-500/30'
 }
 

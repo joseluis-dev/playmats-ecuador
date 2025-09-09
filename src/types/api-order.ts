@@ -30,7 +30,7 @@ export interface ApiPayment {
   amount: number
   providerPaymentId?: string
   method: string
-  status: 'PENDING' | 'COMPLETED' | 'FAILED'
+  status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'APPROVED' | 'REJECTED'
   imageUrl?: string
   paidAt?: string | null
   createdAt?: string

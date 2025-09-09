@@ -4,9 +4,10 @@ import AdminOrderRow from './AdminOrderRow'
 
 interface AdminOrdersListProps {
   orders: ApiOrder[]
+  setOrders: React.Dispatch<React.SetStateAction<ApiOrder[]>>
 }
 
-export const AdminOrdersList: React.FC<AdminOrdersListProps> = ({ orders }) => {
+export const AdminOrdersList: React.FC<AdminOrdersListProps> = ({ orders, setOrders }) => {
   if (!orders || orders.length === 0) {
     return (
       <div className='flex flex-col items-center justify-center py-16 text-center rounded-xl border border-dashed'>
@@ -22,7 +23,7 @@ export const AdminOrdersList: React.FC<AdminOrdersListProps> = ({ orders }) => {
   return (
     <div className='space-y-4'>
       {orders.map(order => (
-        <AdminOrderRow key={order.id} order={order} />
+        <AdminOrderRow key={order.id} order={order} setOrders={setOrders} />
       ))}
     </div>
   )

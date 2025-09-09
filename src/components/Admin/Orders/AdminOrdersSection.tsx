@@ -62,8 +62,10 @@ export const AdminOrdersSection: React.FC = () => {
               </Button>
             ))}
           </div>
-          <Button size='sm' variant='outline' onClick={handleRefresh} disabled={refreshing}>
-            {refreshing ? 'Actualizando…' : 'Actualizar'}
+          <Button size='sm' variant='outline' className='min-w-24' onClick={handleRefresh} disabled={refreshing}>
+            {refreshing ? <>
+              <span className="animate-spin mr-2 h-4 w-4 border-2 border-t-transparent border-current rounded-full" />
+            </> : 'Actualizar'}
           </Button>
         </div>
       </div>
@@ -79,7 +81,7 @@ export const AdminOrdersSection: React.FC = () => {
           {error && (
             <div className='p-4 border rounded-md text-sm text-red-600 bg-red-500/10'>{error}</div>
           )}
-          <AdminOrdersList orders={filtered} />
+          <AdminOrdersList orders={filtered} setOrders={setOrders} />
         </>
       )}
     </div>
