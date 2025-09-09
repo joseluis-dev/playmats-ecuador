@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { orderService } from '@/services/orderService'
-import type { ApiOrder } from './UserOrdersList'
 import { UserOrdersList } from './UserOrdersList'
 import { Button } from '@/components/ui/button'
+import type { ApiOrder } from '@/types/api-order'
 
 export const UserOrdersSection: React.FC = () => {
   const [orders, setOrders] = useState<ApiOrder[]>([])

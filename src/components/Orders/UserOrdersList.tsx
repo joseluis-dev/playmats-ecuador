@@ -2,57 +2,7 @@ import React, { useState } from 'react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import type { Product } from '@/types';
-
-// Tipos basados en la estructura JSON provista (camelCase)
-export interface ApiCountry { id?: number; nombre?: string }
-export interface ApiState { id?: number; nombre?: string }
-export interface ApiShippingAddress {
-  id?: number
-  fullname?: string
-  phone?: string
-  country?: ApiCountry
-  state?: ApiState
-  city?: string
-  postalCode?: string
-  addressOne?: string
-  addressTwo?: string
-  current?: boolean
-}
-
-export interface ApiOrderProduct {
-  id: number
-  quantity: number
-  unitPrice: number
-  subtotal: number
-  createdAt?: string
-  updatedAt?: string
-  product: Product
-  // product?: { id: string; name?: string } // Si luego la API agrega producto, podemos mostrarlo
-}
-
-export interface ApiPayment {
-  id: string
-  amount: number
-  providerPaymentId?: string
-  method: string
-  status: 'PENDING' | 'COMPLETED' | 'FAILED'
-  imageUrl?: string
-  paidAt?: string | null
-  createdAt?: string
-}
-
-export interface ApiOrder {
-  id: string
-  status: 'PENDING' | 'DELIVERED' | 'CANCELLED'
-  totalAmount: number
-  shippingAddress: ApiShippingAddress
-  billingAddress?: string
-  createdAt: string
-  updatedAt?: string
-  orderProducts: ApiOrderProduct[]
-  payments: ApiPayment[]
-}
+import type { ApiOrder, ApiPayment, ApiShippingAddress } from '@/types/api-order'
 
 interface UserOrdersListProps {
   orders: ApiOrder[]
@@ -117,7 +67,7 @@ export const UserOrdersList: React.FC<UserOrdersListProps> = ({ orders, onSelect
               <div className='flex flex-col md:flex-row md:items-start md:justify-between gap-4'>
                 <div className='flex flex-col gap-1'>
                   <CardTitle className='text-base md:text-lg flex items-center gap-2'>
-                    <span className='text-primary font-semibold hidden sm:inline'>Orden</span>
+                    <span className='text-[var(--color-primary)] font-semibold hidden sm:inline'>Orden</span>
                     <span className='font-mono text-xs px-2 py-1 rounded bg-muted text-muted-foreground tracking-tight'>#{order.id.slice(0, 8)}</span>
                   </CardTitle>
                   <CardDescription className='flex flex-wrap gap-3'>
@@ -144,7 +94,7 @@ export const UserOrdersList: React.FC<UserOrdersListProps> = ({ orders, onSelect
             <CardContent className='pt-4 pb-0'>
               <div className='grid gap-4 md:grid-cols-3'>
                 <div className='flex flex-col gap-1 md:col-span-2'>
-                  <span className='text-xs font-medium text-primary uppercase tracking-wide'>Envío a</span>
+                  <span className='text-xs font-medium text-[var(--color-primary)] uppercase tracking-wide'>Envío a</span>
                   <p className='text-sm leading-snug'>{formatAddress(order.shippingAddress)}</p>
                   {order.shippingAddress?.fullname && (
                     <p className='text-xs text-muted-foreground mt-1'>Contacto: {order.shippingAddress.fullname}{order.shippingAddress.phone ? ` • ${order.shippingAddress.phone}` : ''}</p>
@@ -164,7 +114,7 @@ export const UserOrdersList: React.FC<UserOrdersListProps> = ({ orders, onSelect
                         <div key={op.id} className='p-3 flex items-center justify-between text-sm'>
                           <div className='flex flex-col gap-2'>
                             <div>
-                              <span className='font-medium'>Item <span className='font-mono text-xs px-2 py-1 rounded bg-muted text-muted-foreground tracking-tight'>#{op.product?.id.slice(0, 8)}</span> </span><span className='font-medium'>{op.product?.name}</span>
+                              <span className='font-medium'>Item {op.product?.id && (<span className='font-mono text-xs px-2 py-1 rounded bg-muted text-muted-foreground tracking-tight'>#{String(op.product.id).slice(0, 8)}</span>)} </span><span className='font-medium'>{op.product?.name}</span>
                             </div>
                             <span className='text-xs text-muted-foreground'>Cantidad: {op.quantity} • Unit: ${op.unitPrice.toFixed(2)}</span>
                           </div>
