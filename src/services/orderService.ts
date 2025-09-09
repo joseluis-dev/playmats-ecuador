@@ -59,7 +59,12 @@ export const orderService = {
 
   // Listado por usuario autenticado
   listByUser: async (): Promise<Order[]> => {
-    return await api.get<Order[]>(`${ORDERS_ENDPOINT}?user=${userId}`)
+    const orders = await api.get<Order[]>(`${ORDERS_ENDPOINT}?user=${userId}`)
+    const ordersWithProducts = await Promise.all(orders.map(async (order) => {
+      const products = await api.get<OrderProduct[]>(`${ORDERS_ENDPOINT}/${order.id}/order-products`);
+      return { ...order, orderProducts: products };
+    }));
+    return ordersWithProducts;
   },
 
   // Obtener una orden

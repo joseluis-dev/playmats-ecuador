@@ -1,6 +1,5 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { Button } from "@/components/ui/button";
 
 // TODO: Agregar protección de ruta para administradores
 ---
@@ -25,6 +24,15 @@ import { Button } from "@/components/ui/button";
             <h2 class="text-xl font-semibold mb-2">Recursos</h2>
             <p class="text-[var(--color-text)]/70">
               Administra recursos, categorías y atributos del sistema
+            </p>
+          </div>
+        </a>
+
+        <a href="/admin/orders" class="block">
+          <div class="bg-[var(--color-surface)]/90 p-6 rounded-lg hover:bg-[var(--color-surface)] transition-colors">
+            <h2 class="text-xl font-semibold mb-2">Órdenes</h2>
+            <p class="text-[var(--color-text)]/70">
+              Administra las órdenes de los clientes
             </p>
           </div>
         </a>

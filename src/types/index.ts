@@ -100,24 +100,26 @@ export interface ShippingAddress {
 // Order Related Types
 export interface Order {
   id: string
-  user_id?: string
+  userId?: string
   status?: OrderStatus
-  total_amount?: number
-  shipping_address_id?: number
-  billing_address?: string
-  created_at?: Date
-  updated_at?: Date
+  totalAmount?: number
+  shippingAddress?: ShippingAddress
+  billingAddress?: string
+  orderProducts?: OrderProduct[]
+  payments?: Payment[]
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export interface OrderProduct {
   id: number
-  order_id?: string
-  product_id?: string
+  orderId?: string
+  product: Product
   quantity: number
-  unit_price: number
+  unitPrice: number
   subtotal: number
-  created_at?: Date
-  updated_at?: Date
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export interface Payment {
