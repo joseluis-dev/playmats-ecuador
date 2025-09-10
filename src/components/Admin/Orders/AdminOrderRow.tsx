@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import type { ApiOrder, ApiPayment, ApiOrderProduct } from '@/types/api-order'
 import { paymentService } from '@/services/paymentService'
 import { orderService } from '@/services/orderService'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 const orderStatusStyles: Record<ApiOrder['status'], string> = {
   PENDING: 'bg-amber-500/15 text-amber-600 border border-amber-500/30',
@@ -30,18 +31,23 @@ function formatDate(value?: string) {
   }
 }
 
-function ResourcePreview({ op }: { op: ApiOrderProduct }) {
+function ResourcePreview({ op, onOpen }: { op: ApiOrderProduct; onOpen?: (args: { url?: string; type?: string; name?: string }) => void }) {
   const banner = op.product?.resourceProducts?.find((rp: any) => rp.isBanner)?.resource || op.product?.resourceProducts?.[0]?.resource
   const name = op.product?.name ?? `Producto ${op.id}`
+  const previewUrl = banner?.url || banner?.thumbnail
+  const handleOpen = () => {
+    if (!previewUrl) return
+    onOpen?.({ url: previewUrl, type: banner?.type, name })
+  }
   return (
     <div className='flex items-center gap-3'>
-      <div className='size-12 rounded-md overflow-hidden bg-accent/20 border'>
-        {banner?.thumbnail || banner?.url ? (
-          <img src={banner?.thumbnail || banner?.url} className='w-full h-full object-cover' alt={name} />
+      <button type='button' onClick={handleOpen} className='size-12 rounded-md overflow-hidden bg-accent/20 border cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-ring'>
+        {previewUrl ? (
+          <img src={previewUrl} className='w-full h-full object-cover' alt={name} />
         ) : (
           <div className='w-full h-full grid place-items-center text-xs text-muted-foreground'>N/A</div>
         )}
-      </div>
+      </button>
       <div className='flex flex-col'>
         <span className='text-sm font-medium'>{name}</span>
         <span className='text-xs text-muted-foreground'>Cant. {op.quantity} • Unit ${op.unitPrice.toFixed(2)}</span>
@@ -50,10 +56,70 @@ function ResourcePreview({ op }: { op: ApiOrderProduct }) {
   )
 }
 
+function getPrimaryResource(op: ApiOrderProduct) {
+  // Nota: resourceProducts proviene del product; usamos any para evitar acoplar a tipos internos
+  const rp = (op.product as any)?.resourceProducts as Array<any> | undefined
+  const banner = rp?.find((r) => r?.isBanner)?.resource
+  return banner || rp?.[0]?.resource || null
+}
+
+function filenameFromUrl(url?: string) {
+  if (!url) return undefined
+  try {
+    const u = new URL(url)
+    const name = u.pathname.split('/').pop() || undefined
+    return name || undefined
+  } catch {
+    return url.split('/').pop()
+  }
+}
+
+function toCloudinaryAttachment(url: string, suggestedName?: string) {
+  try {
+    if (!/res\.cloudinary\.com/.test(url) || /fl_attachment/.test(url)) return url
+    // Insert fl_attachment after /upload/
+    return url.replace(
+      /\/upload\//,
+      `/upload/fl_attachment${suggestedName ? ':' + encodeURIComponent(suggestedName) : ''}/`
+    )
+  } catch {
+    return url
+  }
+}
+
+async function forceDownload(url: string, filename?: string) {
+  const name = filename || filenameFromUrl(url) || 'recurso'
+  try {
+    const res = await fetch(url, { mode: 'cors' })
+    const blob = await res.blob()
+    const objectUrl = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = objectUrl
+    a.download = name
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(objectUrl)
+  } catch (e) {
+    // Fallback: use Cloudinary fl_attachment or open in new tab with download attr
+    const adjusted = toCloudinaryAttachment(url, name)
+    const a = document.createElement('a')
+    a.href = adjusted
+    a.download = name
+    a.rel = 'noopener'
+    a.target = '_blank'
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+  }
+}
+
 export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatch<React.SetStateAction<ApiOrder[]>> }> = ({ order, setOrders }) => {
   const [open, setOpen] = useState(false)
   const payment = order.payments?.[0]
   const totalItems = order.orderProducts?.reduce((a, p) => a + (p.quantity || 0), 0)
+  const [preview, setPreview] = useState<{ url?: string; type?: string; name?: string } | null>(null)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 
   const handleApprovePayment = async (payment: ApiPayment) => {
     if (!payment) return
@@ -143,12 +209,22 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
                 <span className='text-xs text-muted-foreground'>Total items: {totalItems}</span>
               </div>
               <div className='rounded-lg border divide-y bg-accent/10'>
-                {order.orderProducts?.map(op => (
-                  <div key={op.id} className='p-3 flex items-center justify-between gap-3'>
-                    <ResourcePreview op={op} />
-                    <div className='text-sm font-semibold'>${op.subtotal.toFixed(2)}</div>
-                  </div>
-                ))}
+                {order.orderProducts?.map(op => {
+                  const resource = getPrimaryResource(op)
+                  const downloadUrl: string | undefined = resource?.url || resource?.thumbnail
+                  const suggestedName = (op.product?.name ? op.product.name.replace(/\s+/g, '_') : 'recurso')
+                  return (
+                    <div key={op.id} className='p-3 flex items-center justify-between gap-3'>
+                      <ResourcePreview op={op} onOpen={(p) => { setPreview(p); setIsPreviewOpen(true); }} />
+                      <div className='flex items-center gap-3'>
+                        <div className='text-sm font-semibold'>${op.subtotal.toFixed(2)}</div>
+                        <Button size='sm' variant='outline' disabled={!downloadUrl} onClick={() => downloadUrl && forceDownload(downloadUrl, suggestedName)}>
+                          Descargar
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                })}
                 {(!order.orderProducts || order.orderProducts.length === 0) && (
                   <div className='p-4 text-sm text-muted-foreground italic'>Sin productos</div>
                 )}
@@ -193,6 +269,29 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
         <Button size='sm' className='border border-blue-500/50 bg-transparent hover:bg-blue-600/60 dark:bg-transparent dark:hover:bg-blue-600/60 text-[var(--color-text)]' onClick={() => handleResume(order)}>Reanudar orden</Button>
         <Button size='sm' variant='ghost' onClick={() => setOpen(!open)}>{open ? 'Cerrar' : 'Ver más'}</Button>
       </CardFooter>
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className='sm:max-w-6xl'>
+          <DialogHeader className='flex flex-row items-center justify-between'>
+            <DialogTitle>{preview?.name || 'Vista previa'}</DialogTitle>
+            {preview?.url && (
+              <Button size='sm' variant='outline' onClick={() => forceDownload(preview.url!, preview.name?.replace(/\s+/g, '_'))}>
+                Descargar
+              </Button>
+            )}
+          </DialogHeader>
+          <div className='w-full'>
+            {preview?.url ? (
+              preview?.type === 'VIDEO' || /\.(mp4|webm|ogg)$/i.test(preview.url) ? (
+                <video src={preview.url} controls className='w-full max-h-[70vh] rounded-md' />
+              ) : (
+                <img src={preview.url} alt={preview?.name || 'Recurso'} className='w-full max-h-[70vh] object-contain rounded-md' />
+              )
+            ) : (
+              <div className='p-8 text-center text-muted-foreground'>Recurso no disponible</div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }
