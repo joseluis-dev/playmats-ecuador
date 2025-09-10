@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { ApiOrder, ApiPayment, ApiOrderProduct } from '@/types/api-order'
 import { paymentService } from '@/services/paymentService'
+import { orderService } from '@/services/orderService'
 
 const orderStatusStyles: Record<ApiOrder['status'], string> = {
   PENDING: 'bg-amber-500/15 text-amber-600 border border-amber-500/30',
@@ -80,7 +81,14 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
 
   const handleCancelOrder = async (order: ApiOrder) => {
     if (!order) return
-    // Lógica para cancelar la orden
+    const updatedOrder = await orderService.update(order.id, { ...order, status: 'CANCELLED' })
+    setOrders(prev => prev.map(o => o.id === order.id ? updatedOrder : o) as unknown as ApiOrder[])
+  }
+
+  const handleResume = async (order: ApiOrder) => {
+    if (!order) return
+    const updatedOrder = await orderService.update(order.id, { ...order, status: 'PENDING' })
+    setOrders(prev => prev.map(o => o.id === order.id ? updatedOrder : o) as unknown as ApiOrder[])
   }
 
   return (
@@ -182,6 +190,7 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
         )}
       </CardContent>
       <CardFooter className='justify-end gap-2 mt-6 border-t'>
+        <Button size='sm' className='border border-blue-500/50 bg-transparent hover:bg-blue-600/60 dark:bg-transparent dark:hover:bg-blue-600/60 text-[var(--color-text)]' onClick={() => handleResume(order)}>Reanudar orden</Button>
         <Button size='sm' variant='ghost' onClick={() => setOpen(!open)}>{open ? 'Cerrar' : 'Ver más'}</Button>
       </CardFooter>
     </Card>

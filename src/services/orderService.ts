@@ -1,7 +1,8 @@
 import type { PaymentFormValues } from '@/components/Payment/PaymentForm'
 import { api } from './api'
-import type { Order, OrderProduct, OrderStatus, Payment, PaymentMethod, Cart, ShippingAddress } from '@/types'
+import type { Order, OrderProduct, OrderStatus, Payment, PaymentMethod, Cart } from '@/types'
 import type { CartItemType } from '@/stores/cartStore'
+import type { ApiOrder } from '@/types/api-order'
 
 // Convención base (ajusta si en tu backend difiere, revisa tu Postman):
 //  - Listar /orders
@@ -123,29 +124,18 @@ export const orderService = {
     }
   },
 
-  // Agregar un producto a la orden
-  addProduct: async (orderId: string, payload: AddProductParams): Promise<OrderProduct> => {
-    return await api.post<OrderProduct>(`${ORDERS_ENDPOINT}/${orderId}/products`, payload)
-  },
-
-  // Actualizar un producto (cantidad / precio unitario)
-  updateProduct: async (orderId: string, orderProductId: number, payload: Partial<AddProductParams>): Promise<OrderProduct> => {
-    return await api.patch<OrderProduct>(`${ORDERS_ENDPOINT}/${orderId}/products/${orderProductId}`, payload)
-  },
-
-  // Eliminar un producto de una orden
-  removeProduct: async (orderId: string, orderProductId: number): Promise<boolean> => {
-    return await api.delete(`${ORDERS_ENDPOINT}/${orderId}/products/${orderProductId}`)
-  },
-
-  // Actualizar estado de la orden (PENDING, DELIVERED, CANCELLED)
-  updateStatus: async (orderId: string, status: OrderStatus): Promise<Order> => {
-    return await api.patch<Order>(`${ORDERS_ENDPOINT}/${orderId}`, { status })
-  },
-
-  // Adjuntar un pago (sin archivo)
-  attachPayment: async (orderId: string, payload: AttachPaymentParams): Promise<Payment> => {
-    return await api.post<Payment>(`${ORDERS_ENDPOINT}/${orderId}/payments`, payload)
+  update: async (orderId: string, order: ApiOrder): Promise<Order> => {
+    const mappedOrder: Partial<Order> = {
+      status: order.status,
+      totalAmount: order.totalAmount,
+      shippingAddress: order.shippingAddress.id ? { id: order.shippingAddress.id } : undefined,
+      billingAddress: order.billingAddress,
+      orderProducts: order.orderProducts?.map(op => ({
+        product: { id: op.product?.id || '' },
+        quantity: op.quantity
+      })) as OrderProduct[] | undefined
+    }
+    return await api.patch<Order>(`${ORDERS_ENDPOINT}/${orderId}`, mappedOrder)
   },
 
   // Subir comprobante de pago (si el backend lo soporta como multipart)
@@ -155,16 +145,6 @@ export const orderService = {
     // Ajusta el path si tu API usa otro segmento (ej: /proof o /receipt)
     return await api.postForm(`${ORDERS_ENDPOINT}/${orderId}/payments/proof`, formData)
   },
-
-  // Obtener pagos de una orden
-  listPayments: async (orderId: string): Promise<Payment[]> => {
-    return await api.get<Payment[]>(`${ORDERS_ENDPOINT}/${orderId}/payments`)
-  },
-
-  // Marcar pago como completado (o actualizar estado de pago)
-  updatePaymentStatus: async (orderId: string, paymentId: string, status: string): Promise<Payment> => {
-    return await api.patch<Payment>(`${ORDERS_ENDPOINT}/${orderId}/payments/${paymentId}`, { status })
-  }
 }
 
 export type { CreateOrderParams, AddProductParams, AttachPaymentParams }

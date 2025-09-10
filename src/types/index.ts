@@ -116,8 +116,8 @@ export interface OrderProduct {
   orderId?: string
   product: Product
   quantity: number
-  unitPrice: number
-  subtotal: number
+  unitPrice?: number
+  subtotal?: number
   createdAt?: Date
   updatedAt?: Date
 }
