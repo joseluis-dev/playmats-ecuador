@@ -60,6 +60,9 @@ export const orderService = {
 
   // Listado por usuario autenticado
   listByUser: async (): Promise<Order[]> => {
+    if (!userId) {
+      return []
+    }
     const orders = await api.get<Order[]>(`${ORDERS_ENDPOINT}?user=${userId}`)
     const ordersWithProducts = await Promise.all(orders.map(async (order) => {
       const products = await api.get<OrderProduct[]>(`${ORDERS_ENDPOINT}/${order.id}/order-products`);
@@ -70,12 +73,17 @@ export const orderService = {
 
   // Obtener una orden
   get: async (orderId: string): Promise<Order> => {
+    if (!userId) {
+      return null as unknown as Order
+    }
     return await api.get<Order>(`${ORDERS_ENDPOINT}/${orderId}`)
   },
 
   // Crear una orden (opcionalmente con productos incluidos)
   create: async (params: CreateOrderParams, comprobante?: File): Promise<Order> => {
-    console.log('Creating order with params:', params);
+    if (!userId) {
+      throw new Error('Usuario no autenticado')
+    }
     const formData = new FormData();
       formData.append('order', JSON.stringify(params));
       formData.append('paymentImage', comprobante as Blob);
@@ -84,6 +92,9 @@ export const orderService = {
 
   // Crear una orden a partir del carrito local
   createFromCart: async (cart: CartItemType[], values: PaymentFormValues): Promise<Order> => {
+    if (!userId) {
+      throw new Error('Usuario no autenticado')
+    }
     try {
       if (!userId) {
         throw new Error('Usuario no autenticado')
@@ -125,6 +136,9 @@ export const orderService = {
   },
 
   update: async (orderId: string, order: ApiOrder): Promise<Order> => {
+    if (!orderId) {
+      throw new Error('orderId es requerido')
+    }
     const mappedOrder: Partial<Order> = {
       status: order.status,
       totalAmount: order.totalAmount,
@@ -140,6 +154,9 @@ export const orderService = {
 
   // Subir comprobante de pago (si el backend lo soporta como multipart)
   uploadPaymentProof: async (orderId: string, file: File): Promise<Payment> => {
+    if (!orderId) {
+      throw new Error('orderId es requerido')
+    }
     const formData = new FormData()
     formData.append('file', file)
     // Ajusta el path si tu API usa otro segmento (ej: /proof o /receipt)
