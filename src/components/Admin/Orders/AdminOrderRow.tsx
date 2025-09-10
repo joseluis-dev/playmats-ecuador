@@ -31,28 +31,51 @@ function formatDate(value?: string) {
   }
 }
 
-function ResourcePreview({ op, onOpen }: { op: ApiOrderProduct; onOpen?: (args: { url?: string; type?: string; name?: string }) => void }) {
+function ResourcePreview({ op }: { op: ApiOrderProduct }) {
+  const [open, setOpen] = useState(false)
   const banner = op.product?.resourceProducts?.find((rp: any) => rp.isBanner)?.resource || op.product?.resourceProducts?.[0]?.resource
   const name = op.product?.name ?? `Producto ${op.id}`
   const previewUrl = banner?.url || banner?.thumbnail
-  const handleOpen = () => {
-    if (!previewUrl) return
-    onOpen?.({ url: previewUrl, type: banner?.type, name })
-  }
+
   return (
-    <div className='flex items-center gap-3'>
-      <button type='button' onClick={handleOpen} className='size-12 rounded-md overflow-hidden bg-accent/20 border cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-ring'>
-        {previewUrl ? (
-          <img src={previewUrl} className='w-full h-full object-cover' alt={name} />
-        ) : (
-          <div className='w-full h-full grid place-items-center text-xs text-muted-foreground'>N/A</div>
-        )}
-      </button>
-      <div className='flex flex-col'>
-        <span className='text-sm font-medium'>{name}</span>
-        <span className='text-xs text-muted-foreground'>Cant. {op.quantity} • Unit ${op.unitPrice.toFixed(2)}</span>
+    <>
+      <div className='flex items-center gap-3'>
+        <button type='button' onClick={() => previewUrl && setOpen(true)} className='size-12 rounded-md overflow-hidden bg-accent/20 border cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-ring'>
+          {previewUrl ? (
+            <img src={previewUrl} className='w-full h-full object-cover' alt={name} />
+          ) : (
+            <div className='w-full h-full grid place-items-center text-xs text-muted-foreground'>N/A</div>
+          )}
+        </button>
+        <div className='flex flex-col'>
+          <span className='text-sm font-medium'>{name}</span>
+          <span className='text-xs text-muted-foreground'>Cant. {op.quantity} • Unit ${op.unitPrice.toFixed(2)}</span>
+        </div>
       </div>
-    </div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className='sm:max-w-7xl'>
+          <DialogHeader className='flex flex-row items-center justify-between px-4'>
+            <DialogTitle>{name}</DialogTitle>
+            {previewUrl && (
+              <Button size='sm' variant='outline' onClick={() => forceDownload(previewUrl, name.replace(/\s+/g, '_'))}>
+                Descargar
+              </Button>
+            )}
+          </DialogHeader>
+          <div className='w-full'>
+            {previewUrl ? (
+              banner?.type === 'VIDEO' || /\.(mp4|webm|ogg)$/i.test(previewUrl) ? (
+                <video src={previewUrl} controls className='w-full max-h-[70vh] rounded-md' />
+              ) : (
+                <img src={previewUrl} alt={name} className='w-full max-h-[70vh] object-contain rounded-md' />
+              )
+            ) : (
+              <div className='p-8 text-center text-muted-foreground'>Recurso no disponible</div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 
@@ -116,10 +139,9 @@ async function forceDownload(url: string, filename?: string) {
 
 export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatch<React.SetStateAction<ApiOrder[]>> }> = ({ order, setOrders }) => {
   const [open, setOpen] = useState(false)
+  const [openPaymentPreview, setOpenPaymentPreview] = useState(false)
   const payment = order.payments?.[0]
   const totalItems = order.orderProducts?.reduce((a, p) => a + (p.quantity || 0), 0)
-  const [preview, setPreview] = useState<{ url?: string; type?: string; name?: string } | null>(null)
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 
   const handleApprovePayment = async (payment: ApiPayment) => {
     if (!payment) return
@@ -215,7 +237,7 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
                   const suggestedName = (op.product?.name ? op.product.name.replace(/\s+/g, '_') : 'recurso')
                   return (
                     <div key={op.id} className='p-3 flex items-center justify-between gap-3'>
-                      <ResourcePreview op={op} onOpen={(p) => { setPreview(p); setIsPreviewOpen(true); }} />
+                      <ResourcePreview op={op} />
                       <div className='flex items-center gap-3'>
                         <div className='text-sm font-semibold'>${op.subtotal.toFixed(2)}</div>
                         <Button size='sm' variant='outline' disabled={!downloadUrl} onClick={() => downloadUrl && forceDownload(downloadUrl, suggestedName)}>
@@ -246,15 +268,35 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
                     {payment.imageUrl && payment.method === 'CASH' && (
                       <div className='grid gap-2'>
                         <div className='text-xs text-muted-foreground'>Comprobante</div>
-                        <a href={payment.imageUrl} target='_blank' rel='noreferrer' className='block rounded-md overflow-hidden border bg-background'>
+                        <button
+                          type='button'
+                          onClick={() => setOpenPaymentPreview(true)}
+                          className='block rounded-md overflow-hidden border bg-background cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+                          aria-label='Ver comprobante de pago'
+                        >
                           <img src={payment.imageUrl} alt='Comprobante de pago' className='w-full object-contain max-h-72' />
-                        </a>
+                        </button>
+                        <Dialog open={openPaymentPreview} onOpenChange={setOpenPaymentPreview}>
+                          <DialogContent className='sm:max-w-7xl'>
+                            <DialogHeader className='flex flex-row items-center justify-between px-4'>
+                              <DialogTitle>Comprobante de pago</DialogTitle>
+                              <Button size='sm' variant='outline' onClick={() => forceDownload(payment.imageUrl!, `comprobante_${order.id.slice(0,8)}`)}>
+                                Descargar
+                              </Button>
+                            </DialogHeader>
+                            <div className='w-full'>
+                              <img src={payment.imageUrl} alt='Comprobante de pago' className='w-full max-h-[70vh] object-contain rounded-md' />
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     )}
                     <div className='flex flex-wrap gap-2 pt-2'>
                       <Button size='sm' className='text-[var(--color-text)]' onClick={() => handleApprovePayment(payment)}>Aprobar pago</Button>
                       <Button size='sm' className='border border-red-500/50 bg-transparent hover:bg-red-600/60 dark:bg-transparent dark:hover:bg-red-600/60 text-[var(--color-text)]' onClick={() => handleRejectPayment(payment)}>Rechazar pago</Button>
-                      <Button size='sm' variant='outline' className='text-[var(--color-text)]' onClick={() => handleCancelOrder(order)}>Cancelar orden</Button>
+                      <Button size='sm' variant='outline' onClick={() => forceDownload(payment.imageUrl!, `comprobante_${order.id.slice(0,8)}`)}>
+                        Descargar comprobante
+                      </Button>
                     </div>
                   </>
                 ) : (
@@ -267,31 +309,9 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
       </CardContent>
       <CardFooter className='justify-end gap-2 mt-6 border-t'>
         <Button size='sm' className='border border-blue-500/50 bg-transparent hover:bg-blue-600/60 dark:bg-transparent dark:hover:bg-blue-600/60 text-[var(--color-text)]' onClick={() => handleResume(order)}>Reanudar orden</Button>
+        <Button size='sm' variant='outline' className='text-[var(--color-text)]' onClick={() => handleCancelOrder(order)}>Cancelar orden</Button>
         <Button size='sm' variant='ghost' onClick={() => setOpen(!open)}>{open ? 'Cerrar' : 'Ver más'}</Button>
       </CardFooter>
-      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className='sm:max-w-6xl'>
-          <DialogHeader className='flex flex-row items-center justify-between'>
-            <DialogTitle>{preview?.name || 'Vista previa'}</DialogTitle>
-            {preview?.url && (
-              <Button size='sm' variant='outline' onClick={() => forceDownload(preview.url!, preview.name?.replace(/\s+/g, '_'))}>
-                Descargar
-              </Button>
-            )}
-          </DialogHeader>
-          <div className='w-full'>
-            {preview?.url ? (
-              preview?.type === 'VIDEO' || /\.(mp4|webm|ogg)$/i.test(preview.url) ? (
-                <video src={preview.url} controls className='w-full max-h-[70vh] rounded-md' />
-              ) : (
-                <img src={preview.url} alt={preview?.name || 'Recurso'} className='w-full max-h-[70vh] object-contain rounded-md' />
-              )
-            ) : (
-              <div className='p-8 text-center text-muted-foreground'>Recurso no disponible</div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </Card>
   )
 }

@@ -28,19 +28,6 @@ export interface PaymentFilters {
   to?: string   // ISO date
 }
 
-const fetchCurrentUserId = async (): Promise<string | null> => {
-  try {
-    const res = await fetch('/api/me', { credentials: 'include' });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data?.user?.id ?? null;
-  } catch {
-    return null;
-  }
-};
-
-const userId = await fetchCurrentUserId();
-
 function toQuery(params?: Record<string, any>) {
   if (!params) return ''
   const q = new URLSearchParams()
@@ -55,9 +42,6 @@ function toQuery(params?: Record<string, any>) {
 export const paymentService = {
   // Admin: listar todos los pagos con filtros opcionales
   list: async (filters?: PaymentFilters): Promise<ApiPayment[]> => {
-    if (!userId) {
-      return []
-    }
     return await api.get<ApiPayment[]>(`${PAYMENTS_ENDPOINT}${toQuery(filters)}`)
   },
 
@@ -68,34 +52,16 @@ export const paymentService = {
 
   // Listar pagos de una orden
   listByOrder: async (orderId: string): Promise<ApiPayment[]> => {
-    if (!userId) {
-      throw new Error('Usuario no autenticado')
-    }
-    if (!orderId) {
-      throw new Error('orderId es requerido')
-    }
     return await api.get<ApiPayment[]>(`${ORDERS_ENDPOINT}/${orderId}/payments`)
   },
 
   // Actualizar estado de un pago de una orden
   update: async (paymentId: string, payment: ApiPayment): Promise<ApiPayment> => {
-    if (!userId) {
-      throw new Error('Usuario no autenticado')
-    }
-    if (!paymentId) {
-      throw new Error('paymentId es requerido')
-    }
     return await api.patch<ApiPayment>(`${PAYMENTS_ENDPOINT}/${paymentId}`, payment)
   },
 
   // Eliminar un pago (si el backend lo permite)
   delete: async (paymentId: string): Promise<boolean> => {
-    if (!userId) {
-      throw new Error('Usuario no autenticado')
-    }
-    if (!paymentId) {
-      throw new Error('paymentId es requerido')
-    }
     return await api.delete(`${PAYMENTS_ENDPOINT}/${paymentId}`)
   },
 }
