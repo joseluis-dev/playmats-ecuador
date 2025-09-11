@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Button } from '../ui/button'
-import { PlusIcon, Trash2Icon, PencilIcon } from 'lucide-react'
 import { DataList } from '@/components/DataList'
 import {
   Form,
@@ -17,6 +16,7 @@ import { z } from "zod"
 import type { Attribute } from '@/types'
 import { api } from '@/services/api'
 import { toast } from 'sonner'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 
 const attributeFormSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
@@ -119,114 +119,122 @@ export const AttributesManager = () => {
   }
 
   return (
-    <>
-      <h3 className="px-4 text-xl font-semibold">Lista de Atributos</h3>
-
-      <div className="p-2 space-y-4 flex gap-4 flex-col lg:flex-row">
-        <div className='w-full mb-0'>
-          <DataList<Attribute>
-            items={attributes}
-            selectedId={selectedAttribute?.id?.toString()}
-            onSelect={handleEdit}
-            onDelete={async (id) => handleDelete(Number(id))}
-            keyExtractor={(attribute) => attribute.id.toString()}
-            className="h-full"
-            renderItem={(attribute) => (
-              <div className="space-y-2" style={{ borderColor: attribute.color }}>
-                <h4 className="font-medium">{attribute.name}</h4>
-                <p className="text-sm text-[var(--color-text)]/70">{attribute.value}</p>
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 rounded-full" style={{ backgroundColor: attribute.color }}></div>
-                  <span className="text-sm">{attribute.color}</span>
-                </div>
-              </div>
-            )}
-            emptyListComponent={
-              <div className="text-center p-4 text-[var(--color-text)]/70">
-                No hay atributos disponibles
-              </div>
-            }
-          />
-        </div>
-
-        <div className="bg-[var(--color-surface)]/90 p-4 rounded-lg w-full flex flex-col gap-2">
-          <h2 className="text-2xl font-bold">{isEditing ? 'Editar Atributo' : 'Nuevo Atributo'}</h2>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nombre del atributo" className='bg-transparent dark:bg-transparent' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="value"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Valor del atributo" className='bg-transparent dark:bg-transparent' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Color</FormLabel>
-                    <FormControl>
-                      <Input type="color" className='bg-transparent dark:bg-transparent' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className='flex gap-2 w-full justify-end'>
-                {isEditing && (
-                  <Button
-                    variant="secondary"
-                    disabled={isLoading}
-                    onClick={() => {
-                      form.reset({
-                        name: '',
-                        value: '',
-                        color: '#000000'
-                      });
-                      setIsEditing(false);
-                      setSelectedAttribute(null);
-                    }}
-                  >
-                    Cancelar
-                  </Button>
-                )}
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? (
-                    <span className="loading loading-spinner"></span>
-                  ) : isEditing ? (
-                    'Actualizar Atributo'
-                  ) : (
-                    'Crear Atributo'
-                  )}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </div>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-1">
+        <h3 className="text-2xl font-bold tracking-tight">Atributos</h3>
+        <p className="text-sm text-muted-foreground">Define atributos y valores que enriquecen tus productos y recursos.</p>
       </div>
-    </>
+      <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6">
+        <Card className="h-fit lg:sticky lg:top-24">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Lista</CardTitle>
+            <CardDescription>{attributes.length} atributo{attributes.length === 1 ? '' : 's'}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DataList<Attribute>
+              items={attributes}
+              selectedId={selectedAttribute?.id?.toString()}
+              onSelect={handleEdit}
+              onDelete={async (id) => handleDelete(Number(id))}
+              keyExtractor={(attribute) => attribute.id.toString()}
+              className="h-full"
+              renderItem={(attribute) => (
+                <div className="space-y-2">
+                  <h4 className="font-medium leading-none">{attribute.name}</h4>
+                  <p className="text-xs text-muted-foreground">{attribute.value}</p>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-3.5 h-3.5 rounded-full border" style={{ backgroundColor: attribute.color }}></div>
+                    <span className="text-muted-foreground">{attribute.color}</span>
+                  </div>
+                </div>
+              )}
+              emptyListComponent={<div className="text-center p-6 text-muted-foreground">No hay atributos disponibles</div>}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden w-full flex flex-col gap-2">
+          {isLoading && (
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 grid place-items-center">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground/40 border-top-primary"></div>
+            </div>
+          )}
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">{isEditing ? 'Editar atributo' : 'Nuevo atributo'}</CardTitle>
+            <CardDescription>Nombre, valor y color para identificar el atributo.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nombre del atributo" className='bg-background' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="value"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Valor del atributo" className='bg-background' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Color</FormLabel>
+                      <FormControl>
+                        <Input type="color" className='bg-background' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className='flex gap-2 w-full justify-end'>
+                  {isEditing && (
+                    <Button
+                      variant="outline"
+                      disabled={isLoading}
+                      onClick={() => {
+                        form.reset({
+                          name: '',
+                          value: '',
+                          color: '#000000'
+                        });
+                        setIsEditing(false);
+                        setSelectedAttribute(null);
+                      }}
+                    >
+                      Cancelar
+                    </Button>
+                  )}
+                  <Button type="submit" disabled={isLoading} className='text-[var(--color-text)]'>
+                    {isEditing ? 'Actualizar Atributo' : 'Crear Atributo'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   )
 }

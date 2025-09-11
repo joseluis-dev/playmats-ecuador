@@ -45,19 +45,19 @@ export const MultiImageUploader = ({
       <div
         {...getRootProps()}
         className={`
-          border-2 border-dashed rounded-lg p-6
-          flex flex-col items-center justify-center
+          border-2 border-dashed rounded-lg p-8
+          flex flex-col items-center justify-center text-center
           cursor-pointer
-          transition-colors
+          transition-colors bg-background
           ${isDragActive
-            ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10'
-            : 'border-[var(--color-text)]/20 hover:border-[var(--color-text)]/40'
+            ? 'border-primary bg-primary/5'
+            : 'border-muted hover:border-muted-foreground/40'
           }
         `}
       >
         <input {...getInputProps()} />
-        <ImageIcon className="w-8 h-8 mb-2 text-[var(--color-text)]/60" />
-        <p className="text-sm text-center text-[var(--color-text)]/60">
+        <ImageIcon className="w-8 h-8 mb-2 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">
           {isDragActive
             ? 'Suelta la imagen aquí'
             : 'Arrastra y suelta una imagen aquí, o haz clic para seleccionar'
@@ -69,7 +69,7 @@ export const MultiImageUploader = ({
         <CarouselSize items={value}>
           {(item, index) => (
             <div
-              className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden transition-all duration-200 ease-in-out group"
+              className="relative flex-none aspect-video bg-muted rounded-lg shadow-sm overflow-hidden transition-all duration-200 ease-in-out group"
               style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
               onClick={() => {
                 // addLayers('background', item);
@@ -78,7 +78,7 @@ export const MultiImageUploader = ({
               <Button
                 variant="destructive"
                 size="icon"
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-50"
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow"
                 onClick={(e) => {
                   onChange(value.filter(v => v !== item.id.toString()))
                   onRemove(item)
@@ -88,7 +88,7 @@ export const MultiImageUploader = ({
               >
                 <X className="w-4 h-4" />
               </Button>
-              <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-sm p-1">
+              <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1.5">
                 {item.name}
               </div>
             </div>

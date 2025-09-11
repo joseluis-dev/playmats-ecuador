@@ -19,6 +19,7 @@ import { api } from "@/services/api"
 import type { Resource, Category, Attribute } from "@/types"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MultiSelect } from "@/components/ui/multi-select"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 const resourceFormSchema = z.object({
   name: z.string().min(1, "El nombre es obligatorio"),
@@ -208,211 +209,188 @@ export default function ResourcesSection() {
   };
 
   if (isLoading) {
-    return <div>Cargando recursos...</div>;
+    return <div className="text-sm text-muted-foreground">Cargando recursos...</div>;
   }
 
   return (
     <>
-    <h3 className="px-4 text-xl font-semibold">Lista de Categorías</h3>
-    <div className="p-2 space-y-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Lista de recursos con DataList */}
-      <DataList<Resource>
-        items={resources}
-        selectedId={selectedResource?.id.toString()}
-        keyExtractor={item => String(item.id)}
-        onSelect={handleEdit}
-        renderItem={item => (
-          <div className="flex items-center">
-            {item.type === "IMAGE" ? (
-              <img
-                src={item.thumbnail || item.url}
-                alt={item.name}
-                className="w-16 h-16 object-cover rounded mr-3 border"
-              />
-            ) : (
-              <video
-                src={item.url}
-                className="w-16 h-16 object-cover rounded mr-3 border"
-                controls={false}
-                muted
-                preload="metadata"
-              />
-            )}
-            <div>
-              <h3 className="font-medium">{item.name}</h3>
-              <p className="text-sm text-[var(--color-text)]/70">
-                {item.type}
-              </p>
-            </div>
-          </div>
-        )}
-        onDelete={(id) => handleDelete(id as unknown as number)}
-        emptyListComponent={
-          <div className="text-center py-4 text-[var(--color-text)]/70">
-            No hay recursos disponibles
-          </div>
-        }
-        className="bg-[var(--color-surface)]/70 p-4 rounded-lg"
-      />
-
-      {/* Formulario */}
-      <div className="bg-[var(--color-surface)]/70 p-4 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">
-          {isEditing ? "Editar Recurso" : "Nuevo Recurso"}
-        </h2>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nombre del recurso" className='bg-transparent dark:bg-transparent' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Vista previa del recurso en una altura fija */}
-            <div className="w-full h-[250px] flex items-center justify-center overflow-hidden rounded border border-dashed">
-              {isEditing && selectedResource && selectedResource.thumbnail ? (
-                <div className="relative w-full h-full flex flex-col items-center">
-                  <span className="text-xs text-muted-foreground mb-1 absolute top-1 left-0 right-0 text-center">
-                    Vista previa
-                  </span>
-                  {selectedResource.type === 'IMAGE' ? (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-1">
+        <h3 className="text-2xl font-bold tracking-tight">Recursos</h3>
+        <p className="text-sm text-muted-foreground">Administra imágenes y videos; asigna categorías y atributos.</p>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-6">
+        <Card className="h-fit lg:sticky lg:top-24">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Lista</CardTitle>
+            <CardDescription>{resources.length} recurso{resources.length === 1 ? '' : 's'}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DataList<Resource>
+              items={resources}
+              selectedId={selectedResource?.id.toString()}
+              keyExtractor={item => String(item.id)}
+              onSelect={handleEdit}
+              renderItem={item => (
+                <div className="flex items-center gap-3">
+                  {item.type === "IMAGE" ? (
                     <img
-                      src={selectedResource.url}
-                      alt={selectedResource.name}
-                      className="w-full h-full object-contain p-2 pt-6"
+                      src={item.thumbnail || item.url}
+                      alt={item.name}
+                      className="w-16 h-16 object-cover rounded-md border"
                     />
                   ) : (
                     <video
-                      src={selectedResource.url}
-                      className="w-full h-full object-contain p-2 pt-6"
-                      controls
+                      src={item.url}
+                      className="w-16 h-16 object-cover rounded-md border"
+                      controls={false}
+                      muted
+                      preload="metadata"
                     />
                   )}
+                  <div>
+                    <h3 className="font-medium leading-none">{item.name}</h3>
+                    <p className="text-xs text-muted-foreground">{item.type}</p>
+                  </div>
                 </div>
-              ) : (
-                <span className="text-sm text-[var(--color-text)]/50">
-                  {isEditing ? "No hay vista previa disponible" : "El recurso se previsualizará aquí"}
-                </span>
               )}
-            </div>
-
-            <FormField
-              control={form.control}
-              name="file"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <ImageUploader
-                      maxSize={20 * 1024 * 1024} // 20MB
-                      field={field}
-                      validator={resourceFormSchema.shape.file}
-                      allowedTypes="both"
-                      placeholderText={{
-                        main: "Arrastra y suelta tu recurso aquí",
-                        sub: "o haz clic para seleccionar un archivo",
-                        formats: "Formatos soportados: JPG, PNG, MP4, WEBM (máx. 20MB)"
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              onDelete={(id) => handleDelete(id as unknown as number)}
+              emptyListComponent={<div className="text-center p-6 text-muted-foreground">No hay recursos disponibles</div>}
             />
+          </CardContent>
+        </Card>
 
-            {/* Tabs for Categories and Attributes */}
-            <div className="mt-6">
-              <Tabs defaultValue="categories" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 bg-[var(--color-surface)]/70">
-                  <TabsTrigger value="categories">Categorías</TabsTrigger>
-                  <TabsTrigger value="attributes">Atributos</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="categories" className="space-y-4 mt-4">
-                  <FormField
-                    control={form.control}
-                    name="categories"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Categorías</FormLabel>
-                        <FormControl>
-                          <MultiSelect
-                            options={categories.map(c => ({
-                              id: c.id,
-                              name: c.name || '',
-                              color: c.color
-                            }))}
-                            selected={field.value || []}
-                            onChange={field.onChange}
-                            placeholder="Seleccionar categorías..."
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </TabsContent>
-                
-                <TabsContent value="attributes" className="space-y-4 mt-4">
-                  <FormField
-                    control={form.control}
-                    name="attributes"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Atributos</FormLabel>
-                        <FormControl>
-                          <MultiSelect
-                            options={attributes.map(a => ({
-                              id: a.id,
-                              name: a.name || '',
-                              color: a.color
-                            }))}
-                            selected={field.value || []}
-                            onChange={field.onChange}
-                            placeholder="Seleccionar atributos..."
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </TabsContent>
-              </Tabs>
-            </div>
+        <Card className="relative overflow-hidden">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">{isEditing ? "Editar recurso" : "Nuevo recurso"}</CardTitle>
+            <CardDescription>Sube una imagen o video y asigna metadatos.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nombre del recurso" className='bg-background' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div className="flex justify-end gap-2 mt-6">
-              {isEditing && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setIsEditing(false)
-                    setSelectedResource(null)
-                    form.reset({
-                      name: "",
-                      file: undefined,
-                      categories: [],
-                      attributes: []
-                    })
-                  }}
-                >
-                  Cancelar
-                </Button>
-              )}
-              <Button type="submit">
-                {isEditing ? "Guardar Cambios" : "Crear Recurso"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+                <div className="w-full h-[250px] flex items-center justify-center overflow-hidden rounded-md border border-dashed">
+                  {isEditing && selectedResource && selectedResource.thumbnail ? (
+                    <div className="relative w-full h-full flex flex-col items-center">
+                      <span className="text-xs text-muted-foreground mb-1 absolute top-1 left-0 right-0 text-center">Vista previa</span>
+                      {selectedResource.type === 'IMAGE' ? (
+                        <img src={selectedResource.url} alt={selectedResource.name} className="w-full h-full object-contain p-2 pt-6" />
+                      ) : (
+                        <video src={selectedResource.url} className="w-full h-full object-contain p-2 pt-6" controls />
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">{isEditing ? "No hay vista previa disponible" : "El recurso se previsualizará aquí"}</span>
+                  )}
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="file"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <ImageUploader
+                          maxSize={20 * 1024 * 1024}
+                          field={field}
+                          validator={resourceFormSchema.shape.file}
+                          allowedTypes="both"
+                          placeholderText={{
+                            main: "Arrastra y suelta tu recurso aquí",
+                            sub: "o haz clic para seleccionar un archivo",
+                            formats: "Formatos soportados: JPG, PNG, MP4, WEBM (máx. 20MB)"
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="mt-6">
+                  <Tabs defaultValue="categories" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="categories">Categorías</TabsTrigger>
+                      <TabsTrigger value="attributes">Atributos</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="categories" className="space-y-4 mt-4">
+                      <FormField
+                        control={form.control}
+                        name="categories"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Categorías</FormLabel>
+                            <FormControl>
+                              <MultiSelect
+                                options={categories.map(c => ({ id: c.id, name: c.name || '', color: c.color }))}
+                                selected={field.value || []}
+                                onChange={field.onChange}
+                                placeholder="Seleccionar categorías..."
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="attributes" className="space-y-4 mt-4">
+                      <FormField
+                        control={form.control}
+                        name="attributes"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Atributos</FormLabel>
+                            <FormControl>
+                              <MultiSelect
+                                options={attributes.map(a => ({ id: a.id, name: a.name || '', color: a.color }))}
+                                selected={field.value || []}
+                                onChange={field.onChange}
+                                placeholder="Seleccionar atributos..."
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </TabsContent>
+                  </Tabs>
+                </div>
+
+                <div className="flex justify-end gap-2 mt-6">
+                  {isEditing && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setIsEditing(false)
+                        setSelectedResource(null)
+                        form.reset({ name: "", file: undefined, categories: [], attributes: [] })
+                      }}
+                    >
+                      Cancelar
+                    </Button>
+                  )}
+                  <Button type="submit" className='text-[var(--color-text)]'>{isEditing ? "Guardar Cambios" : "Crear Recurso"}</Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       </div>
     </div>
     </>

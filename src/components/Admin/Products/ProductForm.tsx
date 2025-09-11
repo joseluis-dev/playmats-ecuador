@@ -126,9 +126,10 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <div>
-          <h2 className="text-lg font-semibold mb-4">
-            {product ? 'Editar Producto' : 'Nuevo Producto'}
+          <h2 className="text-xl font-semibold tracking-tight mb-1">
+            {product ? 'Editar producto' : 'Nuevo producto'}
           </h2>
+          <p className="text-sm text-muted-foreground mb-4">Completa la información básica y adjunta recursos.</p>
 
           <div className="space-y-4">
             <FormField
@@ -138,7 +139,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
                 <FormItem>
                   <FormLabel>Nombre</FormLabel>
                   <FormControl>
-                    <Input {...field} className='bg-transparent dark:bg-transparent' placeholder="Nombre del producto" />
+                    <Input {...field} className='bg-background' placeholder="Nombre del producto" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -152,7 +153,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
                 <FormItem>
                   <FormLabel>Descripción</FormLabel>
                   <FormControl>
-                    <Input {...field} className='bg-transparent dark:bg-transparent' placeholder="Descripción del producto" />
+                    <Input {...field} className='bg-background' placeholder="Descripción del producto" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -168,7 +169,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
                     <FormLabel>Precio</FormLabel>
                     <FormControl>
                       <Input
-                        className='bg-transparent dark:bg-transparent'
+                        className='bg-background'
                         type="number"
                         step="0.01"
                         {...field}
@@ -202,7 +203,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
         </div>
 
         <Tabs defaultValue="resources" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-[var(--color-surface)]/70">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="resources">Recursos</TabsTrigger>
             <TabsTrigger value="categories">Categorías</TabsTrigger>
             <TabsTrigger value="attributes">Atributos</TabsTrigger>
@@ -292,11 +293,11 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
 
         <div className="flex justify-end gap-2 pt-4">
           {product && (
-            <Button onClick={() => handleReset()} variant="secondary" type='button'>
+            <Button onClick={() => handleReset()} variant="outline" type='button'>
               Cancelar
             </Button>
           )}
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading} className='text-[var(--color-text)]'>
             {isLoading
               ? 'Guardando...'
               : product
