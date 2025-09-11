@@ -13,6 +13,9 @@ import { Image } from "astro:assets"
 import AddressIcon from "./icons/AddressIcon.astro";
 import { AddressesClerk } from "@/components/Address/AddressesClerk";
 import { ModeToggle } from "@/components/ModeToggle";
+import { checkUserAuth } from "@/utils/authUtils";
+
+const { isAuthorized } = await checkUserAuth(Astro, 'ADMIN');
 ---
 <div class="relative flex items-center justify-between py-4 px-8 ">
   <a href="/" class="z-100">
@@ -26,12 +29,15 @@ import { ModeToggle } from "@/components/ModeToggle";
     <li><NavLink href="/cataloge">Catalogo</NavLink></li>
     <li><NavLink href="/customise">Personalizar</NavLink></li>
     <li><NavLink href="#contact">Contacto</NavLink></li>
+    {isAuthorized && (
+      <li><NavLink href="/admin">Administración</NavLink></li>
+    )}
   </ul>
   <div class="flex items-center gap-2">
     <Cart client:load transition:persist/>
     <div class="flex gap-2">
       <ModeToggle client:load />
-      <Menu />
+      <Menu isAuthorized={isAuthorized} />
       <SignedIn>
         <UserButton>
           <UserButton.MenuItems>

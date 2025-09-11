@@ -8,7 +8,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { PencilIcon, Trash2Icon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -45,7 +44,7 @@ export default function ResourcesSection() {
   const [isEditing, setIsEditing] = useState(false)
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  console.log({ resources })
+  
   const form = useForm({
     resolver: zodResolver(resourceFormSchema),
     defaultValues: {

@@ -73,6 +73,8 @@ const fetchCurrentUserId = async (): Promise<string | null> => {
   }
 };
 
+const userId = await fetchCurrentUserId();
+
 export const useCartStore = create<CartState>((set, get) => ({
   cart: [],
   total: "0",
@@ -82,7 +84,6 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   loadCart: async () => {
     set({ loading: true, error: null });
-    const userId = await fetchCurrentUserId();
     if (!userId) {
       // Usuario no autenticado: mantener estado local
       set({ cart: [], loading: false });
@@ -106,7 +107,6 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   addToCart: async (item) => {
-    const userId = await fetchCurrentUserId();
     if (!userId) {
       return
     }
@@ -152,7 +152,6 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   removeFromCart: async (item) => {
-    const userId = await fetchCurrentUserId();
     if (!userId) {
       return;
     }
@@ -172,7 +171,6 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   clearCart: async () => {
-    const userId = await fetchCurrentUserId();
     if (!userId) {
       return;
     }
@@ -186,7 +184,6 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   updateCart: async (item, quantity) => {
-    const userId = await fetchCurrentUserId();
     if (!userId) {
       return;
     }
