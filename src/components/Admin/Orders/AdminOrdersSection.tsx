@@ -57,7 +57,7 @@ export const AdminOrdersSection: React.FC = () => {
         <div className='flex items-center gap-2'>
           <div className='flex items-center gap-1 p-1 rounded-lg border bg-background'>
             {statusOptions.map(opt => (
-              <Button key={opt.value} variant={statusFilter === opt.value ? 'default' : 'ghost'} size='sm' onClick={() => setStatusFilter(opt.value)}>
+              <Button key={opt.value} className='text-[var(--color-text)]' variant={statusFilter === opt.value ? 'default' : 'ghost'} size='sm' onClick={() => setStatusFilter(opt.value)}>
                 {opt.label}
               </Button>
             ))}
