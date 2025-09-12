@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -6,6 +6,7 @@ import type { ApiOrder, ApiPayment, ApiOrderProduct } from '@/types/api-order'
 import { paymentService } from '@/services/paymentService'
 import { orderService } from '@/services/orderService'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 
 const orderStatusStyles: Record<ApiOrder['status'], string> = {
   PENDING: 'bg-amber-500/15 text-amber-600 border border-amber-500/30',
@@ -141,16 +142,27 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
   const [open, setOpen] = useState(false)
   const [openPaymentPreview, setOpenPaymentPreview] = useState(false)
   const payment = order.payments?.[0]
+  const [paymentAmount, setPaymentAmount] = useState({ 
+    value: payment.amount?.toFixed(2) || 0, 
+    error: {
+      value: false,
+      message: 'El monto no puede ser 0'
+    }
+  })
   const totalItems = order.orderProducts?.reduce((a, p) => a + (p.quantity || 0), 0)
-
+  
   const handleApprovePayment = async (payment: ApiPayment) => {
+    if (Number(paymentAmount.value) === 0 || String(paymentAmount.value) === '' || isNaN(Number(paymentAmount.value))) {
+      setPaymentAmount({ ...paymentAmount, error: { value: true, message: 'El monto no puede ser 0' } })
+      return
+    }
     if (!payment) return
-    const paymentUpdated = await paymentService.update(payment.id, { ...payment, status: 'APPROVED' })
-    console.log({ paymentUpdated })
+    const paymentUpdated = await paymentService.update(payment.id, { ...payment, amount: paymentAmount.value as number, status: 'APPROVED' })
     setOrders(prev => prev.map(o => {
       if (o.id === order.id) {
         return { ...o, payments: o.payments?.map(p => p.id === payment.id ? paymentUpdated : p) }
       }
+      setPaymentAmount({ ...paymentAmount, value: paymentUpdated.amount.toFixed(2), error: { value: false, message: '' } })
       return o
     }))
   }
@@ -158,7 +170,6 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
   const handleRejectPayment = async (payment: ApiPayment) => {
     if (!payment) return
     const paymentUpdated = await paymentService.update(payment.id, { ...payment, status: 'REJECTED' })
-    console.log({ paymentUpdated })
     setOrders(prev => prev.map(o => {
       if (o.id === order.id) {
         return { ...o, payments: o.payments?.map(p => p.id === payment.id ? paymentUpdated : p) }
@@ -177,6 +188,14 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
     if (!order) return
     const updatedOrder = await orderService.update(order.id, { ...order, status: 'PENDING' })
     setOrders(prev => prev.map(o => o.id === order.id ? updatedOrder : o) as unknown as ApiOrder[])
+  }
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (Number(e.target.value) === 0 || String(e.target.value) === '' || isNaN(Number(e.target.value))) {
+      setPaymentAmount({ ...paymentAmount, value: e.target.value, error: { value: true, message: 'El monto no puede ser 0' } })
+    } else {
+      setPaymentAmount({ ...paymentAmount, value: e.target.value, error: { value: false, message: '' } })
+    }
   }
 
   return (
@@ -263,7 +282,30 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
                   <>
                     <div className='flex items-center justify-between'>
                       <span className={cn('text-[11px] px-2 py-0.5 rounded-full font-medium', paymentStatusStyles[payment.status])}>Estado: {payment.status}</span>
-                      <span className='text-sm font-semibold'>Monto: ${payment.amount?.toFixed(2)}</span>
+                      <div className='flex flex-col gap-2'>
+                        <span className='text-sm font-semibold'>Monto: </span>
+                        <div className='flex flex-col space-y-1'>
+                          <Input
+                            value={paymentAmount.value}
+                            onChange={handleAmountChange}
+                            aria-invalid={paymentAmount.error.value}
+                            aria-describedby={paymentAmount.error.value ? `payment-amount-error-${order.id}` : undefined}
+                            className={cn(
+                              'w-32',
+                              paymentAmount.error.value && 'border-destructive text-destructive focus-visible:ring-destructive'
+                            )}
+                            inputMode='decimal'
+                          />
+                          {paymentAmount.error.value && (
+                            <p
+                              id={`payment-amount-error-${order.id}`}
+                              className='text-xs text-destructive leading-tight'
+                            >
+                              El monto no puede ser 0
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </div>
                     {payment.imageUrl && payment.method === 'CASH' && (
                       <div className='grid gap-2'>
