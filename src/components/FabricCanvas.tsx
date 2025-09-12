@@ -121,8 +121,8 @@ export const FabricCanvas = () => {
         };
         img.set('id', imgSrc.url);
         img.set('layer', imgSrc.layer || 'default');
-        if (imgSrc.attributes && imgSrc.attributes.find((attr: any) => attr.name === 'price')) {
-          img.set('price', imgSrc.attributes.find((attr: any) => attr.name === 'price').value);
+        if (imgSrc.attributes && imgSrc.attributes.find((attr: any) => attr.name.includes('price'))) {
+          img.set('price', imgSrc.attributes.find((attr: any) => attr.name.includes('price')).value);
         }
         const objects = fabricCanvasRef.current.getObjects()
         modifyItems('images', [...objects, img]);

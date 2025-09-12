@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import type { Category } from '@/types'
-import { api } from '@/services/api'
+import { categoriesService } from '@/services/categoriesService'
 import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 
@@ -41,7 +41,7 @@ export const CategoriesManager = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get<Category[]>('categories')
+      const response = await categoriesService.list()
       setCategories(response)
     } catch (error) {
       console.error('Error fetching categories:', error)
@@ -58,14 +58,10 @@ export const CategoriesManager = () => {
     setIsLoading(true)
     try {
       if (isEditing && selectedCategory) {
-        await api.put(`categories/${selectedCategory.id}`, {
-          ...values,
-        })
+        await categoriesService.update(selectedCategory.id, values)
         toast.success('Categoría actualizada correctamente')
       } else {
-        await api.post('categories', {
-          ...values
-        })
+        await categoriesService.create(values)
         toast.success('Categoría creada correctamente')
       }
       await fetchCategories()
@@ -99,7 +95,7 @@ export const CategoriesManager = () => {
     
     setIsLoading(true)
     try {
-      await api.delete(`categories/${id}`)
+  await categoriesService.remove(id)
       toast.success('Categoría eliminada correctamente')
       await fetchCategories()
     } catch (error) {
@@ -137,7 +133,7 @@ export const CategoriesManager = () => {
               className='h-full'
               renderItem={(category) => (
                 <div className="space-y-2">
-                  <h4 className="font-medium leading-none">{category.name}</h4>
+                  <h4 className="font-medium leading-none">{category.id} - {category.name}</h4>
                   <p className="text-xs text-muted-foreground">{category.description}</p>
                   <div className="flex items-center gap-2 text-xs">
                     <div className="w-3.5 h-3.5 rounded-full border" style={{ backgroundColor: category.color }}></div>

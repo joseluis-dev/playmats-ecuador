@@ -15,6 +15,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { ImageUploader } from "@/components/ImageUploader"
 import { DataList } from "@/components/DataList"
 import { api } from "@/services/api"
+import { resourcesService } from "@/services/resourcesService"
+import { categoriesService } from "@/services/categoriesService"
 import type { Resource, Category, Attribute } from "@/types"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MultiSelect } from "@/components/ui/multi-select"
@@ -62,8 +64,8 @@ export default function ResourcesSection() {
       try {
         // Fetch resources, categories, and attributes in parallel
         const [resourcesData, categoriesData, attributesData] = await Promise.all([
-          api.get<Resource[]>("resources"),
-          api.get<Category[]>("categories"),
+          resourcesService.list(),
+          categoriesService.list(),
           api.get<Attribute[]>("attributes")
         ]);
         
@@ -86,8 +88,8 @@ export default function ResourcesSection() {
     setIsLoading(true);
     try {
       const [resourcesData, categoriesData, attributesData] = await Promise.all([
-        api.get<Resource[]>("resources"),
-        api.get<Category[]>("categories"),
+        resourcesService.list(),
+        categoriesService.list(),
         api.get<Attribute[]>("attributes")
       ]);
       
@@ -110,36 +112,18 @@ export default function ResourcesSection() {
       let resourceId;
       
       if (isEditing && selectedResource) {
-        // Actualizar recurso existente
-        const formData = new FormData();
-        formData.append("name", values.name);
-        if (values.file) formData.append("file", values.file);
-        await api.putForm(`resources/${selectedResource.id}`, formData);
-        resourceId = selectedResource.id;
+        const updated = await resourcesService.update(selectedResource.id, { name: values.name, file: values.file })
+        resourceId = updated.id
       } else {
-        // Crear nuevo recurso
-        const formData = new FormData();
-        formData.append("name", values.name);
-        if (values.file) formData.append("file", values.file);
-        const response = await api.postForm("resources", formData);
-        resourceId = response.id;
+        const created = await resourcesService.create({ name: values.name, file: values.file })
+        resourceId = (created as any).id
       }
       
       // Actualizar las categorías y atributos del recurso
       if (resourceId) {
         // Actualizar categorías si hay seleccionadas
-        if (values.categories.length > 0) {
-          await api.put(`resources/${resourceId}/categories`, {
-            categoryIds: values.categories
-          });
-        }
-        
-        // Actualizar atributos si hay seleccionados
-        if (values.attributes.length > 0) {
-          await api.put(`resources/${resourceId}/attributes`, {
-            attributeIds: values.attributes
-          });
-        }
+        await resourcesService.assignCategories(resourceId, values.categories)
+        await resourcesService.assignAttributes(resourceId, values.attributes)
       }
       
       // Refrescar lista
@@ -165,10 +149,7 @@ export default function ResourcesSection() {
     
     try {
       // Fetch resource with categories and attributes
-      const resourceWithRelations = await api.get<Resource & {
-        categories?: Array<{id: number}>,
-        attributes?: Array<{id: number}>
-      }>(`resources/${resource.id}?include=categories,attributes`);
+      const resourceWithRelations = await resourcesService.get(resource.id, ['categories','attributes'])
       
       // Reset form with resource data including relations
       form.reset({

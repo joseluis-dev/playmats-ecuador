@@ -140,7 +140,7 @@ export const AttributesManager = () => {
               className="h-full"
               renderItem={(attribute) => (
                 <div className="space-y-2">
-                  <h4 className="font-medium leading-none">{attribute.name}</h4>
+                  <h4 className="font-medium leading-none">{attribute.id} - {attribute.name}</h4>
                   <p className="text-xs text-muted-foreground">{attribute.value}</p>
                   <div className="flex items-center gap-2 text-xs">
                     <div className="w-3.5 h-3.5 rounded-full border" style={{ backgroundColor: attribute.color }}></div>

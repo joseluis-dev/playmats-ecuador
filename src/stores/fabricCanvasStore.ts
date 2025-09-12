@@ -19,7 +19,8 @@ interface FabricCanvasState {
 export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
   total: 20,
   items: {
-    size: 20
+    size: 20,
+    border: 0,
   },
   imgSrc: {
     url: null,
@@ -76,6 +77,7 @@ export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
       if (Array.isArray(item)) {
         for (let i = 0; i < currentItems[name].length; i++) {
           const el = currentItems[name][i];
+          console.log(el);
           if (el.price) {
             total -= parseFloat(el.price);
           }
