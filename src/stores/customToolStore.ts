@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { Resource } from "@/types";
 
 interface FabricCanvasState {
   ref: any;
@@ -10,15 +11,25 @@ interface FabricCanvasState {
     width: number;
     height: number;
   };
+  // Shared resources state
+  seals: Resource[];
+  borders: Resource[];
+  types: Resource[];
+  sizes: Resource[];
   setRef: (ref: any) => void;
   setSize: (width: number, height: number) => void;
   setImgSrc: (url: object | null) => void;
   addLayers: (name: string, object: any) => void;
   modifyItems: (name: string, item: number | any[]) => void;
   removeLayer: (name: string, id: string) => void;
+  // Setters for shared resources
+  setSeals: (list: Resource[]) => void;
+  setBorders: (list: Resource[]) => void;
+  setTypes: (list: Resource[]) => void;
+  setSizes: (list: Resource[]) => void;
 }
 
-export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
+export const useCustomizationTool = create<FabricCanvasState>((set) => ({
   ref: null,
   total: 20,
   items: {
@@ -35,12 +46,20 @@ export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
     width: 610,
     height: 225,
   },
+  seals: [],
+  borders: [],
+  types: [],
+  sizes: [],
   setRef: (ref: any) => set({ ref }),
   setSize: (width: number, height: number) => set((state) => ({
     ...state,
     size: { width, height },
   })),
   setImgSrc: (url) => set({ imgSrc: url }),
+  setSeals: (list) => set(() => ({ seals: list })),
+  setBorders: (list) => set(() => ({ borders: list })),
+  setTypes: (list) => set(() => ({ types: list })),
+  setSizes: (list) => set(() => ({ sizes: list })),
   addLayers: (name: string, object: any) => set((state) => {
     const newLayers = state.layers[name] ? [...state.layers[name], object] : [object];
     return ({

@@ -12,7 +12,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccordionDynamic } from "../AccordionCustom/AccordionDynamic";
 import { CarouselSize } from "../Carousel";
-import { useFabricCanvasStore } from "@/stores/fabricCanvasStore";
+import { useCustomizationTool } from "@/stores/customToolStore";
 import { useEffect, useRef, useState } from "react";
 import { resourcesService } from "@/services/resourcesService";
 import type { Resource } from "@/types";
@@ -31,11 +31,7 @@ const designSchema = z.object({
 });
 
 export const ControlPanel = () => {
-  const { addLayers, setSize, layers, modifyItems, ref } = useFabricCanvasStore()
-  const [seals, setSeals] = useState<Resource[]>([])
-  const [borders, setBorders] = useState<Resource[]>([])
-  const [types, setTypes] = useState<Resource[]>([])
-  const [sizes, setSizes] = useState<Resource[]>([])
+  const { addLayers, setSize, layers, modifyItems, ref, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes } = useCustomizationTool()
   const fileInputRef = useRef<HTMLInputElement>(null);
   const form = useForm<z.infer<typeof designSchema>>({
     resolver: zodResolver(designSchema),
@@ -236,11 +232,7 @@ export const ControlPanel = () => {
                       style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
                       onClick={() => {
                         const currentSeals = field.value || [];
-                        if (currentSeals.includes(item.name)) {
-                          field.onChange(currentSeals.filter(seal => seal.name !== item.name));
-                        } else {
-                          field.onChange([...currentSeals, item]);
-                        }
+                        field.onChange([...currentSeals, item]);
                         addLayers('seals', item);
                       }}
                     >
