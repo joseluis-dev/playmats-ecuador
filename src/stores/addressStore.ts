@@ -2,6 +2,7 @@ import type { FormValues } from '@/components/Payment/ShippingAddressForm'
 import { addressService } from '@/services/addressService'
 import type { ShippingAddress } from '@/types'
 import { create } from 'zustand'
+import { useUser } from './userStore'
 
 interface AddressStore {
   loading: boolean
@@ -14,17 +15,6 @@ interface AddressStore {
   loadAddresses: () => Promise<void>
   deleteAddress: (id: number) => Promise<void>
 }
-
-const fetchCurrentUserId = async (): Promise<string | null> => {
-  try {
-    const res = await fetch('/api/me', { credentials: 'include' });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data?.user?.id ?? null;
-  } catch {
-    return null;
-  }
-};
 
 function mapToApi(a: FormValues, userId: string): Omit<ShippingAddress, 'id'> {
   return {
@@ -47,7 +37,8 @@ function mapToApi(a: FormValues, userId: string): Omit<ShippingAddress, 'id'> {
   }
 }
 
-const userId = await fetchCurrentUserId();
+const getUserId = () => useUser.getState().user?.id ?? null;
+const userId = getUserId();
 
 export const useAddressStore = create<AddressStore>((set, get) => ({
   loading: false,

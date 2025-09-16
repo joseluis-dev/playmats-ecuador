@@ -8,7 +8,7 @@ const deleteIcon =
 export const FabricCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fabricCanvasRef = useRef<Canvas | null>(null);
-  const { imgSrc, setImgSrc, layers, removeLayer, size, modifyItems, setRef } = useCustomizationTool()
+  const { imgSrc, setImgSrc, layers, removeLayer, size, modifyItems, setRef, formRef } = useCustomizationTool()
   
   const deleteImgRef = useRef<HTMLImageElement | null>(null);
   // Load delete icon image once
@@ -71,6 +71,15 @@ export const FabricCanvas = () => {
     canvas.remove(transform.target);
     canvas.requestRenderAll();
     modifyItems('images', canvas.getObjects());
+    if (transform.target.layer === 'seals' && formRef) {
+      const current: any[] = formRef.getValues('seals') || [];
+      const idx = current.findIndex((s: any) => s?.url === transform.target.id);
+      if (idx >= 0) {
+        const next = current.slice();
+        next.splice(idx, 1); // Remove only ONE occurrence
+        formRef.setValue('seals', next, { shouldDirty: true, shouldTouch: true, shouldValidate: false });
+      }
+    }
   };
 
   // Render icon for control

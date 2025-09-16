@@ -3,6 +3,7 @@ import type { Resource } from "@/types";
 
 interface FabricCanvasState {
   ref: any;
+  formRef: any;
   total: number;
   items: Record<string, any>;
   imgSrc: Record<string, any> | null;
@@ -17,6 +18,7 @@ interface FabricCanvasState {
   types: Resource[];
   sizes: Resource[];
   setRef: (ref: any) => void;
+  setFormRef: (formRef: any) => void;
   setSize: (width: number, height: number) => void;
   setImgSrc: (url: object | null) => void;
   addLayers: (name: string, object: any) => void;
@@ -31,6 +33,7 @@ interface FabricCanvasState {
 
 export const useCustomizationTool = create<FabricCanvasState>((set) => ({
   ref: null,
+  formRef: null,
   total: 20,
   items: {
     size: 20,
@@ -51,6 +54,7 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
   types: [],
   sizes: [],
   setRef: (ref: any) => set({ ref }),
+  setFormRef: (formRef: any) => set({ formRef }),
   setSize: (width: number, height: number) => set((state) => ({
     ...state,
     size: { width, height },

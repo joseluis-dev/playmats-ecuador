@@ -13,10 +13,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AccordionDynamic } from "../AccordionCustom/AccordionDynamic";
 import { CarouselSize } from "../Carousel";
 import { useCustomizationTool } from "@/stores/customToolStore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { resourcesService } from "@/services/resourcesService";
 import type { Resource } from "@/types";
 import { toast } from "sonner";
+import { useUser } from "@/stores/userStore";
+import { dataUrlToFile } from "@/utils/fileUtils";
 
 const designSchema = z.object({
   type: z.string(),
@@ -31,7 +33,8 @@ const designSchema = z.object({
 });
 
 export const ControlPanel = () => {
-  const { addLayers, setSize, layers, modifyItems, ref, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes } = useCustomizationTool()
+  const { addLayers, setSize, layers, modifyItems, ref, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes, setFormRef, total } = useCustomizationTool()
+  const { user } = useUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const form = useForm<z.infer<typeof designSchema>>({
     resolver: zodResolver(designSchema),
@@ -72,20 +75,31 @@ export const ControlPanel = () => {
     fetchBorders().then(res => setBorders(res)).catch(err => console.error(err))
     fetchTypes().then(res => setTypes(res)).catch(err => console.error(err))
     fetchSizes({ type: '1' }).then(res => setSizes(res)).catch(err => console.error(err))
+    setFormRef(form);
   }, [])
 
-  function onSubmit(values: z.infer<typeof designSchema>) {
+  async function onSubmit(values: z.infer<typeof designSchema>) {
     console.log(values)
     if (!values.type) return toast.warning("Debes seleccionar un tipo de diseño");
     if (!values.img) return toast.warning("Debes subir una imagen");
     if (!ref) return toast.error("El lienzo no está listo. Por favor, intenta de nuevo.");
     const dataUrl = ref.toDataURL({
-      format: 'png'
+      format: 'png',
+      multiplier: 4
     });
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = 'design.png';
-    link.click();
+    const file = await dataUrlToFile(dataUrl, values.img.name);
+    const product = {
+      name: `${values.type} - ${user?.id || 'invitado'}`,
+      description: `Diseño personalizado de tipo ${values.type} y tamaño ${values.size || 'personalizado'}`,
+      price: total,
+      isCustomizable: true
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'IMAGE')
+    formData.append('isBanner', 'false');
+    console.log(product, file)
   }
 
   const accordionItems = [

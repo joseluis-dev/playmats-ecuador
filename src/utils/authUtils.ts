@@ -1,5 +1,6 @@
 import type { AstroGlobal } from "astro";
 import { userService } from "@/services/userService";
+import type { User } from "@clerk/astro/server";
 
 export interface AuthCheckResult {
   isAuthenticated: boolean;
@@ -64,3 +65,14 @@ export async function checkAuthAndRedirect(
   
   return null;
 }
+
+export const fetchCurrentUser = async (): Promise<User | null> => {
+  try {
+    const res = await fetch('/api/me', { credentials: 'include' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.user ?? null;
+  } catch {
+    return null;
+  }
+};

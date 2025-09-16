@@ -1,3 +1,4 @@
+import { dataUrlToFile } from '@/utils/fileUtils'
 import { api } from './api'
 import type { Resource, Category, Attribute } from '@/types'
 
@@ -37,6 +38,10 @@ export const resourcesService = {
   },
   async create(data: CreateResourceDto): Promise<Resource> {
     return api.postForm('resources', buildForm(data)) as Promise<Resource>
+  },
+  async createFromDataUrl(name: string, dataUrl: string): Promise<Resource> {
+    const file = await dataUrlToFile(dataUrl, name);
+    return this.create({ name, file });
   },
   async update(id: number | string, data: UpdateResourceDto): Promise<Resource> {
     return api.putForm(`resources/${id}`, buildForm(data)) as Promise<Resource>

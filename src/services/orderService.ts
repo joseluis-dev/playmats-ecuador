@@ -3,6 +3,7 @@ import { api } from './api'
 import type { Order, OrderProduct, OrderStatus, Payment, PaymentMethod, Cart } from '@/types'
 import type { CartItemType } from '@/stores/cartStore'
 import type { ApiOrder } from '@/types/api-order'
+import { useUser } from '@/stores/userStore'
 
 // Convención base (ajusta si en tu backend difiere, revisa tu Postman):
 //  - Listar /orders
@@ -39,18 +40,8 @@ interface AttachPaymentParams {
   imageUrl?: string
 }
 
-const fetchCurrentUserId = async (): Promise<string | null> => {
-  try {
-    const res = await fetch('/api/me', { credentials: 'include' });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data?.user?.id ?? null;
-  } catch {
-    return null;
-  }
-};
-
-const userId = await fetchCurrentUserId();
+const getUserId = () => useUser.getState().user?.id ?? null;
+const userId = getUserId();
 
 export const orderService = {
   // Listado general (admin)

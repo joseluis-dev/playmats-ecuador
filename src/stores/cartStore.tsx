@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { cartService } from "@/services/cartService";
-import type { Cart, CartProduct, Product, ResourceProduct } from "@/types";
+import type { Cart, Product, ResourceProduct } from "@/types";
+import { useUser } from "./userStore";
 
 // Tipo para un producto en el carrito
 export interface CartItemType {
@@ -62,18 +63,8 @@ const mapCartApiToItems = (cart: Cart): CartItemType[] => {
   }) ?? [];
 };
 
-const fetchCurrentUserId = async (): Promise<string | null> => {
-  try {
-    const res = await fetch('/api/me', { credentials: 'include' });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data?.user?.id ?? null;
-  } catch {
-    return null;
-  }
-};
-
-const userId = await fetchCurrentUserId();
+const getUserId = () => useUser.getState().user?.id ?? null;
+const userId = getUserId();
 
 export const useCartStore = create<CartState>((set, get) => ({
   cart: [],
