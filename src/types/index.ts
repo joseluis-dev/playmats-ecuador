@@ -49,6 +49,8 @@ export interface Resource {
   watermark?: string
   hosting?: string
   type?: ResourceType
+  categories?: Category[]
+  attributes?: Attribute[]
   file?: File
   isBanner?: boolean
 }

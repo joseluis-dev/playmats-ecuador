@@ -42,11 +42,9 @@ export const resourcesService = {
     return api.putForm(`resources/${id}`, buildForm(data)) as Promise<Resource>
   },
   async assignCategories(id: number | string, categoryIds: (number | string)[]): Promise<void> {
-    if (categoryIds.length === 0) return
     await api.put(`resources/${id}/categories`, { categoryIds })
   },
   async assignAttributes(id: number | string, attributeIds: (number | string)[]): Promise<void> {
-    if (attributeIds.length === 0) return
     await api.put(`resources/${id}/attributes`, { attributeIds })
   },
   async remove(id: number | string): Promise<void> {

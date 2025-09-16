@@ -157,6 +157,6 @@ export const FabricCanvas = () => {
   }
 
   return (
-    <canvas ref={canvasRef} className='border border-[var(--color-text)] rounded-xl'/>
+    <canvas ref={canvasRef} className='border border-[var(--color-text)] rounded-xl transition-all duration-200 ease-in-out'/>
   )
 }

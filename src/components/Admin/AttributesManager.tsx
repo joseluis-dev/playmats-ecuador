@@ -132,12 +132,12 @@ export const AttributesManager = () => {
           </CardHeader>
           <CardContent>
             <DataList<Attribute>
+              className='max-h-[300px] overflow-y-auto'
               items={attributes}
               selectedId={selectedAttribute?.id?.toString()}
               onSelect={handleEdit}
               onDelete={async (id) => handleDelete(Number(id))}
               keyExtractor={(attribute) => attribute.id.toString()}
-              className="h-full"
               renderItem={(attribute) => (
                 <div className="space-y-2">
                   <h4 className="font-medium leading-none">{attribute.id} - {attribute.name}</h4>

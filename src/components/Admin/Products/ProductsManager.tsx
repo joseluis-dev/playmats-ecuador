@@ -43,6 +43,7 @@ export const ProductsManager = () => {
           </CardHeader>
           <CardContent>
             <DataList<Product>
+              className='max-h-[500px] overflow-y-auto'
               items={products}
               selectedId={selectedProduct?.id}
               onSelect={setSelectedProduct}

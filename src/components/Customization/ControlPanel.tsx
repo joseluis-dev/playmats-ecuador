@@ -29,43 +29,6 @@ const designSchema = z.object({
   border: z.custom<Resource>().optional(),
 });
 
-const typesOptions = [
-  {
-    name: "Playmat",
-    url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-    thumbnail:
-      "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp",
-    watermark: "",
-    hosting: "cloudinary",
-    type: "image",
-    isBanner: false,
-    categories: [
-      {
-        name: "Tipo de diseño",
-        description: "",
-        color: "bg-purple-500",
-      }
-    ],
-  },
-  {
-    name: "Mousepad",
-    url: "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Mouspad-Gamer_yau6cl.webp",
-    thumbnail:
-      "https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Mouspad-Gamer_yau6cl.webp",
-    watermark: "",
-    hosting: "cloudinary",
-    type: "image",
-    isBanner: false,
-    categories: [
-      {
-        name: "Tipo de diseño",
-        description: "",
-        color: "bg-purple-500",
-      }
-    ],
-  },
-];
-
 const sizesOptions = [
   {
     name: "Mediano",
@@ -154,6 +117,8 @@ export const ControlPanel = () => {
   const { addLayers, setSize, layers, modifyItems } = useFabricCanvasStore()
   const [seals, setSeals] = useState<Resource[]>([])
   const [borders, setBorders] = useState<Resource[]>([])
+  const [types, setTypes] = useState<Resource[]>([])
+  const [sizes, setSizes] = useState<Resource[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null);
   const form = useForm<z.infer<typeof designSchema>>({
     resolver: zodResolver(designSchema),
@@ -172,6 +137,13 @@ export const ControlPanel = () => {
   const fetchBorders = async () => {
     return await resourcesService.list({ category: '4' })
   }
+  const fetchTypes = async () => {
+    return await resourcesService.list({ category: '10' })
+  }
+  const fetchSizes = async ({ type }: { type: string }) => {
+    if (!type) return [];
+    return await resourcesService.list({ category: `8,${type}` })
+  }
 
   useEffect(() => {
     if (!layers.background || layers.background.length === 0) {
@@ -185,6 +157,8 @@ export const ControlPanel = () => {
   useEffect(() => {
     fetchSeals().then(res => setSeals(res)).catch(err => console.error(err))
     fetchBorders().then(res => setBorders(res)).catch(err => console.error(err))
+    fetchTypes().then(res => setTypes(res)).catch(err => console.error(err))
+    fetchSizes({ type: '1' }).then(res => setSizes(res)).catch(err => console.error(err))
   }, [])
 
   function onSubmit(values: z.infer<typeof designSchema>) {
@@ -201,13 +175,31 @@ export const ControlPanel = () => {
           render={({ field }) => (
             <FormItem className="flex flex-col w-[85%] gap-3 items-center justify-center mx-auto">
               <FormControl>
-                <CarouselSize items={typesOptions}>
+                <CarouselSize items={types}>
                   {(item, index) => (
                     <div
                       className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
                       style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
                       onClick={() => {
                         field.onChange(item.name)
+                        const type = item.categories.find((cat: any) => cat.name === item.name);
+                        fetchSizes({ type: type?.id }).then(res => {
+                          setSizes(res)
+                          const smallestSize = res.map(size => {
+                            const ancho = size.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || "61";
+                            const alto = size.attributes?.find((attr: any) => attr.name.includes('alto'))?.value || "22.5";
+                            return {
+                              ...size,
+                              area: parseFloat(ancho) * parseFloat(alto)
+                            }
+                          }).sort((a, b) => a.area - b.area)[0];
+                          setSize(
+                            parseFloat(smallestSize?.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || "61") * 10,
+                            parseFloat(smallestSize?.attributes?.find((attr: any) => attr.name.includes('alto'))?.value || "22.5") * 10
+                          )
+                          const price = parseFloat(smallestSize?.attributes?.find((attr: any) => attr.name.includes('price'))?.value || "0") || 0;
+                          modifyItems('size', price)
+                        }).catch(err => console.error(err))
                         // addLayers('background', item);
                       }}
                     >
@@ -233,18 +225,21 @@ export const ControlPanel = () => {
           render={({ field }) => (
             <FormItem className="flex flex-col w-[85%] gap-3 items-center justify-center mx-auto">
               <FormControl>
-                <CarouselSize items={sizesOptions}>
+                <CarouselSize items={sizes}>
                   {(item, index) => (
                     <div
                       className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
                       style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
                       onClick={() => {
                         field.onChange(item.name)
+                        const ancho = item.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || 61;
+                        const alto = item.attributes?.find((attr: any) => attr.name.includes('alto'))?.value || 22.5;
+                        const price = parseFloat(item.attributes?.find((attr: any) => attr.name.includes('price'))?.value) || 0;
                         setSize(
-                          parseFloat(item.attribute?.find((attr: any) => attr.name === 'ancho')?.value) * 10 || 610,
-                          parseFloat(item.attribute?.find((attr: any) => attr.name === 'alto')?.value) * 10 || 355
+                          parseFloat(ancho) * 10 || 610,
+                          parseFloat(alto) * 10 || 355
                         )
-                        modifyItems('size', item.attribute?.find((attr: any) => attr.name.includes('price'))?.value || 0);
+                        modifyItems('size', price);
                       }}
                     >
                       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">

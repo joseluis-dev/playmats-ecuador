@@ -43,7 +43,6 @@ interface AddressFormProps {
 }
 
 export const AddressForm = ({ initialData, onSave, countries, states }: AddressFormProps) => {
-  console.log({ initialData })
   // Configuración del formulario
   const form = useForm<z.infer<typeof addressSchema>>({
     resolver: zodResolver(addressSchema),

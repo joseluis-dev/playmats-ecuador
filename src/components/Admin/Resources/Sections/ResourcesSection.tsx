@@ -207,6 +207,7 @@ export default function ResourcesSection() {
           </CardHeader>
           <CardContent>
             <DataList<Resource>
+              className='max-h-[500px] overflow-y-auto'
               items={resources}
               selectedId={selectedResource?.id.toString()}
               keyExtractor={item => String(item.id)}

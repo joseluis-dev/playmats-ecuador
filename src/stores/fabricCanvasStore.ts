@@ -77,7 +77,6 @@ export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
       if (Array.isArray(item)) {
         for (let i = 0; i < currentItems[name].length; i++) {
           const el = currentItems[name][i];
-          console.log(el);
           if (el.price) {
             total -= parseFloat(el.price);
           }

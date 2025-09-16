@@ -125,12 +125,12 @@ export const CategoriesManager = () => {
           </CardHeader>
           <CardContent>
             <DataList<Category>
+              className='max-h-[300px] overflow-y-auto'
               items={categories}
               selectedId={selectedCategory?.id?.toString()}
               onSelect={handleEdit}
               onDelete={async (id) => handleDelete(Number(id))}
               keyExtractor={(category) => category.id.toString()}
-              className='h-full'
               renderItem={(category) => (
                 <div className="space-y-2">
                   <h4 className="font-medium leading-none">{category.id} - {category.name}</h4>
