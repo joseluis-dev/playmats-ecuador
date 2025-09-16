@@ -8,10 +8,9 @@ const deleteIcon =
 export const FabricCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fabricCanvasRef = useRef<Canvas | null>(null);
-  const { imgSrc, setImgSrc, layers, removeLayer, size, modifyItems } = useFabricCanvasStore()
+  const { imgSrc, setImgSrc, layers, removeLayer, size, modifyItems, setRef } = useFabricCanvasStore()
   
   const deleteImgRef = useRef<HTMLImageElement | null>(null);
-
   // Load delete icon image once
   useEffect(() => {
     const img = document.createElement('img');
@@ -27,6 +26,7 @@ export const FabricCanvas = () => {
       preserveObjectStacking: true,
     });
     fabricCanvasRef.current = canvas;
+    setRef(canvas);
 
     return () => {
       if (fabricCanvasRef.current) {
@@ -37,6 +37,7 @@ export const FabricCanvas = () => {
           layer: null,
           action: null,
         })
+        setRef(null);
       }
     };
   }, []);
@@ -157,6 +158,8 @@ export const FabricCanvas = () => {
   }
 
   return (
+    <>
     <canvas ref={canvasRef} className='border border-[var(--color-text)] rounded-xl transition-all duration-200 ease-in-out'/>
+    </>
   )
 }

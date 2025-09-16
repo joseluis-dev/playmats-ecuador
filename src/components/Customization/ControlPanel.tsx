@@ -16,6 +16,7 @@ import { useFabricCanvasStore } from "@/stores/fabricCanvasStore";
 import { useEffect, useRef, useState } from "react";
 import { resourcesService } from "@/services/resourcesService";
 import type { Resource } from "@/types";
+import { toast } from "sonner";
 
 const designSchema = z.object({
   type: z.string(),
@@ -29,92 +30,8 @@ const designSchema = z.object({
   border: z.custom<Resource>().optional(),
 });
 
-const sizesOptions = [
-  {
-    name: "Mediano",
-    url: "",
-    thumbnail:
-      "",
-    watermark: "",
-    hosting: "cloudinary",
-    type: "image",
-    isBanner: false,
-    attribute: [
-      {
-        name: "ancho",
-        value: 61,
-        color: "bg-blue-500",
-      },
-      {
-        name: "alto",
-        value: 22.5,
-        color: "bg-blue-500",
-      },
-      {
-        name: "price",
-        value: 20,
-        color: "bg-blue-500",
-      }
-    ]
-  },
-  {
-    name: "Grande",
-    url: "",
-    thumbnail:
-      "",
-    watermark: "",
-    hosting: "cloudinary",
-    type: "image",
-    isBanner: false,
-    attribute: [
-      {
-        name: "ancho",
-        value: 61,
-        color: "bg-blue-500",
-      },
-      {
-        name: "alto",
-        value: 35.5,
-        color: "bg-blue-500",
-      },
-      {
-        name: "price",
-        value: 30,
-        color: "bg-blue-500",
-      }
-    ]
-  },
-  {
-    name: "Doble",
-    url: "",
-    thumbnail:
-      "",
-    watermark: "",
-    hosting: "cloudinary",
-    type: "image",
-    isBanner: false,
-    attribute: [
-      {
-        name: "ancho",
-        value: 61,
-        color: "bg-blue-500",
-      },
-      {
-        name: "alto",
-        value: 71,
-        color: "bg-blue-500",
-      },
-      {
-        name: "price",
-        value: 50,
-        color: "bg-blue-500",
-      }
-    ]
-  },
-];
-
 export const ControlPanel = () => {
-  const { addLayers, setSize, layers, modifyItems } = useFabricCanvasStore()
+  const { addLayers, setSize, layers, modifyItems, ref } = useFabricCanvasStore()
   const [seals, setSeals] = useState<Resource[]>([])
   const [borders, setBorders] = useState<Resource[]>([])
   const [types, setTypes] = useState<Resource[]>([])
@@ -130,7 +47,7 @@ export const ControlPanel = () => {
       border: undefined
     },
   })
-  
+
   const fetchSeals = async () => {
     return await resourcesService.list({ category: '3' })
   }
@@ -163,6 +80,16 @@ export const ControlPanel = () => {
 
   function onSubmit(values: z.infer<typeof designSchema>) {
     console.log(values)
+    if (!values.type) return toast.warning("Debes seleccionar un tipo de diseño");
+    if (!values.img) return toast.warning("Debes subir una imagen");
+    if (!ref) return toast.error("El lienzo no está listo. Por favor, intenta de nuevo.");
+    const dataUrl = ref.toDataURL({
+      format: 'png'
+    });
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = 'design.png';
+    link.click();
   }
 
   const accordionItems = [

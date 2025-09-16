@@ -1,22 +1,25 @@
 import { create } from "zustand";
 
 interface FabricCanvasState {
+  ref: any;
   total: number;
   items: Record<string, any>;
-  modifyItems: (name: string, item: number | any[]) => void;
   imgSrc: Record<string, any> | null;
   layers: Record<string, any[]>;
   size: {
     width: number;
     height: number;
   };
+  setRef: (ref: any) => void;
   setSize: (width: number, height: number) => void;
   setImgSrc: (url: object | null) => void;
   addLayers: (name: string, object: any) => void;
+  modifyItems: (name: string, item: number | any[]) => void;
   removeLayer: (name: string, id: string) => void;
 }
 
 export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
+  ref: null,
   total: 20,
   items: {
     size: 20,
@@ -32,6 +35,7 @@ export const useFabricCanvasStore = create<FabricCanvasState>((set) => ({
     width: 610,
     height: 225,
   },
+  setRef: (ref: any) => set({ ref }),
   setSize: (width: number, height: number) => set((state) => ({
     ...state,
     size: { width, height },

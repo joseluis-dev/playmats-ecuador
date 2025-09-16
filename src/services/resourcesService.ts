@@ -1,5 +1,5 @@
 import { api } from './api'
-import type { Resource } from '@/types'
+import type { Resource, Category, Attribute } from '@/types'
 
 export interface CreateResourceDto {
   name: string
@@ -12,8 +12,8 @@ export interface UpdateResourceDto {
 }
 
 export interface ResourceWithRelations extends Resource {
-  categories?: Array<{ id: number }>
-  attributes?: Array<{ id: number }>
+  categories?: Category[]
+  attributes?: Attribute[]
 }
 
 function buildForm(data: { name: string; file?: File }) {
