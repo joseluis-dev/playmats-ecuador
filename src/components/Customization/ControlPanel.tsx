@@ -15,14 +15,15 @@ import { CarouselSize } from "../Carousel";
 import { useCustomizationTool } from "@/stores/customToolStore";
 import { useEffect, useRef } from "react";
 import { resourcesService } from "@/services/resourcesService";
-import type { Resource } from "@/types";
+import type { Product, Resource } from "@/types";
 import { toast } from "sonner";
 import { useUser } from "@/stores/userStore";
 import { dataUrlToFile } from "@/utils/fileUtils";
+import { api } from "@/services/api";
 
 const designSchema = z.object({
-  type: z.string(),
-  size: z.string().optional(),
+  type: z.custom<Resource>().optional(),
+  size: z.custom<Resource>().optional(),
   img: z.custom<File>((file) => file instanceof File && file.size > 0, {
     message: "Debes subir una imagen",
   }).refine(file => file.type.startsWith("image/"), {
@@ -33,14 +34,14 @@ const designSchema = z.object({
 });
 
 export const ControlPanel = () => {
-  const { addLayers, setSize, layers, modifyItems, ref, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes, setFormRef, total } = useCustomizationTool()
+  const { addLayers, setSize, layers, modifyItems, canvasRef, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes, setFormRef, total } = useCustomizationTool()
   const { user } = useUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const form = useForm<z.infer<typeof designSchema>>({
     resolver: zodResolver(designSchema),
     defaultValues: {
-      type: "",
-      size: "",
+      type: undefined,
+      size: undefined,
       img: undefined,
       seals: [],
       border: undefined
@@ -78,28 +79,106 @@ export const ControlPanel = () => {
     setFormRef(form);
   }, [])
 
+  useEffect(() => {
+    if (!types || types.length === 0) return;
+    if (!borders || borders.length === 0) return;
+    if (!sizes || sizes.length === 0) return;
+    form.reset({
+      type: types.find(t => t.name === 'Playmat') || undefined,
+      size: (() => {
+        if (!sizes || sizes.length === 0) return undefined;
+        const sizesWithArea = sizes.map(s => {
+          const ancho = s.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || "61";
+          const alto = s.attributes?.find((attr: any) => attr.name.includes('alto'))?.value || "22.5";
+          const area = parseFloat(ancho) * parseFloat(alto);
+          return { ...s, area };
+        });
+        const sortedSizes = sizesWithArea.sort((a, b) => (a.area || 0) - (b.area || 0));
+        return sortedSizes[0];
+      })(),
+      img: undefined,
+      seals: [],
+      border: borders.find(b => b.name === 'Bordes sin borde') || undefined
+    });
+  }, [types, borders, sizes])
+
   async function onSubmit(values: z.infer<typeof designSchema>) {
     console.log(values)
     if (!values.type) return toast.warning("Debes seleccionar un tipo de diseño");
     if (!values.img) return toast.warning("Debes subir una imagen");
-    if (!ref) return toast.error("El lienzo no está listo. Por favor, intenta de nuevo.");
-    const dataUrl = ref.toDataURL({
+    if (!canvasRef) return toast.error("El lienzo no está listo. Por favor, intenta de nuevo.");
+    const dataUrl = canvasRef.toDataURL({
       format: 'png',
       multiplier: 4
     });
-    const file = await dataUrlToFile(dataUrl, values.img.name);
-    const product = {
-      name: `${values.type} - ${user?.id || 'invitado'}`,
-      description: `Diseño personalizado de tipo ${values.type} y tamaño ${values.size || 'personalizado'}`,
+    const fileDesign = await dataUrlToFile(dataUrl, values.img.name);
+    const newProduct = {
+      name: `${values.type?.name} - Diseño personalizado`,
+      description: `Diseño personalizado de tipo ${values.type?.name} y tamaño ${values.size?.name || 'personalizado'} - ${user?.id || 'invitado'}`,
       price: total,
       isCustomizable: true
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', 'IMAGE')
-    formData.append('isBanner', 'false');
-    console.log(product, file)
+    const formDataDesign = new FormData();
+    formDataDesign.append('file', fileDesign);
+    formDataDesign.append('type', 'IMAGE')
+    formDataDesign.append('isBanner', 'true');
+
+    const formDataBackground = new FormData();
+    formDataBackground.append('file', values.img);
+    formDataBackground.append('type', 'IMAGE')
+    formDataBackground.append('isBanner', 'false');
+
+    const sealsIds = values.seals?.map(seal => seal.id) || [];
+    console.log(fileDesign, values.img)
+
+    try {      
+      const response = await api.post('products', newProduct)
+      const createdProduct = response as Product
+      const productId = createdProduct.id
+      // toast.success('Producto creado correctamente')
+      const resourceResponse = await api.postForm(`products/${productId}/resources`, formDataDesign)
+      const resource = resourceResponse as { isBanner: boolean, resource: Resource }
+      const resourceId = resource.resource.id
+      console.log({ resourceResponse })
+
+      // Assign categories and attributes
+      const categories = [values.type?.categories?.find(cat => cat.name === values.type?.name)?.id].filter(id => id !== undefined);
+      const attributes = [values.size?.attributes?.find(attr => attr.name.includes('ancho'))?.id, values.size?.attributes?.find(attr => attr.name.includes('alto'))?.id].filter(id => id !== undefined);
+
+      const resourceBackgroundResponse = await api.postForm(`products/${productId}/resources`, formDataBackground)
+      const resourceBackground = resourceBackgroundResponse as { isBanner: boolean, resource: Resource }
+      const resourceBackgroundId = resourceBackground.resource.id
+      console.log({ resourceBackgroundResponse })
+
+      await api.post(`products/${productId}/categories`, {
+        categoryIds: categories
+      })
+
+      await api.post(`products/${productId}/attributes`, {
+        attributeIds: attributes
+      })
+
+      await api.put(`products/${productId}/resources`, {
+        resourceIds: [...sealsIds, resourceId, resourceBackgroundId]
+      })
+
+      // await resourcesService.assignCategories(resourceId, categories)
+      // await resourcesService.assignAttributes(resourceId, attributes)
+
+      toast.success('Producto personalizado guardado correctamente')
+    } catch (error) {
+      console.error('Error al guardar el producto:', error)
+      toast.error('Error al guardar el producto')
+    } finally {
+      form.reset({
+        type: undefined,
+        size: undefined,
+        img: undefined,
+        seals: [],
+        border: undefined
+      });
+    }
   }
 
   const accordionItems = [
@@ -118,7 +197,7 @@ export const ControlPanel = () => {
                       className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
                       style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
                       onClick={() => {
-                        field.onChange(item.name)
+                        field.onChange(item)
                         const type = item.categories.find((cat: any) => cat.name === item.name);
                         fetchSizes({ type: type?.id }).then(res => {
                           setSizes(res)
@@ -168,7 +247,7 @@ export const ControlPanel = () => {
                       className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
                       style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
                       onClick={() => {
-                        field.onChange(item.name)
+                        field.onChange(item)
                         const ancho = item.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || 61;
                         const alto = item.attributes?.find((attr: any) => attr.name.includes('alto'))?.value || 22.5;
                         const price = parseFloat(item.attributes?.find((attr: any) => attr.name.includes('price'))?.value) || 0;
@@ -278,12 +357,7 @@ export const ControlPanel = () => {
                       className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
                       style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
                       onClick={() => {
-                        const currentBorder = field.value || undefined;
-                        if (currentBorder?.name === item.name) {
-                          field.onChange(undefined);
-                        } else {
-                          field.onChange(item);
-                        }
+                        field.onChange(item);
                         // addLayers('borders', item);
                         modifyItems('border', parseFloat(item.attributes?.find((attr: any) => attr.name.includes('price'))?.value) || 0);
                       }}

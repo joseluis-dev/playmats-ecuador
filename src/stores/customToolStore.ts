@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { Resource } from "@/types";
 
 interface FabricCanvasState {
-  ref: any;
+  canvasRef: any;
   formRef: any;
   total: number;
   items: Record<string, any>;
@@ -17,7 +17,7 @@ interface FabricCanvasState {
   borders: Resource[];
   types: Resource[];
   sizes: Resource[];
-  setRef: (ref: any) => void;
+  setCanvasRef: (canvasRef: any) => void;
   setFormRef: (formRef: any) => void;
   setSize: (width: number, height: number) => void;
   setImgSrc: (url: object | null) => void;
@@ -32,7 +32,7 @@ interface FabricCanvasState {
 }
 
 export const useCustomizationTool = create<FabricCanvasState>((set) => ({
-  ref: null,
+  canvasRef: null,
   formRef: null,
   total: 20,
   items: {
@@ -53,7 +53,7 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
   borders: [],
   types: [],
   sizes: [],
-  setRef: (ref: any) => set({ ref }),
+  setCanvasRef: (canvasRef: any) => set({ canvasRef }),
   setFormRef: (formRef: any) => set({ formRef }),
   setSize: (width: number, height: number) => set((state) => ({
     ...state,

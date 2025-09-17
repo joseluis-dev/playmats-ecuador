@@ -8,7 +8,67 @@ const deleteIcon =
 export const FabricCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fabricCanvasRef = useRef<Canvas | null>(null);
-  const { imgSrc, setImgSrc, layers, removeLayer, size, modifyItems, setRef, formRef } = useCustomizationTool()
+  const { imgSrc, setImgSrc, layers, removeLayer, size, modifyItems, setCanvasRef, formRef } = useCustomizationTool()
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const ringRef = useRef<HTMLDivElement | null>(null);
+  
+  // Helpers: radio del wrapper, gap (distancia entre bordes), y dibujo del anillo
+  const getWrapperRadius = () => {
+    if (!wrapperRef.current) return 12; // aprox. rounded-xl
+    const cs = window.getComputedStyle(wrapperRef.current);
+    const r = parseFloat(cs.borderTopLeftRadius || '12');
+    return isNaN(r) ? 12 : r;
+  };
+
+  const getGap = () => {
+    if (!wrapperRef.current || !overlayRef.current) return 8; // coincide con inset-2 (~8px)
+    const w = wrapperRef.current.getBoundingClientRect();
+    const o = overlayRef.current.getBoundingClientRect();
+    const gap = Math.max(0, Math.round(o.left - w.left));
+    return gap || 8;
+  };
+
+  const syncRingRadii = () => {
+    const ring = ringRef.current;
+    const inner = overlayRef.current;
+    if (!ring || !inner) return;
+    const outerRadius = getWrapperRadius();
+    const gap = getGap();
+    const innerRadius = Math.max(0, outerRadius - gap);
+    ring.style.borderRadius = `${outerRadius}px`;
+    inner.style.borderRadius = `${innerRadius}px`;
+  };
+
+  const setRingFill = (fill: { color?: string; image?: string } | null) => {
+    const ring = ringRef.current;
+    if (!ring) return;
+    // Reset
+    ring.style.background = 'transparent';
+    ring.style.backgroundImage = '';
+    ring.style.backgroundSize = '';
+    ring.style.backgroundPosition = '';
+    ring.style.padding = '0px';
+    ring.style.mask = '';
+    (ring.style as any).webkitMaskComposite = '';
+    (ring.style as any).maskComposite = '';
+
+    if (!fill) return; // anillo transparente
+
+    const gap = getGap();
+    if (fill.image) {
+      ring.style.backgroundImage = `url(${fill.image})`;
+      ring.style.backgroundSize = 'cover';
+      ring.style.backgroundPosition = 'center';
+    } else {
+      ring.style.background = fill.color || 'transparent';
+    }
+    // Máscara para recortar el interior y formar un anillo perfecto
+    ring.style.padding = `${gap}px`;
+    ring.style.mask = 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)';
+    (ring.style as any).webkitMaskComposite = 'xor';
+    (ring.style as any).maskComposite = 'exclude';
+  };
   
   const deleteImgRef = useRef<HTMLImageElement | null>(null);
   // Load delete icon image once
@@ -26,7 +86,7 @@ export const FabricCanvas = () => {
       preserveObjectStacking: true,
     });
     fabricCanvasRef.current = canvas;
-    setRef(canvas);
+    setCanvasRef(canvas);
 
     return () => {
       if (fabricCanvasRef.current) {
@@ -37,7 +97,7 @@ export const FabricCanvas = () => {
           layer: null,
           action: null,
         })
-        setRef(null);
+        setCanvasRef(null);
       }
     };
   }, []);
@@ -55,6 +115,36 @@ export const FabricCanvas = () => {
 
       // Renderizar cambios
       canvas.renderAll();
+
+      // Animar SOLO los bordes decorativos para suavizar la percepción
+      // sin escalar el bitmap del canvas y evitar distorsión.
+      const timing: KeyframeAnimationOptions = { duration: 250, easing: 'ease-in-out' };
+      wrapperRef.current?.animate?.(
+        [
+          { transform: 'scale(0.99)' },
+          { transform: 'scale(1)' }
+        ],
+        timing
+      );
+      overlayRef.current?.animate?.(
+        [
+          { transform: 'scale(0.985)' },
+          { transform: 'scale(1)' }
+        ],
+        timing
+      );
+      // Re-sincronizar radios y relleno del anillo tras actualizar tamaño
+      syncRingRadii();
+      const currentBorder = formRef?.getValues?.('border');
+      const name = currentBorder?.name?.toLowerCase?.() || '';
+      if (!name || name.includes('sin borde') || name.includes('transparente')) {
+        setRingFill(null);
+      } else if (name.includes('negro')) {
+        const url: string | undefined = currentBorder?.url;
+        if (url) setRingFill({ image: url }); else setRingFill({ color: '#000' });
+      } else {
+        setRingFill(null);
+      }
     }
   }, [size]);
 
@@ -63,6 +153,61 @@ export const FabricCanvas = () => {
       handleAddImage(imgSrc);
     }
   }, [imgSrc, layers]);
+
+  // Sincronizar apariencia de los bordes según el valor de `border` en el formulario
+  useEffect(() => {
+    if (!formRef) return;
+
+    const applyBorderStyle = (border: any) => {
+      const name: string | undefined = border?.name;
+      const inner = overlayRef.current;
+      if (!inner) return;
+      // Mostrar/ocultar borde interno
+      inner.style.display = '';
+      syncRingRadii();
+
+      // Casos:
+      // - "Bordes color negro": rellenar anillo entre bordes de negro
+      // - "Bordes transparentes": dejar anillo transparente (como ahora)
+      // - "Bordes sin borde": ocultar borde interno y anillo (solo borde exterior)
+      if (!name || name?.toLowerCase().includes('sin borde')) {
+        inner.style.display = 'none';
+        setRingFill(null);
+        return;
+      }
+
+      if (name?.toLowerCase().includes('transparente')) {
+        // Mantener tal cual (anillo transparente)
+        setRingFill(null);
+        return;
+      }
+
+      if (name?.toLowerCase().includes('negro')) {
+        // Pintar el anillo con textura (si existe) o negro sólido
+        // const url: string | undefined = border?.url;
+        // if (url) setRingFill({ image: url }); else setRingFill({ color: '#000' });
+        setRingFill({ color: '#000' });
+        return;
+      }
+
+      // Default: transparente
+      setRingFill(null);
+    };
+
+    // Aplicar al cargar
+    applyBorderStyle(formRef.getValues('border'));
+
+    // Suscribirse a cambios en el campo 'border'
+    const subscription = (formRef as any).watch?.((value: any, info: any) => {
+      if (info?.name === 'border') {
+        applyBorderStyle(value?.border);
+      }
+    });
+
+    return () => {
+      subscription?.unsubscribe?.();
+    };
+  }, [formRef]);
 
   // Delete handler for control
   const deleteObject = (_eventData: any, transform: any) => {
@@ -168,8 +313,17 @@ export const FabricCanvas = () => {
   }
 
   return (
-    <>
-    <canvas ref={canvasRef} className='border border-[var(--color-text)] rounded-xl transition-all duration-200 ease-in-out'/>
-    </>
+    <div
+      ref={wrapperRef}
+      style={{ width: `${size.width + 2}px`, height: `${size.height + 2}px` }}
+      className='relative rounded-xl border border-[var(--color-text)]'
+    >
+      {/* Mantener el canvas sin transiciones CSS para evitar escalado/blur */}
+      <canvas ref={canvasRef} className='block rounded-xl' />
+      {/* Capa que rellena el anillo entre bordes (por defecto transparente) */}
+      <div ref={ringRef} className='pointer-events-none absolute inset-0 rounded-xl z-10'></div>
+      {/* Borde interno para el efecto de doble borde */}
+      <div ref={overlayRef} className='pointer-events-none absolute inset-2 rounded-xl border border-black z-20'></div>
+    </div>
   )
 }
