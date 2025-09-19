@@ -76,7 +76,7 @@ export const UserOrdersList: React.FC<UserOrdersListProps> = ({ orders, onSelect
                     <span className={cn('text-xs px-2 py-1 rounded-full font-medium', orderStatusStyles[order.status])}>{order.status === 'PENDING' ? 'Pendiente' : order.status === 'DELIVERED' ? 'Entregada' : 'Cancelada'}</span>
                     {primaryPayment && (
                       <span className={cn('text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1', paymentStatusStyles[primaryPayment.status])}>
-                        {primaryPayment.status === 'PENDING' ? 'Pago pendiente' : primaryPayment.status === 'COMPLETED' ? 'Pago completado' : 'Pago fallido'}
+                        {primaryPayment.status === 'PENDING' ? 'Pago pendiente' : primaryPayment.status === 'APPROVED' ? 'Pago aprobado' : 'Pago fallido'}
                       </span>
                     )}
                     <span className='text-xs px-2 py-1 rounded-full bg-accent/40 text-accent-foreground border border-border/50'>Items: {totalItems}</span>
@@ -137,7 +137,7 @@ export const UserOrdersList: React.FC<UserOrdersListProps> = ({ orders, onSelect
                             <span className='font-medium'>Pago <span className='font-mono text-xs px-2 py-1 rounded bg-muted text-muted-foreground tracking-tight'>#{pay.id.slice(0, 6)}</span> </span>
                             <span className='text-xs text-muted-foreground'>Método: {pay.method} • Monto: ${pay.amount?.toFixed(2)}</span>
                             <span className={cn('text-[10px] w-fit mt-1 px-2 py-0.5 rounded-full font-medium', paymentStatusStyles[pay.status])}>
-                              {pay.status === 'PENDING' ? 'Pendiente' : pay.status === 'COMPLETED' ? 'Completado' : 'Fallido'}
+                              {pay.status === 'PENDING' ? 'Pendiente' : pay.status === 'APPROVED' ? 'Aprobado' : 'Fallido'}
                             </span>
                           </div>
                           <div className='flex flex-col items-end gap-3'>

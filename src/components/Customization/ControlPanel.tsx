@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { useUser } from "@/stores/userStore";
 import { dataUrlToFile } from "@/utils/fileUtils";
 import { api } from "@/services/api";
+import { useCart } from "@/hooks/useCart";
 
 const designSchema = z.object({
   type: z.custom<Resource>().optional(),
@@ -36,6 +37,7 @@ const designSchema = z.object({
 export const ControlPanel = () => {
   const { addLayers, setSize, layers, modifyItems, canvasRef, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes, setFormRef, total } = useCustomizationTool()
   const { user } = useUser();
+  const { addToCart } = useCart()
   const fileInputRef = useRef<HTMLInputElement>(null);
   const form = useForm<z.infer<typeof designSchema>>({
     resolver: zodResolver(designSchema),
@@ -130,7 +132,7 @@ export const ControlPanel = () => {
     formDataBackground.append('isBanner', 'false');
 
     const sealsIds = values.seals?.map(seal => seal.id) || [];
-    console.log(fileDesign, values.img)
+    const borderId = values.border?.id;
 
     try {      
       const response = await api.post('products', newProduct)
@@ -140,7 +142,6 @@ export const ControlPanel = () => {
       const resourceResponse = await api.postForm(`products/${productId}/resources`, formDataDesign)
       const resource = resourceResponse as { isBanner: boolean, resource: Resource }
       const resourceId = resource.resource.id
-      console.log({ resourceResponse })
 
       // Assign categories and attributes
       const categories = [values.type?.categories?.find(cat => cat.name === values.type?.name)?.id].filter(id => id !== undefined);
@@ -149,8 +150,7 @@ export const ControlPanel = () => {
       const resourceBackgroundResponse = await api.postForm(`products/${productId}/resources`, formDataBackground)
       const resourceBackground = resourceBackgroundResponse as { isBanner: boolean, resource: Resource }
       const resourceBackgroundId = resourceBackground.resource.id
-      console.log({ resourceBackgroundResponse })
-
+      
       await api.post(`products/${productId}/categories`, {
         categoryIds: categories
       })
@@ -160,13 +160,16 @@ export const ControlPanel = () => {
       })
 
       await api.put(`products/${productId}/resources`, {
-        resourceIds: [...sealsIds, resourceId, resourceBackgroundId]
+        resourceIds: [...sealsIds, resourceId, resourceBackgroundId, borderId].filter(id => id !== undefined)
       })
 
-      // await resourcesService.assignCategories(resourceId, categories)
-      // await resourcesService.assignAttributes(resourceId, attributes)
+      await resourcesService.assignCategories(resourceId, categories)
+      await resourcesService.assignAttributes(resourceId, attributes)
 
       toast.success('Producto personalizado guardado correctamente')
+
+      await addToCart({ id: createdProduct.id, product: createdProduct, quantity: 1, price: createdProduct.price as number })
+      window.location.assign('/payment')
     } catch (error) {
       console.error('Error al guardar el producto:', error)
       toast.error('Error al guardar el producto')
@@ -382,7 +385,7 @@ export const ControlPanel = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3 w-full">
         <AccordionDynamic items={accordionItems} />
         <Button type="submit" className="text-[var(--color-text)]" variant="default">
-          Comprar
+          Añadir al carrito - ${total.toFixed(2)}
         </Button>
       </form>
     </Form>

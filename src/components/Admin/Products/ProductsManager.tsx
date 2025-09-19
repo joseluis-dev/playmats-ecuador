@@ -129,17 +129,13 @@ export const ProductsManager = () => {
                   }
 
                   // Actualizar categorías y atributos
-                  if (product.categories.length > 0) {
-                    await api.post(`products/${productId}/categories`, {
-                      categoryIds: product.categories
-                    })
-                  }
+                  await api.put(`products/${productId}/categories`, {
+                    categoryIds: product.categories
+                  })
                   
-                  if (product.attributes.length > 0) {
-                    await api.post(`products/${productId}/attributes`, {
-                      attributeIds: product.attributes
-                    })
-                  }
+                  await api.put(`products/${productId}/attributes`, {
+                    attributeIds: product.attributes
+                  })
 
                   // Recargar productos
                   fetchProducts()

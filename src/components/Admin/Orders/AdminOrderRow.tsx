@@ -186,7 +186,12 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
 
   const handleResume = async (order: ApiOrder) => {
     if (!order) return
-    const updatedOrder = await orderService.update(order.id, { ...order, status: 'PENDING' })
+    let updatedOrder: any = order
+    if (order.status === 'PENDING') {
+      updatedOrder = await orderService.update(order.id, { ...order, status: 'DELIVERED' })
+    } else if (order.status === 'CANCELLED' || order.status === 'DELIVERED') {
+      updatedOrder = await orderService.update(order.id, { ...order, status: 'PENDING' })
+    }
     setOrders(prev => prev.map(o => o.id === order.id ? updatedOrder : o) as unknown as ApiOrder[])
   }
 
@@ -350,7 +355,7 @@ export const AdminOrderRow: React.FC<{ order: ApiOrder, setOrders: React.Dispatc
         )}
       </CardContent>
       <CardFooter className='justify-end gap-2 mt-6 border-t'>
-        <Button size='sm' className='border border-blue-500/50 bg-transparent hover:bg-blue-600/60 dark:bg-transparent dark:hover:bg-blue-600/60 text-[var(--color-text)]' onClick={() => handleResume(order)}>Reanudar orden</Button>
+        <Button size='sm' className='border border-blue-500/50 bg-transparent hover:bg-blue-600/60 dark:bg-transparent dark:hover:bg-blue-600/60 text-[var(--color-text)]' onClick={() => handleResume(order)}>{order.status === 'PENDING' ? 'Entregar Orden' : 'Reanudar Orden'}</Button>
         <Button size='sm' variant='outline' className='text-[var(--color-text)]' onClick={() => handleCancelOrder(order)}>Cancelar orden</Button>
         <Button size='sm' variant='ghost' onClick={() => setOpen(!open)}>{open ? 'Cerrar' : 'Ver más'}</Button>
       </CardFooter>
