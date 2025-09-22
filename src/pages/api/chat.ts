@@ -49,33 +49,40 @@ export async function POST(req: any) {
           };
         }
       },
-      "list-seals-by-precio": {
+      "list-seals-by-price": {
         description: `Úsalo para listar los sellos disponibles por precio.`,
         inputSchema: z.object({
-          precio: z.number().describe("Precio de los sellos a listar"),
+          price: z.number().describe("Precio de los sellos a listar"),
         }),
-        execute: async ({ precio }) => {
+        execute: async ({ price }) => {
+          console.log("Listing seals by price:", price);
           const sellos = await resourcesService.list({ category: '3' })
-          return sellos.filter((sello) => {
+          const filteredSeals = sellos.filter((sello) => {
             const priceValue = sello.attributes?.find(attr => attr.name.includes('price'))?.value ?? "0";
             const priceAttr = parseFloat(priceValue);
-            return !isNaN(priceAttr) && priceAttr <= precio;
+            return !isNaN(priceAttr) && priceAttr <= price;
           });
+          return {
+            found: filteredSeals.length > 0,
+            count: filteredSeals.length,
+            seals: filteredSeals,
+            message: filteredSeals.length > 0 
+              ? `Encontré ${filteredSeals.length} sello(s) por debajo de $${price}` 
+              : `No encontré sellos por debajo de $${price} en nuestro catálogo`,
+          };
         },
       },
       "list-seals-by-theme": {
         description: `Úsalo para listar los sellos disponibles por tema.`,
         inputSchema: z.object({
-          theme: z.string().describe("The specific theme, character, or franchise the user is asking about"),
-          query: z.string().describe("The specific question or request about seals")
+          theme: z.string().describe("The specific theme, character, or franchise the user is asking about")
         }),
-        execute: async ({ theme, query }) => {
+        execute: async ({ theme }) => {
           const sellos = await resourcesService.list({ category: '3' })
           // Filter seals based on theme (intelligent matching)
           const filteredSeals = sellos.filter(seal => {
             const sealName = seal.name?.toLowerCase();
             const searchTheme = theme.toLowerCase();
-            const searchQuery = query.toLowerCase();
             return sealName?.includes(searchTheme) ||
                   sealName?.split(' ').some(word => searchTheme.includes(word))
           });

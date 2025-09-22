@@ -3,10 +3,11 @@ import { DefaultChatTransport } from 'ai';
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CustomBadge } from '@/components/ui/custom-badge';
 import { BotIcon } from '@/components/icons/BotIcon';
 import { Send, User, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SealResults } from './SealResults';
+import type { SealSearchResult } from './types';
 
 export default function Chat() {
   const { messages, sendMessage, status } = useChat({
@@ -43,74 +44,6 @@ export default function Chat() {
       sendMessage({ text: input });
       setInput('');
     }
-  };
-
-  const renderSealResults = (sealData: any) => {
-    if (!sealData || !sealData.seals || sealData.seals.length === 0) {
-      return (
-        <div className="p-4 bg-muted/50 border border-border rounded-lg mt-4">
-          <p className="text-sm text-muted-foreground">
-            🔍 {sealData?.message || 'No se encontraron sellos para tu búsqueda'}
-          </p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="mt-6">
-        <div className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-lg">
-          <p className="text-sm text-primary font-medium">
-            ✅ {sealData.message} - ${sealData.seals.reduce((sum: number, seal: any) => 
-              sum + parseFloat(seal.attributes?.[0]?.value || '0'), 0)} total
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sealData.seals.map((seal: any, index: number) => (
-            <div
-              key={index}
-              className="border border-border rounded-xl p-4 bg-card shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group"
-            >
-              <div className="mb-3 overflow-hidden rounded-lg">
-                <img 
-                  src={seal.thumbnail || seal.url} 
-                  alt={seal.name}
-                  className="w-full h-48 object-cover border transition-transform duration-300 group-hover:scale-105"
-                  onError={(e) => {
-                    e.currentTarget.src = seal.url;
-                  }}
-                />
-              </div>
-              
-              <div className="text-center space-y-3">
-                <h4 className="font-heading font-semibold text-card-foreground text-sm sm:text-base">
-                  {seal.name}
-                </h4>
-                
-                {seal.attributes && seal.attributes.length > 0 && (
-                  <div className="flex justify-center flex-wrap gap-2">
-                    {seal.attributes.map((attr: any, attrIndex: number) => (
-                      <CustomBadge
-                        key={attrIndex}
-                        color={attr.color || '#059669'}
-                        label={`💰 ${attr.name}`}
-                        type="ghost"
-                      />
-                    ))}
-                  </div>
-                )}
-                
-                {seal.categories?.[0] && (
-                  <p className="text-xs text-muted-foreground">
-                    📂 {seal.categories[0].name}
-                  </p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -222,7 +155,7 @@ export default function Chat() {
                     ) : null;
 
                   case 'tool-all-seals':
-                  case 'tool-list-seals-by-precio':
+                  case 'tool-list-seals-by-price':
                   case 'tool-list-seals-by-theme':
                     switch (part.state) {
                       case 'input-streaming':
@@ -247,7 +180,7 @@ export default function Chat() {
                       case 'output-available':
                         return (
                           <div key={index}>
-                            {renderSealResults((part as any).output)}
+                            <SealResults sealData={(part as any).output as SealSearchResult} />
                           </div>
                         );
                       case 'output-error':
