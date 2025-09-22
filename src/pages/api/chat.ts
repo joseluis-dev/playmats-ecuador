@@ -34,6 +34,21 @@ export async function POST(req: any) {
       - Usa párrafos cortos y bien separados para mejor legibilidad`,
     messages: convertToModelMessages(messages),
     tools: {
+      "all-seals": {
+        description: `Úsalo para listar todos los sellos disponibles.`,
+        inputSchema: z.object({}),
+        execute: async () => {
+          const sellos = await resourcesService.list({ category: '3' })
+          return {
+            found: sellos.length > 0,
+            count: sellos.length,
+            seals: sellos,
+            message: sellos.length > 0 
+              ? `Encontré ${sellos.length} sello(s) en total` 
+              : `No encontré sellos en nuestro catálogo`,
+          };
+        }
+      },
       "list-seals-by-precio": {
         description: `Úsalo para listar los sellos disponibles por precio.`,
         inputSchema: z.object({
@@ -51,20 +66,18 @@ export async function POST(req: any) {
       "list-seals-by-theme": {
         description: `Úsalo para listar los sellos disponibles por tema.`,
         inputSchema: z.object({
-          tema: z.string().describe("Tema de los sellos a listar"),
+          theme: z.string().describe("The specific theme, character, or franchise the user is asking about"),
+          query: z.string().describe("The specific question or request about seals")
         }),
-        execute: async ({ tema, query }) => {
+        execute: async ({ theme, query }) => {
           const sellos = await resourcesService.list({ category: '3' })
+          // Filter seals based on theme (intelligent matching)
           const filteredSeals = sellos.filter(seal => {
             const sealName = seal.name?.toLowerCase();
-            const searchTheme = tema.toLowerCase();
+            const searchTheme = theme.toLowerCase();
             const searchQuery = query.toLowerCase();
-
-            return sealName?.includes(searchTheme) || 
-                  sealName?.includes('kimetsu') && (searchTheme.includes('kimetsu') || searchTheme.includes('yaiba')) ||
-                  sealName?.includes('league') && searchTheme.includes('league') ||
-                  sealName?.includes('apex') && searchTheme.includes('apex') ||
-                  searchQuery.includes(sealName?.split(' ')[1]?.toLowerCase() || '');
+            return sealName?.includes(searchTheme) ||
+                  sealName?.split(' ').some(word => searchTheme.includes(word))
           });
           
           return {
@@ -72,8 +85,8 @@ export async function POST(req: any) {
             count: filteredSeals.length,
             seals: filteredSeals,
             message: filteredSeals.length > 0 
-              ? `Encontré ${filteredSeals.length} sello(s) de ${tema}` 
-              : `No encontré sellos de ${tema} en nuestro catálogo`,
+              ? `Encontré ${filteredSeals.length} sello(s) de ${theme}` 
+              : `No encontré sellos de ${theme} en nuestro catálogo`,
           };
         }
       }
