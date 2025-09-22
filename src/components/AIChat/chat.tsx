@@ -118,7 +118,7 @@ export default function Chat() {
       {/* Header */}
       <div className="flex items-center gap-3 p-4 bg-muted/50 border-b border-border">
         <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-          <BotIcon className="w-4 h-4 text-primary-foreground" />
+          <BotIcon className="w-4 h-4 text-[var(--color-text)]" />
         </div>
         <div>
           <h2 className="font-heading font-semibold">Asistente de Playmats EC</h2>
