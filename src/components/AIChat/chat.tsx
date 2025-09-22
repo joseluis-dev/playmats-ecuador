@@ -163,7 +163,7 @@ export default function Chat() {
                           <div key={index} className="flex items-center gap-2 p-3 bg-muted/50 border border-border rounded-lg">
                             <Loader2 className="w-4 h-4 animate-spin text-primary" />
                             <span className="text-sm text-muted-foreground">
-                              🦭 Preparando búsqueda...
+                              🤖 Preparando búsqueda...
                             </span>
                           </div>
                         );
@@ -172,7 +172,7 @@ export default function Chat() {
                           <div key={index} className="flex items-center gap-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
                             <Loader2 className="w-4 h-4 animate-spin text-primary" />
                             <span className="text-sm text-primary">
-                              🦭 Buscando sellos{(part as any).input?.tema && ` de ${(part as any).input.tema}`}
+                              🤖 Buscando sellos{(part as any).input?.tema && ` de ${(part as any).input.tema}`}
                               {(part as any).input?.precio && ` hasta $${(part as any).input.precio}`}...
                             </span>
                           </div>
