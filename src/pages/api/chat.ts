@@ -47,15 +47,43 @@ const PROHIBITED_TOPICS = [
   'python', 'react', 'desarrollo', 'software'
 ];
 
+function validateMessage(message: string): { isValid: boolean; reason?: string } {
+  // Validar mensaje vacío
+  if (!message.trim()) {
+    return { isValid: false, reason: 'Mensaje vacío' };
+  }
+  
+  // Validar longitud mínima (evitar spam de 1-2 caracteres)
+  if (message.trim().length < 2) {
+    return { isValid: false, reason: 'Mensaje demasiado corto' };
+  }
+  
+  // Validar longitud máxima (evitar spam)
+  if (message.length > 1000) {
+    return { isValid: false, reason: 'Mensaje demasiado largo' };
+  }
+  
+  // Detectar posible spam (muchos caracteres repetidos)
+  const repeatedChars = /(.)\1{10,}/; // Más de 10 caracteres iguales seguidos
+  if (repeatedChars.test(message)) {
+    return { isValid: false, reason: 'Posible spam detectado' };
+  }
+  
+  return { isValid: true };
+}
+
 function isBusinessRelated(message: string): boolean {
   const lowerMessage = message.toLowerCase();
   
-  // Verificar si contiene temas prohibidos
-  const hasProhibitedContent = PROHIBITED_TOPICS.some(topic => 
-    lowerMessage.includes(topic)
-  );
+  // Verificar si contiene temas prohibidos (más estricto)
+  const hasProhibitedContent = PROHIBITED_TOPICS.some(topic => {
+    // Buscar la palabra completa, no solo como parte de otra palabra
+    const wordBoundary = new RegExp(`\\b${topic}\\b`);
+    return wordBoundary.test(lowerMessage);
+  });
   
   if (hasProhibitedContent) {
+    console.log('🔍 Tema prohibido detectado en el mensaje');
     return false;
   }
   
@@ -64,61 +92,129 @@ function isBusinessRelated(message: string): boolean {
     lowerMessage.includes(keyword)
   );
   
-  // Patrones adicionales específicos del negocio
+  // Patrones adicionales específicos del negocio (mejorados)
   const businessPatterns = [
     /\$\d+/,  // Menciones de precios como $5, $10
-    /precio.*\d+/,  // "precio de 5", "precio hasta 10"
+    /precio.*\d+/,  // "precio de 5", "precio hasta 10"  
     /\d+.*dollar/,  // "5 dollars"
     /cuant[oa].*cuesta/,  // "cuanto cuesta", "cuanta cuesta"
     /que.*tienes?/,  // "que tienes", "qué tienes"
     /mostrar.*todo/,  // "mostrar todo", "muestra todo"
     /ver.*catalogo/,  // "ver catálogo"
+    /quiero.*comprar/,  // "quiero comprar"
+    /busco.*sello/,  // "busco sello"
+    /tienen.*disponible/,  // "tienen disponible"
+    /me.*interesa/,  // "me interesa"
+    /recomienda.*algo/,  // "recomiendas algo"
   ];
   
   const hasBusinessPatterns = businessPatterns.some(pattern => 
     pattern.test(lowerMessage)
   );
   
-  return hasBusinessKeywords || hasBusinessPatterns;
+  // Permitir saludos simples y cortesías básicas
+  const greetingPatterns = [
+    /^(hola|buenos|buenas|gracias|por favor)(\s|$)/,
+    /^(hi|hello|hey)(\s|$)/,
+  ];
+  
+  const hasGreeting = greetingPatterns.some(pattern => 
+    pattern.test(lowerMessage)
+  );
+  
+  const isBusinessRelated = hasBusinessKeywords || hasBusinessPatterns || hasGreeting;
+  
+  console.log('🔍 Análisis de contenido:', {
+    hasBusinessKeywords,
+    hasBusinessPatterns,
+    hasGreeting,
+    isBusinessRelated
+  });
+  
+  return isBusinessRelated;
 }
 
 export async function POST(req: any) {
+  const startTime = Date.now();
   const { messages }: { messages: UIMessage[] } = await req.request.json();
+  
+  console.log('📨 Nueva solicitud de chat recibida');
   
   // Obtener el último mensaje del usuario
   const lastUserMessage = messages.filter(m => m.role === 'user').pop();
   
   if (lastUserMessage?.parts?.[0]?.type === 'text') {
     const messageText = lastUserMessage.parts[0].text;
+    console.log('👤 Mensaje del usuario:', messageText.substring(0, 100) + (messageText.length > 100 ? '...' : ''));
+    
+    // Validar el mensaje antes del filtrado
+    const validation = validateMessage(messageText);
+    if (!validation.isValid) {
+      console.log('❌ Mensaje rechazado por validación:', validation.reason);
+      
+      const validationMessage = `🦭 Lo siento, tu mensaje no pudo ser procesado. Por favor:
+
+• Escribe un mensaje claro y completo
+• Usa un lenguaje apropiado
+• Pregunta sobre sellos, playmats o productos
+
+¿En qué puedo ayudarte con nuestros productos? 😊`;
+
+      return new Response(
+        JSON.stringify({
+          messages: [
+            {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content: validationMessage,
+              createdAt: new Date()
+            }
+          ]
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+    }
     
     // Verificar si el mensaje está relacionado con el negocio
     if (!isBusinessRelated(messageText)) {
-      console.log('🚫 Mensaje rechazado por no estar relacionado con el negocio:', messageText);
+      console.log('🚫 Mensaje rechazado por contenido no relacionado al negocio');
       
-      // Crear un mensaje simulado del asistente usando streamText
-      const openai = createOpenAI({
-        apiKey: import.meta.env.OPENAI_API_KEY,
-      });
+      // Respuesta estática sin llamar a OpenAI para ahorrar costos
+      const restrictedMessage = `🦭 Hola! Soy tu asistente especializado en sellos y playmats. Solo puedo ayudarte con:
 
-      const restrictedResponse = streamText({
-        model: openai("gpt-4o-mini"),
-        messages: [{
-          role: 'system',
-          content: `Responde exactamente con este texto:
+• Búsqueda de sellos por tema o franquicia
+• Consultas de precios y disponibilidad  
+• Información sobre nuestro catálogo
+• Recomendaciones de productos
 
-            🦭 Hola! Soy tu asistente especializado en sellos y playmats. Solo puedo ayudarte con:
+¿Te gustaría ver nuestros sellos disponibles o buscar algo específico? 😊`;
 
-            • Búsqueda de sellos por tema o franquicia
-            • Consultas de precios y disponibilidad  
-            • Información sobre nuestro catálogo
-            • Recomendaciones de productos
-
-            ¿Te gustaría ver nuestros sellos disponibles o buscar algo específico? 😊`
-        }],
-      });
-
-      return restrictedResponse.toUIMessageStreamResponse();
+      return new Response(
+        JSON.stringify({
+          messages: [
+            {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content: restrictedMessage,
+              createdAt: new Date()
+            }
+          ]
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
     }
+    
+    console.log('✅ Mensaje aprobado - Procesando con OpenAI');
   }
 
   // Create OpenAI client with API key
@@ -130,25 +226,25 @@ export async function POST(req: any) {
     model: openai("gpt-4o-mini"),
     system: `Eres un asistente experto en sellos y playmats EXCLUSIVAMENTE.
 
-RESTRICCIONES ESTRICTAS:
-- SOLO responde preguntas sobre sellos, playmats, precios y productos de la tienda
-- NUNCA respondas preguntas sobre otros temas (política, tecnología, vida personal, etc.)
-- Si alguien pregunta algo no relacionado, redirige educadamente hacia los productos
+      RESTRICCIONES ESTRICTAS:
+      - SOLO responde preguntas sobre sellos, playmats, precios y productos de la tienda
+      - NUNCA respondas preguntas sobre otros temas (política, tecnología, vida personal, etc.)
+      - Si alguien pregunta algo no relacionado, redirige educadamente hacia los productos
 
-INSTRUCCIONES DE RESPUESTA:
-- Responde SOLO con texto natural, amigable y bien estructurado
-- NUNCA menciones URLs, enlaces, herramientas, plugins o procesos técnicos
-- Para sellos: menciona nombre, precio y describe brevemente el diseño
-- Usa lenguaje conversacional como si estuvieras hablando cara a cara
-- Utiliza emojis de forma moderada y apropiada
-- Si no encuentras algo, sugiere alternativas similares
-- Evita símbolos especiales como ***, ###, ---, etc.
-- Usa párrafos cortos y bien separados para mejor legibilidad
+      INSTRUCCIONES DE RESPUESTA:
+      - Responde SOLO con texto natural, amigable y bien estructurado
+      - NUNCA menciones URLs, enlaces, herramientas, plugins o procesos técnicos
+      - Para sellos: menciona nombre, precio y describe brevemente el diseño
+      - Usa lenguaje conversacional como si estuvieras hablando cara a cara
+      - Utiliza emojis de forma moderada y apropiada
+      - Si no encuentras algo, sugiere alternativas similares
+      - Evita símbolos especiales como ***, ###, ---, etc.
+      - Usa párrafos cortos y bien separados para mejor legibilidad
 
-PRODUCTOS DISPONIBLES:
-- Sellos de diversas franquicias (anime, videojuegos, etc.)
-- Precios desde $1
-- Personalización disponible`,
+      PRODUCTOS DISPONIBLES:
+      - Sellos de diversas franquicias (anime, videojuegos, etc.)
+      - Precios desde $1
+      - Personalización disponible`,
     messages: convertToModelMessages(messages),
     tools: {
       "all-seals": {
@@ -218,5 +314,6 @@ PRODUCTOS DISPONIBLES:
     stopWhen: stepCountIs(5),
   });
 
+  console.log('🤖 Respuesta generada por OpenAI - Tiempo total:', Date.now() - startTime, 'ms');
   return result.toUIMessageStreamResponse();
 }
