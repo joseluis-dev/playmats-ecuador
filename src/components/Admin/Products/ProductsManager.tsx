@@ -14,7 +14,7 @@ export const ProductsManager = () => {
   const fetchProducts = async () => {
     try {
       setIsLoading(true)
-      const response = await api.get('products?include=categories,attributes,resources')
+      const response = await api.get('products')
       setProducts(response as Product[])
     } catch (error) {
       toast.error('Error al cargar los productos')
