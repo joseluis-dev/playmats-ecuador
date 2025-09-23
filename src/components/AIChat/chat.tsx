@@ -42,7 +42,7 @@ export default function Chat({ className = '' }: { className?: string }) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-
+  console.log(messages)
   // Persist messages on each change (evita escribir durante hidratación inicial)
   useEffect(() => {
     if (!chatId) return;
@@ -251,7 +251,7 @@ export default function Chat({ className = '' }: { className?: string }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={status !== 'ready'}
-            placeholder="Pregúntame sobre sellos..."
+            placeholder="Puedo resolver tus dudas..."
             className="flex-1 text-sm h-9"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {

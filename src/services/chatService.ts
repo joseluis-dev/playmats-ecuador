@@ -190,20 +190,20 @@ export function analyzeMessage(message: string): BusinessAnalysis {
 export const REJECTION_MESSAGES = {
   validation: `🤖 Lo siento, tu mensaje no pudo ser procesado. Por favor:
 
-• Escribe un mensaje claro y completo
-• Usa un lenguaje apropiado
-• Pregunta sobre sellos, playmats o productos
+    • Escribe un mensaje claro y completo
+    • Usa un lenguaje apropiado
+    • Pregunta sobre playmats, sellos o productos
 
-¿En qué puedo ayudarte con nuestros productos? 😊`,
+    ¿En qué puedo ayudarte con nuestros productos? 😊`,
 
-  businessRestriction: `🤖 Hola! Soy tu asistente especializado en sellos y playmats. Solo puedo ayudarte con:
+  businessRestriction: `🤖 Hola! Soy tu asistente especializado de Playmats Ecuador. Solo puedo ayudarte con:
 
-• Búsqueda de sellos por tema o franquicia
-• Consultas de precios y disponibilidad  
-• Información sobre nuestro catálogo
-• Recomendaciones de productos
+    • Búsqueda de productos por tema o franquicia
+    • Consultas de precios y disponibilidad  
+    • Información sobre nuestro catálogo
+    • Recomendaciones de productos
 
-¿Te gustaría ver nuestros sellos disponibles o buscar algo específico? 😊`
+    ¿Te gustaría ver nuestros productos disponibles o buscar algo específico? 😊`
 };
 
 /**

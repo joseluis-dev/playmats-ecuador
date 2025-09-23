@@ -10,7 +10,6 @@ interface ChatbotProps {
 
 export const Chatbot = ({ className = '' }: ChatbotProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
 
   // Hide tooltip after 5 seconds
@@ -28,7 +27,6 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         setIsOpen(false);
-        setIsMinimized(false);
       }
     };
 
@@ -41,7 +39,6 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
   const toggleChat = () => {
     if (isOpen) {
       setIsOpen(false);
-      setIsMinimized(false);
     } else {
       setIsOpen(true);
       setShowTooltip(false);
@@ -50,19 +47,17 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
 
   const toggleMinimize = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsMinimized(!isMinimized);
   };
 
   const closeChat = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsOpen(false);
-    setIsMinimized(false);
   };
 
   return (
     <>
       {/* Backdrop for mobile */}
-      {isOpen && !isMinimized && (
+      {isOpen && (
         <div 
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsOpen(false)}
@@ -76,7 +71,6 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
         {isOpen && (
           <div className={`
             fixed bottom-20 right-4 
-            ${isMinimized ? 'w-80 h-16' : 'w-96 h-[600px]'} 
             md:w-96 md:h-[600px]
             max-w-[calc(100vw-2rem)] max-h-[calc(100vh-6rem)]
             bg-[var(--color-background)] 
@@ -106,19 +100,6 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={toggleMinimize}
-                  className="h-8 w-8 p-0 hover:bg-[var(--color-muted)]"
-                  title={isMinimized ? "Expandir" : "Minimizar"}
-                >
-                  {isMinimized ? (
-                    <Maximize2 className="h-4 w-4" />
-                  ) : (
-                    <Minimize2 className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
                   onClick={closeChat}
                   className="h-8 w-8 p-0 hover:bg-[var(--color-muted)] text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
                   title="Cerrar"
@@ -129,11 +110,9 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
             </div>
 
             {/* Chat Content */}
-            {!isMinimized && (
-              <div className="h-[calc(100%-4rem)] overflow-hidden">
-                <Chat />
-              </div>
-            )}
+            <div className="h-[calc(100%-4rem)] overflow-hidden">
+              <Chat />
+            </div>
           </div>
         )}
 
@@ -143,7 +122,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
           {showTooltip && !isOpen && (
             <div className="mb-3 mr-4 bg-[var(--color-popover)] text-[var(--color-popover-foreground)] px-3 py-2 rounded-lg shadow-lg border border-[var(--color-border)] animate-bounce">
               <div className="text-sm font-medium">¿Necesitas ayuda?</div>
-              <div className="text-xs opacity-90">Pregúntame sobre sellos</div>
+              <div className="text-xs opacity-90">Puedo resolver tus dudas</div>
               {/* Arrow pointing down-right */}
               <div className="absolute -bottom-1 right-4 w-2 h-2 bg-[var(--color-popover)] border-r border-b border-[var(--color-border)] transform rotate-45"></div>
             </div>
@@ -153,9 +132,9 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
           <Button
             onClick={toggleChat}
             className={`
-              w-14 h-14 rounded-full shadow-2xl 
+              w-14 h-10 rounded-full shadow-2xl 
               bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90
-              text-[var(--color-primary-foreground)]
+              text-[var(--color-text)]
               transition-all duration-300 ease-in-out
               ${isOpen ? 'scale-95' : 'scale-100 hover:scale-110'}
               group relative overflow-hidden
@@ -163,11 +142,11 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
             title={isOpen ? "Cerrar chat" : "Abrir chat"}
           >
             {/* Button icon with animation */}
-            <div className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`}>
+            <div className={`transition-transform duration-300 ${isOpen ? 'rotate-270' : 'rotate-0'}`}>
               {isOpen ? (
-                <MessageCircle className="h-6 w-6" />
+                <MessageCircle className="h-8 w-8" />
               ) : (
-                <BotIcon className="h-6 w-6" />
+                <BotIcon className="h-8 w-8" />
               )}
             </div>
             
