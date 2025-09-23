@@ -97,7 +97,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
                     Asistente Virtual
                   </h3>
                   <p className="text-xs text-[var(--color-muted-foreground)]">
-                    Sellos y Playmats EC
+                    Playmats EC
                   </p>
                 </div>
               </div>

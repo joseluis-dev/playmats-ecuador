@@ -246,7 +246,7 @@ export default function Chat({ className = '' }: { className?: string }) {
 
       {/* Input Area - Compact for popup */}
       <div className="border-t border-[var(--color-border)] p-3 bg-[var(--color-muted)]/20">
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form onSubmit={handleSubmit} className="flex gap-2 items-center">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -270,9 +270,9 @@ export default function Chat({ className = '' }: { className?: string }) {
             size="sm"
           >
             {status !== 'ready' ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin text-[var(--color-text)]" />
             ) : (
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4 text-[var(--color-text)]" />
             )}
           </Button>
         </form>
