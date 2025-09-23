@@ -147,6 +147,97 @@ export async function POST(req: any) {
         - Personalización disponible`,
       messages: convertToModelMessages(contextMessages),
       tools: {
+        "list-products": {
+          description: `SIEMPRE úsalo cuando el usuario pregunte por el catálogo general de productos.`,
+          inputSchema: z.object({}),
+          execute: async () => {
+            const products: any[] = []
+            return {
+              found: products.length > 0,
+              count: products.length,
+              products,
+              message: products.length > 0
+                ? `Encontré ${products.length} producto(s) en total` 
+                : `No encontré productos en nuestro catálogo`,
+            };
+          }
+        },
+        "list-products-by-price": {
+          description: `SIEMPRE úsalo cuando el usuario pregunte por precios, productos baratos, o mencione un precio específico.`,
+          inputSchema: z.object({
+            price: z.number().describe("Precio máximo de los productos a listar"),
+          }),
+          execute: async ({ price }: { price: number }) => {
+            const products: any[] = []
+            const filteredProducts = products.filter((product) => {
+              const priceValue = product.attributes?.find((attr: any) => attr.name.includes('price'))?.value ?? "0";
+              const priceAttr = parseFloat(priceValue);
+              return !isNaN(priceAttr) && priceAttr <= price;
+            });
+            return {
+              found: filteredProducts.length > 0,
+              count: filteredProducts.length,
+              products: filteredProducts,
+              message: filteredProducts.length > 0 
+                ? `Encontré ${filteredProducts.length} producto(s) por debajo de $${price}` 
+                : `No encontré productos por debajo de $${price} en nuestro catálogo`,
+            };
+          },
+        },
+        "list-products-by-theme": {
+          description: `SIEMPRE úsalo cuando el usuario mencione cualquier tema, personaje, anime, videojuego o franquicia específica.`,
+          inputSchema: z.object({
+            theme: z.string().describe("El tema, personaje o franquicia específica que el usuario está pidiendo")
+          }),
+          execute: async ({ theme }: { theme: string }) => {
+            const products: any[] = []
+            // Filter products based on theme (intelligent matching)
+            const filteredProducts = products.filter(product => {
+              const productName = product.name?.toLowerCase();
+              const searchTheme = theme.toLowerCase();
+              return productName?.includes(searchTheme) ||
+                    productName?.split(' ').some((word: string) => searchTheme.includes(word))
+            });
+            return {
+              found: filteredProducts.length > 0,
+              count: filteredProducts.length,
+              products: filteredProducts,
+              message: filteredProducts.length > 0 
+                ? `Encontré ${filteredProducts.length} producto(s) de ${theme}`
+                : `No encontré productos de ${theme} en nuestro catálogo`,
+            };
+          }
+        },
+        "list-types": {
+          description: `SIEMPRE úsalo cuando el usuario pregunte por tipos o categorías de playmats o mouspads.`,
+          inputSchema: z.object({}),
+          execute: async () => {
+            const types: any[] = []
+            return {
+              found: types.length > 0,
+              count: types.length,
+              types,
+              message: types.length > 0
+                ? `Encontré ${types.length} tipo(s) de playmats/mousepads` 
+                : `No encontré tipos de playmats/mousepads en nuestro catálogo`,
+            };
+          }
+        },
+        "list-sizes": {
+          description: `SIEMPRE úsalo cuando el usuario pregunte por tamaños o dimensiones de playmats o mouspads.`,
+          inputSchema: z.object({}),
+          execute: async () => {
+            const sizes: any[] = []
+            return {
+              found: sizes.length > 0,
+              count: sizes.length,
+              sizes,
+              message: sizes.length > 0
+                ? `Encontré ${sizes.length} tamaño(s) de playmats/mousepads`
+                : `No encontré tamaños de playmats/mousepads en nuestro catálogo`,
+            };
+          }
+        },
         "all-seals": {
           description: `SIEMPRE úsalo cuando el usuario pregunte por sellos disponibles, catálogo o qué sellos tienes.`,
           inputSchema: z.object({}),
@@ -208,7 +299,22 @@ export async function POST(req: any) {
                 : `No encontré sellos de ${theme} en nuestro catálogo`,
             };
           }
-        }
+        },
+        "list-borders": {
+          description: `SIEMPRE úsalo cuando el usuario pregunte por bordes disponibles para sellos.`,
+          inputSchema: z.object({}),
+          execute: async () => {
+            const borders: any[] = []
+            return {
+              found: borders.length > 0,
+              count: borders.length,
+              borders,
+              message: borders.length > 0
+                ? `Encontré ${borders.length} borde(s) para sellos`
+                : `No encontré bordes para sellos en nuestro catálogo`,
+            };
+          }
+        },
       },
       stopWhen: stepCountIs(5),
     });
@@ -239,7 +345,7 @@ export async function POST(req: any) {
     model: openai("gpt-4o-mini"),
     messages: [{
       role: 'system',
-      content: `Responde con un saludo apropiado y pregunta en qué puedes ayudar con sellos y playmats.`
+      content: `Responde con un saludo apropiado y pregunta en qué puedes ayudar con los productos de Playmats Ecuador.`
     }],
   });
 
