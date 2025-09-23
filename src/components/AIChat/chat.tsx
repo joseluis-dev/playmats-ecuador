@@ -34,15 +34,23 @@ export default function Chat({ className = '' }: { className?: string }) {
     messages: initialMessages,
     transport: new DefaultChatTransport({
       api: '/api/chat',
-      // For ahora enviamos todos los mensajes (el backend aún no reconstruye historial).
-      // Más adelante se puede optimizar con prepareSendMessagesRequest enviando solo el último.
+      // Enviar solo el último mensaje al servidor
+      prepareSendMessagesRequest: ({ messages, id }) => {
+        const lastMessage = messages[messages.length - 1];
+        return {
+          body: { 
+            message: lastMessage, 
+            chatId: id 
+          },
+        };
+      },
     }),
     // NOTA: Cuando migremos a persistencia en base de datos, considerar generación de IDs en el servidor.
   });
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  console.log(messages)
+
   // Persist messages on each change (evita escribir durante hidratación inicial)
   useEffect(() => {
     if (!chatId) return;

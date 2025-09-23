@@ -16,12 +16,42 @@ export const maxDuration = 30;
 
 export async function POST(req: any) {
   const startTime = Date.now();
-  const { messages }: { messages: UIMessage[] } = await req.request.json();
+  const body = await req.request.json();
+  
+  // Nuevo formato: recibir solo el último mensaje y chatId
+  const { message, chatId, messages: fullMessages } = body;
+  
+  // Si viene en el formato anterior (array completo), mantener compatibilidad
+  const isLegacyFormat = Array.isArray(body.messages);
+  let lastUserMessage: UIMessage | undefined;
+  let conversationHistory: UIMessage[] = [];
+  
+  if (isLegacyFormat) {
+    // Formato anterior - usar tal como está
+    conversationHistory = body.messages;
+    lastUserMessage = conversationHistory.filter(m => m.role === 'user').pop();
+  } else {
+    // Nuevo formato - reconstruir contexto desde persistencia
+    if (chatId) {
+      try {
+        // Importar dinámicamente para evitar problemas SSR
+        const { loadChat } = await import('@/utils/chatPersistence');
+        conversationHistory = loadChat(chatId);
+        console.log('📚 Contexto cargado desde persistencia:', conversationHistory.length, 'mensajes');
+      } catch (error) {
+        console.warn('⚠️ No se pudo cargar contexto:', error);
+        conversationHistory = [];
+      }
+    }
+    
+    // Añadir el nuevo mensaje al contexto
+    if (message) {
+      conversationHistory = [...conversationHistory, message];
+      lastUserMessage = message;
+    }
+  }
   
   console.log('📨 Nueva solicitud de chat recibida');
-  
-  // Obtener el último mensaje del usuario
-  const lastUserMessage = messages.filter(m => m.role === 'user').pop();
   
   if (lastUserMessage?.parts?.[0]?.type === 'text') {
     const messageText = lastUserMessage.parts[0].text;
@@ -61,6 +91,25 @@ ${rejectionMessage}`
     
     console.log('✅ Mensaje aprobado - Procesando con OpenAI');
     
+    // ESTRATEGIA: Usar contexto mínimo para herramientas
+    // Solo incluir mensajes de usuario recientes (últimos 3-5) para evitar que el LLM "recuerde" 
+    // resultados de herramientas y prefiera responder directamente
+    const recentUserMessages = conversationHistory
+      .filter(m => m.role === 'user')
+      .slice(-3); // Últimos 3 mensajes de usuario
+    
+    const contextMessages = [
+      // Incluir solo mensajes de usuario recientes para que el LLM use herramientas
+      ...recentUserMessages,
+      // Siempre incluir el mensaje actual
+      lastUserMessage
+    ].filter((msg, index, arr) => 
+      // Evitar duplicados
+      arr.findIndex(m => m.id === msg.id) === index
+    );
+    
+    console.log('🎯 Usando contexto reducido:', contextMessages.length, 'mensajes para forzar uso de herramientas');
+    
     // Si llega aquí, procesar con el sistema principal
     const result = streamText({
       model: openai("gpt-4o-mini"),
@@ -70,6 +119,12 @@ ${rejectionMessage}`
         - SOLO responde preguntas sobre playmats, sellos, precios y productos de la tienda
         - NUNCA respondas preguntas sobre otros temas (política, tecnología, vida personal, etc.)
         - Si alguien pregunta algo no relacionado, redirige educadamente hacia los productos
+
+        INSTRUCCIONES CRÍTICAS PARA HERRAMIENTAS:
+        - SIEMPRE usa las herramientas disponibles para consultas sobre sellos
+        - NO respondas de memoria sobre productos, precios o disponibilidad
+        - Las herramientas te dan la información más actualizada
+        - Aunque hayas respondido antes, SIEMPRE consulta las herramientas para datos precisos
 
         INSTRUCCIONES DE RESPUESTA:
         - Responde SOLO con texto natural, amigable y bien estructurado
@@ -87,10 +142,10 @@ ${rejectionMessage}`
         - Sellos de diversas franquicias (anime, videojuegos, etc.)
         - Precios desde $1
         - Personalización disponible`,
-      messages: convertToModelMessages(messages),
+      messages: convertToModelMessages(contextMessages),
       tools: {
         "all-seals": {
-          description: `Úsalo para listar todos los sellos disponibles.`,
+          description: `SIEMPRE úsalo cuando el usuario pregunte por sellos disponibles, catálogo o qué sellos tienes.`,
           inputSchema: z.object({}),
           execute: async () => {
             const sellos = await resourcesService.list({ category: '3' })
@@ -105,9 +160,9 @@ ${rejectionMessage}`
           }
         },
         "list-seals-by-price": {
-          description: `Úsalo para listar los sellos disponibles por precio.`,
+          description: `SIEMPRE úsalo cuando el usuario pregunte por precios, sellos baratos, o mencione un precio específico.`,
           inputSchema: z.object({
-            price: z.number().describe("Precio de los sellos a listar"),
+            price: z.number().describe("Precio máximo de los sellos a listar"),
           }),
           execute: async ({ price }: { price: number }) => {
             console.log("Listing seals by price:", price);
@@ -128,9 +183,9 @@ ${rejectionMessage}`
           },
         },
         "list-seals-by-theme": {
-          description: `Úsalo para listar los sellos disponibles por tema.`,
+          description: `SIEMPRE úsalo cuando el usuario mencione cualquier tema, personaje, anime, videojuego o franquicia específica.`,
           inputSchema: z.object({
-            theme: z.string().describe("The specific theme, character, or franchise the user is asking about")
+            theme: z.string().describe("El tema, personaje o franquicia específica que el usuario está pidiendo")
           }),
           execute: async ({ theme }: { theme: string }) => {
             const sellos = await resourcesService.list({ category: '3' })
@@ -157,7 +212,20 @@ ${rejectionMessage}`
     });
 
     console.log('🤖 Respuesta generada por OpenAI - Tiempo total:', Date.now() - startTime, 'ms');
-    return result.toUIMessageStreamResponse();
+    return result.toUIMessageStreamResponse({
+      originalMessages: conversationHistory,
+      onFinish: async ({ messages }) => {
+        if (chatId && !isLegacyFormat) {
+          try {
+            const { saveChat } = await import('@/utils/chatPersistence');
+            saveChat(chatId, messages);
+            console.log('💾 Conversación guardada en persistencia');
+          } catch (error) {
+            console.warn('⚠️ Error al guardar conversación:', error);
+          }
+        }
+      },
+    });
   }
 
   // Si no hay mensaje de texto válido, crear respuesta por defecto
