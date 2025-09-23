@@ -8,16 +8,47 @@ import { Send, User, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SealResults } from './SealResults';
 import type { SealSearchResult } from './types';
+import type { UIMessage } from 'ai';
+import { getOrCreateChatId, loadChat, saveChat } from '@/utils/chatPersistence';
 
 export default function Chat({ className = '' }: { className?: string }) {
+  // Chat ID & initial messages persistence layer
+  const [chatId, setChatId] = useState<string | undefined>();
+  const [initialMessages, setInitialMessages] = useState<UIMessage[] | undefined>();
+  const [ready, setReady] = useState(false);
+
+  // Initialize chat id & load messages once on mount
+  useEffect(() => {
+    try {
+      const id = getOrCreateChatId();
+      setChatId(id);
+      const stored = loadChat(id);
+      setInitialMessages(stored);
+    } finally {
+      setReady(true);
+    }
+  }, []);
+
   const { messages, sendMessage, status } = useChat({
+    id: chatId,
+    messages: initialMessages,
     transport: new DefaultChatTransport({
       api: '/api/chat',
+      // For ahora enviamos todos los mensajes (el backend aún no reconstruye historial).
+      // Más adelante se puede optimizar con prepareSendMessagesRequest enviando solo el último.
     }),
+    // NOTA: Cuando migremos a persistencia en base de datos, considerar generación de IDs en el servidor.
   });
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  // Persist messages on each change (evita escribir durante hidratación inicial)
+  useEffect(() => {
+    if (!chatId) return;
+    if (!ready) return; // evita sobrescribir al cargar
+    saveChat(chatId, messages);
+  }, [messages, chatId, ready]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -45,6 +76,18 @@ export default function Chat({ className = '' }: { className?: string }) {
       setInput('');
     }
   };
+
+  // Loading skeleton while initializing persistence
+  if (!ready) {
+    return (
+      <div className={cn(
+        'w-full h-full flex flex-col items-center justify-center text-xs text-[var(--color-muted-foreground)]',
+        className
+      )}>
+        Cargando historial de chat...
+      </div>
+    );
+  }
 
   return (
     <div className={cn(
