@@ -3,11 +3,12 @@ import type { Seal } from './types';
 
 interface SealCardProps {
   seal: Seal;
+  sealAction: ({ seal }: { seal: Seal }) => void;
 }
 
-export function SealCard({ seal }: SealCardProps) {
+export function SealCard({ seal, sealAction }: SealCardProps) {
   return (
-    <div className="border border-border rounded-xl p-4 bg-card shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group">
+    <div className="border border-border rounded-xl p-4 bg-card shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group cursor-pointer" onClick={() => sealAction({ seal })} >
       <div className="mb-3 overflow-hidden rounded-lg">
         <img 
           src={seal.thumbnail || seal.url} 

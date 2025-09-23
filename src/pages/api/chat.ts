@@ -22,13 +22,13 @@ export async function POST(req: any) {
   const { message, chatId, messages: fullMessages } = body;
   
   // Si viene en el formato anterior (array completo), mantener compatibilidad
-  const isLegacyFormat = Array.isArray(body.messages);
+  const isLegacyFormat = Array.isArray(fullMessages);
   let lastUserMessage: UIMessage | undefined;
   let conversationHistory: UIMessage[] = [];
   
   if (isLegacyFormat) {
     // Formato anterior - usar tal como está
-    conversationHistory = body.messages;
+    conversationHistory = fullMessages;
     lastUserMessage = conversationHistory.filter(m => m.role === 'user').pop();
   } else {
     // Nuevo formato - reconstruir contexto desde persistencia
@@ -82,7 +82,7 @@ export async function POST(req: any) {
           role: 'system',
           content: `Responde exactamente con este mensaje:
 
-${rejectionMessage}`
+          ${rejectionMessage}`
         }],
       });
 
@@ -121,7 +121,10 @@ ${rejectionMessage}`
         - Si alguien pregunta algo no relacionado, redirige educadamente hacia los productos
 
         INSTRUCCIONES CRÍTICAS PARA HERRAMIENTAS:
-        - SIEMPRE usa las herramientas disponibles para consultas sobre sellos
+        - SIEMPRE usa las herramientas disponibles para consultas sobre playmats, mousepads, sellos y productos
+        - SIEMPRE úsalo cuando el usuario pregunte por sellos disponibles, catálogo o qué sellos tienes.
+        - SIEMPRE úsalo cuando el usuario pregunte por precios, sellos baratos, o mencione un precio específico.
+        - SIEMPRE úsalo cuando el usuario mencione cualquier tema, personaje, anime, videojuego o franquicia específica.
         - NO respondas de memoria sobre productos, precios o disponibilidad
         - Las herramientas te dan la información más actualizada
         - Aunque hayas respondido antes, SIEMPRE consulta las herramientas para datos precisos
@@ -165,7 +168,6 @@ ${rejectionMessage}`
             price: z.number().describe("Precio máximo de los sellos a listar"),
           }),
           execute: async ({ price }: { price: number }) => {
-            console.log("Listing seals by price:", price);
             const sellos = await resourcesService.list({ category: '3' })
             const filteredSeals = sellos.filter((sello) => {
               const priceValue = sello.attributes?.find(attr => attr.name.includes('price'))?.value ?? "0";

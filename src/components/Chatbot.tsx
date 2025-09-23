@@ -3,12 +3,15 @@ import { BotIcon } from "./icons/BotIcon";
 import { X, MessageCircle, Minimize2, Maximize2 } from 'lucide-react';
 import Chat from './AIChat/chat';
 import { Button } from './ui/button';
+import { useCustomizationTool } from '@/stores/customToolStore';
+import type { Seal } from './AIChat/types';
 
 interface ChatbotProps {
   className?: string;
 }
 
 export const Chatbot = ({ className = '' }: ChatbotProps) => {
+  const { addLayers, setSize, layers, modifyItems, canvasRef, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes, total, formRef } = useCustomizationTool()
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
 
@@ -45,13 +48,20 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
     }
   };
 
-  const toggleMinimize = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   const closeChat = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsOpen(false);
+  };
+
+  const handleSealAction = ({ seal }: { seal: Seal }) => {
+    const location = window.location.href;
+    if (!location.includes('customise')) {
+      // window.open(seal.url, '_blank');
+      return;
+    }
+    const currentSeals = formRef.getValues('seals') || [];
+    formRef.setValue('seals', [...currentSeals, seal]);
+    addLayers('seals', seal);
   };
 
   return (
@@ -71,7 +81,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
         {isOpen && (
           <div className={`
             fixed bottom-20 right-4 
-            md:w-96 md:h-[600px]
+            h-[calc(100vh-6rem)] md:w-96 md:h-[600px]
             max-w-[calc(100vw-2rem)] max-h-[calc(100vh-6rem)]
             bg-[var(--color-background)] 
             border border-[var(--color-border)]
@@ -111,7 +121,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
 
             {/* Chat Content */}
             <div className="h-[calc(100%-4rem)] overflow-hidden">
-              <Chat />
+              <Chat sealAction={handleSealAction} sizeAction={() => {}} borderAction={() => {}} />
             </div>
           </div>
         )}

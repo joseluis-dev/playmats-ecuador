@@ -7,11 +7,18 @@ import { BotIcon } from '@/components/icons/BotIcon';
 import { Send, User, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SealResults } from './SealResults';
-import type { SealSearchResult } from './types';
+import type { Seal, SealSearchResult } from './types';
 import type { UIMessage } from 'ai';
 import { getOrCreateChatId, loadChat, saveChat } from '@/utils/chatPersistence';
 
-export default function Chat({ className = '' }: { className?: string }) {
+interface ChatProps {
+  className?: string;
+  sealAction?: ({ seal }: { seal: Seal }) => void;
+  sizeAction?: () => void;
+  borderAction?: () => void;
+}
+
+export default function Chat({ className = '', sealAction = () => {}, sizeAction = () => {}, borderAction = () => {} }: ChatProps) {
   // Chat ID & initial messages persistence layer
   const [chatId, setChatId] = useState<string | undefined>();
   const [initialMessages, setInitialMessages] = useState<UIMessage[] | undefined>();
@@ -228,7 +235,7 @@ export default function Chat({ className = '' }: { className?: string }) {
                       case 'output-available':
                         return (
                           <div key={index}>
-                            <SealResults sealData={(part as any).output as SealSearchResult} />
+                            <SealResults sealData={(part as any).output as SealSearchResult} sealAction={sealAction} />
                           </div>
                         );
                       case 'output-error':
