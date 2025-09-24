@@ -105,7 +105,6 @@ export const ControlPanel = () => {
   }, [types, borders, sizes])
 
   async function onSubmit(values: z.infer<typeof designSchema>) {
-    console.log(values)
     if (!values.type) return toast.warning("Debes seleccionar un tipo de diseño");
     if (!values.img) return toast.warning("Debes subir una imagen");
     if (!canvasRef) return toast.error("El lienzo no está listo. Por favor, intenta de nuevo.");

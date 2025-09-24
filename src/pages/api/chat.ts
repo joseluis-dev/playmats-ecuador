@@ -8,6 +8,7 @@ import {
   stepCountIs,
 } from "ai";
 import { z } from "zod";
+import productService from "@/services/productService";
 
 export const prerender = false;
 
@@ -147,11 +148,28 @@ export async function POST(req: any) {
         - Personalización disponible`,
       messages: convertToModelMessages(contextMessages),
       tools: {
+        "list-topics": {
+          description: `SIEMPRE úsalo cuando el usuario pregunte sobre los temas que puede consultar o en que le puedes ayudar.`,
+          inputSchema: z.object({}),
+          execute: async () => {
+            const topics = [
+              "Catálogo de productos",
+              "Precios de productos",
+              "Tipos y tamaños de playmats/mousepads",
+              "Sellos disponibles",
+              "Precios de sellos",
+            ];
+            return {
+              topics,
+              message: `Puedo ayudarte con los siguientes temas:\n- ${topics.join('\n- ')}`
+            };
+          }
+        },
         "list-products": {
           description: `SIEMPRE úsalo cuando el usuario pregunte por el catálogo general de productos.`,
           inputSchema: z.object({}),
           execute: async () => {
-            const products: any[] = []
+            const products: any[] = await productService.list()
             return {
               found: products.length > 0,
               count: products.length,
@@ -165,14 +183,15 @@ export async function POST(req: any) {
         "list-products-by-price": {
           description: `SIEMPRE úsalo cuando el usuario pregunte por precios, productos baratos, o mencione un precio específico.`,
           inputSchema: z.object({
-            price: z.number().describe("Precio máximo de los productos a listar"),
+            minPrice: z.number().optional().describe("Precio mínimo de los productos a listar"),
+            maxPrice: z.number().optional().describe("Precio máximo de los productos a listar"),
+            price: z.number().describe("Precio promedio de los productos a listar"),
           }),
-          execute: async ({ price }: { price: number }) => {
-            const products: any[] = []
+          execute: async ({ price, minPrice, maxPrice }: { price: number, minPrice?: number, maxPrice?: number }) => {
+            const products: any[] = await productService.list()
             const filteredProducts = products.filter((product) => {
-              const priceValue = product.attributes?.find((attr: any) => attr.name.includes('price'))?.value ?? "0";
-              const priceAttr = parseFloat(priceValue);
-              return !isNaN(priceAttr) && priceAttr <= price;
+              const productPrice = product.price ?? 0;
+              return (!minPrice || productPrice >= minPrice) && (!maxPrice || productPrice <= maxPrice);
             });
             return {
               found: filteredProducts.length > 0,
@@ -190,13 +209,16 @@ export async function POST(req: any) {
             theme: z.string().describe("El tema, personaje o franquicia específica que el usuario está pidiendo")
           }),
           execute: async ({ theme }: { theme: string }) => {
-            const products: any[] = []
+            const products: any[] = await productService.list()
             // Filter products based on theme (intelligent matching)
             const filteredProducts = products.filter(product => {
               const productName = product.name?.toLowerCase();
+              const productDescription = product.description?.toLowerCase() || "";
               const searchTheme = theme.toLowerCase();
               return productName?.includes(searchTheme) ||
-                    productName?.split(' ').some((word: string) => searchTheme.includes(word))
+                    productDescription.includes(searchTheme) ||
+                    productName?.split(' ').some((word: any) => searchTheme.includes(word)) ||
+                    productDescription.split(' ').some((word: any) => searchTheme.includes(word))
             });
             return {
               found: filteredProducts.length > 0,
@@ -212,7 +234,7 @@ export async function POST(req: any) {
           description: `SIEMPRE úsalo cuando el usuario pregunte por tipos o categorías de playmats o mouspads.`,
           inputSchema: z.object({}),
           execute: async () => {
-            const types: any[] = []
+            const types: any[] = await resourcesService.list({ category: '10' })
             return {
               found: types.length > 0,
               count: types.length,
@@ -225,13 +247,20 @@ export async function POST(req: any) {
         },
         "list-sizes": {
           description: `SIEMPRE úsalo cuando el usuario pregunte por tamaños o dimensiones de playmats o mouspads.`,
-          inputSchema: z.object({}),
-          execute: async () => {
-            const sizes: any[] = []
+          inputSchema: z.object({
+            type: z.string().describe("La categoría de los tamaños a listar como playmats o mousepads usando la referencia en singular, ej: 'playmat' o 'mousepad'"),
+          }),
+          execute: async ({ type }: { type: string }) => {
+            const sizes: any[] = await resourcesService.list({ category: `8` })
+            const typeSearch = type.toLowerCase();
+            const filteredSizes = type
+              ? sizes.filter(size => size.categories?.some((cat: any) => cat.name.toLowerCase().includes(typeSearch)))
+              : sizes;
+              console.log(type, JSON.stringify(sizes, null, 2), JSON.stringify(filteredSizes, null, 2))
             return {
               found: sizes.length > 0,
               count: sizes.length,
-              sizes,
+              sizes: filteredSizes,
               message: sizes.length > 0
                 ? `Encontré ${sizes.length} tamaño(s) de playmats/mousepads`
                 : `No encontré tamaños de playmats/mousepads en nuestro catálogo`,
@@ -304,7 +333,7 @@ export async function POST(req: any) {
           description: `SIEMPRE úsalo cuando el usuario pregunte por bordes disponibles para sellos.`,
           inputSchema: z.object({}),
           execute: async () => {
-            const borders: any[] = []
+            const borders: any[] = await resourcesService.list({ category: '4' })
             return {
               found: borders.length > 0,
               count: borders.length,

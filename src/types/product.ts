@@ -10,6 +10,8 @@ export interface ProductFilters {
   category?: string
   minPrice?: number
   maxPrice?: number
+  price?: number
+  description?: string
   isCustomizable?: boolean
   sortBy?: 'name' | 'price' | 'createdAt' | 'updatedAt'
   sortOrder?: 'asc' | 'desc'
