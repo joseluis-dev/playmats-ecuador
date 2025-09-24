@@ -19,8 +19,8 @@ import type { Product, Resource } from "@/types";
 import { toast } from "sonner";
 import { useUser } from "@/stores/userStore";
 import { dataUrlToFile } from "@/utils/fileUtils";
-import { api } from "@/services/api";
 import { useCart } from "@/hooks/useCart";
+import productService from "@/services/productService";
 
 const designSchema = z.object({
   type: z.custom<Resource>().optional(),
@@ -134,33 +134,35 @@ export const ControlPanel = () => {
     const sealsIds = values.seals?.map(seal => seal.id) || [];
     const borderId = values.border?.id;
 
-    try {      
-      const response = await api.post('products', newProduct)
+    try {
+      const response = await productService.create(newProduct)
       const createdProduct = response as Product
       const productId = createdProduct.id
       // toast.success('Producto creado correctamente')
-      const resourceResponse = await api.postForm(`products/${productId}/resources`, formDataDesign)
-      const resource = resourceResponse as { isBanner: boolean, resource: Resource }
+      const resourceResponse = await productService.uploadResource(productId, formDataDesign)
+      const resource = resourceResponse as unknown as { isBanner: boolean, resource: Resource }
       const resourceId = resource.resource.id
 
       // Assign categories and attributes
-      const categories = [values.type?.categories?.find(cat => cat.name === values.type?.name)?.id].filter(id => id !== undefined);
-      const attributes = [values.size?.attributes?.find(attr => attr.name.includes('ancho'))?.id, values.size?.attributes?.find(attr => attr.name.includes('alto'))?.id].filter(id => id !== undefined);
+      const categories = [values.type?.categories?.find(cat => cat.name === values.type?.name)?.id.toString()].filter(id => id !== undefined);
+      const attributes = [values.size?.attributes?.find(attr => attr.name.includes('ancho'))?.id.toString(), values.size?.attributes?.find(attr => attr.name.includes('alto'))?.id.toString()].filter(id => id !== undefined);
 
-      const resourceBackgroundResponse = await api.postForm(`products/${productId}/resources`, formDataBackground)
-      const resourceBackground = resourceBackgroundResponse as { isBanner: boolean, resource: Resource }
+      const resourceBackgroundResponse = await productService.uploadResource(productId, formDataBackground)
+      const resourceBackground = resourceBackgroundResponse as unknown as { isBanner: boolean, resource: Resource }
       const resourceBackgroundId = resourceBackground.resource.id
-      
-      await api.post(`products/${productId}/categories`, {
+
+      await productService.assignCategories(productId, {
         categoryIds: categories
       })
 
-      await api.post(`products/${productId}/attributes`, {
+      await productService.replaceAttributes(productId, {
         attributeIds: attributes
       })
 
-      await api.put(`products/${productId}/resources`, {
-        resourceIds: [...sealsIds, resourceId, resourceBackgroundId, borderId].filter(id => id !== undefined)
+      await productService.replaceResources(productId, {
+        resourceIds: [...sealsIds, resourceId, resourceBackgroundId, borderId]
+          .filter(id => id !== undefined)
+          .map(id => String(id))
       })
 
       await resourcesService.assignCategories(resourceId, categories)

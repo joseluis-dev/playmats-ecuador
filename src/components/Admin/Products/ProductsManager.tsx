@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
-import { api } from '@/services/api'
+import { productService } from '@/services/productService'
 import { DataList } from '@/components/DataList'
 import { ProductForm } from '@/components/Admin/Products/ProductForm'
 import type { Product } from '@/types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ProductNotFoundError, ProductValidationError, ProductUploadError } from '@/types/product'
 
 export const ProductsManager = () => {
   const [products, setProducts] = useState<Product[]>([])
@@ -14,9 +15,10 @@ export const ProductsManager = () => {
   const fetchProducts = async () => {
     try {
       setIsLoading(true)
-      const response = await api.get('products')
-      setProducts(response as Product[])
+      const response = await productService.list()
+      setProducts(response)
     } catch (error) {
+      console.error('Error al cargar los productos:', error)
       toast.error('Error al cargar los productos')
     } finally {
       setIsLoading(false)
@@ -50,12 +52,18 @@ export const ProductsManager = () => {
               onDelete={async (id: string) => {
                 try {
                   setIsLoading(true)
-                  await api.delete(`products/${id}`)
+                  await productService.delete(id)
                   toast.success('Producto eliminado correctamente')
                   fetchProducts()
                 } catch (error) {
                   console.error('Error al eliminar el producto:', error)
-                  toast.error('Error al eliminar el producto')
+                  if (error instanceof ProductNotFoundError) {
+                    toast.error('El producto no existe')
+                  } else if (error instanceof ProductValidationError) {
+                    toast.error('Error de validación al eliminar el producto')
+                  } else {
+                    toast.error('Error al eliminar el producto')
+                  }
                 } finally {
                   setIsLoading(false)
                 }
@@ -100,13 +108,12 @@ export const ProductsManager = () => {
                   let productId: string;
                   
                   if (selectedProduct) {
-                    await api.put(`products/${selectedProduct.id}`, newProduct)
+                    await productService.replace(selectedProduct.id, newProduct)
                     productId = selectedProduct.id
                     toast.success('Producto actualizado correctamente')
                   } else {
-                    const response = await api.post('products', newProduct)
-                    const createdProduct = response as Product
-                    productId = createdProduct.id
+                    const response = await productService.create(newProduct)
+                    productId = response.id
                     toast.success('Producto creado correctamente')
                   }
 
@@ -118,22 +125,27 @@ export const ProductsManager = () => {
                       const formData = new FormData()
                       if (r.file) formData.append('file', r.file)
                       formData.append('isBanner', r.isBanner ? 'true' : 'false')
-                      return api.postForm(`products/${productId}/resources`, formData)
+                      return productService.uploadResource(productId, formData)
                     }))
                   }
 
+                  // Nota: La eliminación de recursos individuales requeriría un endpoint específico
+                  // que no está disponible en el servicio actual, mantenemos la implementación directa
                   if (toDeleteResources.length > 0) {
+                    // Esta funcionalidad requiere un endpoint de recursos que no está en el servicio
+                    // Se mantiene la implementación original hasta que se agregue al servicio
+                    const { api } = await import('@/services/api')
                     await Promise.all(toDeleteResources.map(async (r) => {
                       return api.delete(`products/${productId}/resources/${r.id}`)
                     }))
                   }
 
                   // Actualizar categorías y atributos
-                  await api.put(`products/${productId}/categories`, {
+                  await productService.replaceCategories(productId, {
                     categoryIds: product.categories
                   })
                   
-                  await api.put(`products/${productId}/attributes`, {
+                  await productService.replaceAttributes(productId, {
                     attributeIds: product.attributes
                   })
 
@@ -141,7 +153,17 @@ export const ProductsManager = () => {
                   fetchProducts()
                 } catch (error) {
                   console.error('Error al guardar el producto:', error)
-                  toast.error('Error al guardar el producto')
+                  
+                  if (error instanceof ProductValidationError) {
+                    const errorMessages = error.validationErrors.map(e => e.message).join(', ')
+                    toast.error(`Error de validación: ${errorMessages}`)
+                  } else if (error instanceof ProductUploadError) {
+                    toast.error('Error al subir los recursos del producto')
+                  } else if (error instanceof ProductNotFoundError) {
+                    toast.error('El producto no existe')
+                  } else {
+                    toast.error('Error al guardar el producto')
+                  }
                 } finally {
                   setIsLoading(false)
                 }
