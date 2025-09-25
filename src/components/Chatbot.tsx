@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
 import { BotIcon } from "./icons/BotIcon";
-import { X, MessageCircle, Minimize2, Maximize2 } from 'lucide-react';
+import { X, MessageCircle } from 'lucide-react';
 import Chat from './AIChat/chat';
 import { Button } from './ui/button';
 import { useCustomizationTool } from '@/stores/customToolStore';
-import type { Seal } from './AIChat/types';
 
 interface ChatbotProps {
   className?: string;
 }
 
 export const Chatbot = ({ className = '' }: ChatbotProps) => {
-  const { addLayers, setSize, layers, modifyItems, canvasRef, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes, total, formRef } = useCustomizationTool()
+  const { addLayers, formRef } = useCustomizationTool()
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
 
@@ -53,7 +52,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
     setIsOpen(false);
   };
 
-  const handleSealAction = ({ seal }: { seal: Seal }) => {
+  const handleSealAction = ({ seal }: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
       // window.open(seal.url, '_blank');

@@ -62,8 +62,6 @@ export default function Chat({
     // NOTA: Cuando migremos a persistencia en base de datos, considerar generación de IDs en el servidor.
   });
   const [input, setInput] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Persist messages on each change (evita escribir durante hidratación inicial)
   useEffect(() => {
@@ -71,25 +69,6 @@ export default function Chat({
     if (!ready) return; // evita sobrescribir al cargar
     saveChat(chatId, messages);
   }, [messages, chatId, ready]);
-
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (messagesContainerRef.current && messagesEndRef.current) {
-      const container = messagesContainerRef.current;
-      const endElement = messagesEndRef.current;
-      
-      // Scroll within the container only
-      const containerRect = container.getBoundingClientRect();
-      const elementRect = endElement.getBoundingClientRect();
-      
-      if (elementRect.bottom > containerRect.bottom || elementRect.top < containerRect.top) {
-        container.scrollTo({
-          top: container.scrollHeight,
-          behavior: 'smooth'
-        });
-      }
-    }
-  }, [messages]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,7 +97,6 @@ export default function Chat({
     )}>
       {/* Messages Area - Adjusted for popup */}
       <div 
-        ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth"
         style={{ 
           scrollbarWidth: 'thin',
@@ -409,7 +387,6 @@ export default function Chat({
             </div>
           </div>
         ))}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Input Area - Compact for popup */}

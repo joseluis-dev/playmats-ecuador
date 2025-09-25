@@ -246,23 +246,16 @@ export async function POST(req: any) {
           }
         },
         "list-sizes": {
-          description: `SIEMPRE úsalo cuando el usuario pregunte por tamaños o dimensiones de playmats o mouspads.`,
-          inputSchema: z.object({
-            type: z.string().describe("La categoría de los tamaños a listar como playmats o mousepads usando la referencia en singular, ej: 'playmat' o 'mousepad'"),
-          }),
-          execute: async ({ type }: { type: string }) => {
+          description: `SIEMPRE úsalo cuando el usuario pregunte por tamaños o dimensiones en general.`,
+          inputSchema: z.object({}),
+          execute: async () => {
             const sizes: any[] = await resourcesService.list({ category: `8` })
-            const typeSearch = type.toLowerCase();
-            const filteredSizes = type
-              ? sizes.filter(size => size.categories?.some((cat: any) => cat.name.toLowerCase().includes(typeSearch)))
-              : sizes;
-              console.log(type, JSON.stringify(sizes, null, 2), JSON.stringify(filteredSizes, null, 2))
             return {
-              found: filteredSizes.length > 0,
-              count: filteredSizes.length,
-              sizes: filteredSizes,
-              message: filteredSizes.length > 0
-                ? `Encontré ${filteredSizes.length} tamaño(s) de playmats/mousepads`
+              found: sizes.length > 0,
+              count: sizes.length,
+              sizes,
+              message: sizes.length > 0
+                ? `Encontré ${sizes.length} tamaño(s) de playmats/mousepads`
                 : `No encontré tamaños de playmats/mousepads en nuestro catálogo`,
             };
           }
