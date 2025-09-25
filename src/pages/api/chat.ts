@@ -137,7 +137,6 @@ export async function POST(req: any) {
         - Usa lenguaje conversacional como si estuvieras hablando cara a cara
         - Utiliza emojis de forma moderada y apropiada
         - Si no encuentras algo, sugiere alternativas similares
-        - Evita símbolos especiales como ***, ###, ---, etc.
         - Usa párrafos cortos y bien separados para mejor legibilidad
 
         PRODUCTOS DISPONIBLES:

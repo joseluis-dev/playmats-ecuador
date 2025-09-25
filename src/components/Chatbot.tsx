@@ -52,7 +52,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
     setIsOpen(false);
   };
 
-  const handleSealAction = ({ seal }: any) => {
+  const handleSealAction = (seal: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
       // window.open(seal.url, '_blank');
@@ -80,7 +80,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
         {isOpen && (
           <div className={`
             fixed bottom-20 right-4 
-            h-[calc(100vh-6rem)] md:w-96 md:h-[600px]
+            h-[calc(100vh-6rem)] md:w-[450px] md:h-[700px]
             max-w-[calc(100vw-2rem)] max-h-[calc(100vh-6rem)]
             bg-[var(--color-background)] 
             border border-[var(--color-border)]

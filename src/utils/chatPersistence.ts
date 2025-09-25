@@ -13,7 +13,7 @@ interface StoredChat {
 }
 
 const STORAGE_VERSION = 1;
-const MAX_MESSAGES = 50; // límite para evitar crecimiento descontrolado
+const MAX_MESSAGES = 25; // límite para evitar crecimiento descontrolado
 
 export function getOrCreateChatId(): string {
   if (typeof window === 'undefined') return '';
