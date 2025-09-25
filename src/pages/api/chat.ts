@@ -231,7 +231,7 @@ export async function POST(req: any) {
           }
         },
         "list-types": {
-          description: `SIEMPRE úsalo cuando el usuario pregunte por tipos o categorías de playmats o mouspads.`,
+          description: `SIEMPRE úsalo cuando el usuario pregunte por tipos o categorías de diseños.`,
           inputSchema: z.object({}),
           execute: async () => {
             const types: any[] = await resourcesService.list({ category: '10' })
@@ -258,11 +258,33 @@ export async function POST(req: any) {
               : sizes;
               console.log(type, JSON.stringify(sizes, null, 2), JSON.stringify(filteredSizes, null, 2))
             return {
-              found: sizes.length > 0,
-              count: sizes.length,
+              found: filteredSizes.length > 0,
+              count: filteredSizes.length,
               sizes: filteredSizes,
-              message: sizes.length > 0
-                ? `Encontré ${sizes.length} tamaño(s) de playmats/mousepads`
+              message: filteredSizes.length > 0
+                ? `Encontré ${filteredSizes.length} tamaño(s) de playmats/mousepads`
+                : `No encontré tamaños de playmats/mousepads en nuestro catálogo`,
+            };
+          }
+        },
+        "list-sizes-by-type": {
+          description: `SIEMPRE úsalo cuando el usuario pregunte por tamaños o dimensiones de playmats o mouspads.`,
+          inputSchema: z.object({
+            type: z.string().describe("La categoría de los tamaños a listar como playmats o mousepads usando la referencia en singular, ej: 'playmat' o 'mousepad'"),
+          }),
+          execute: async ({ type }: { type: string }) => {
+            const sizes: any[] = await resourcesService.list({ category: `8` })
+            const typeSearch = type.toLowerCase();
+            const filteredSizes = type
+              ? sizes.filter(size => size.categories?.some((cat: any) => cat.name.toLowerCase().includes(typeSearch)))
+              : sizes;
+              console.log(type, JSON.stringify(sizes, null, 2), JSON.stringify(filteredSizes, null, 2))
+            return {
+              found: filteredSizes.length > 0,
+              count: filteredSizes.length,
+              sizes: filteredSizes,
+              message: filteredSizes.length > 0
+                ? `Encontré ${filteredSizes.length} tamaño(s) de playmats/mousepads`
                 : `No encontré tamaños de playmats/mousepads en nuestro catálogo`,
             };
           }
@@ -330,7 +352,7 @@ export async function POST(req: any) {
           }
         },
         "list-borders": {
-          description: `SIEMPRE úsalo cuando el usuario pregunte por bordes disponibles para sellos.`,
+          description: `SIEMPRE úsalo cuando el usuario pregunte por bordes disponibles para playmats.`,
           inputSchema: z.object({}),
           execute: async () => {
             const borders: any[] = await resourcesService.list({ category: '4' })
@@ -339,8 +361,8 @@ export async function POST(req: any) {
               count: borders.length,
               borders,
               message: borders.length > 0
-                ? `Encontré ${borders.length} borde(s) para sellos`
-                : `No encontré bordes para sellos en nuestro catálogo`,
+                ? `Encontré ${borders.length} borde(s) para playmats`
+                : `No encontré bordes para playmats en nuestro catálogo`,
             };
           }
         },

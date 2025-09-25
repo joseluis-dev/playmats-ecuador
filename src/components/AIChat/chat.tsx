@@ -6,19 +6,26 @@ import { Input } from '@/components/ui/input';
 import { BotIcon } from '@/components/icons/BotIcon';
 import { Send, User, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { SealResults } from './SealResults';
-import type { Seal, SealSearchResult } from './types';
+import { ResourceResults } from './ResourceResults';
+import type { ResourceItem, ResourceSearchResult } from './types';
 import type { UIMessage } from 'ai';
 import { getOrCreateChatId, loadChat, saveChat } from '@/utils/chatPersistence';
 
 interface ChatProps {
   className?: string;
-  sealAction?: ({ seal }: { seal: Seal }) => void;
-  sizeAction?: () => void;
-  borderAction?: () => void;
+  sealAction?: (type: ResourceItem) => void;
+  typeAction?: (type: ResourceItem) => void;
+  sizeAction?: (size: ResourceItem) => void;
+  borderAction?: (border: ResourceItem) => void;
 }
 
-export default function Chat({ className = '', sealAction = () => {}, sizeAction = () => {}, borderAction = () => {} }: ChatProps) {
+export default function Chat({ 
+  className = '', 
+  sealAction = () => {}, 
+  typeAction = () => {}, 
+  sizeAction = () => {}, 
+  borderAction = () => {} 
+}: ChatProps) {
   // Chat ID & initial messages persistence layer
   const [chatId, setChatId] = useState<string | undefined>();
   const [initialMessages, setInitialMessages] = useState<UIMessage[] | undefined>();
@@ -146,10 +153,26 @@ export default function Chat({ className = '', sealAction = () => {}, sizeAction
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => sendMessage({ text: "¿Tienes sellos de $2 o menos?" })}
+                  onClick={() => sendMessage({ text: "¿Qué tipos de playmat tienes?" })}
                   className="text-xs"
                 >
-                  Sellos por precio
+                  Ver tipos de playmat
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => sendMessage({ text: "¿Qué tamaños están disponibles?" })}
+                  className="text-xs"
+                >
+                  Ver tamaños disponibles
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => sendMessage({ text: "¿Tienes bordes decorativos?" })}
+                  className="text-xs"
+                >
+                  Ver bordes disponibles
                 </Button>
               </div>
             </div>
@@ -235,7 +258,7 @@ export default function Chat({ className = '', sealAction = () => {}, sizeAction
                       case 'output-available':
                         return (
                           <div key={index}>
-                            <SealResults sealData={(part as any).output as SealSearchResult} sealAction={sealAction} />
+                            <ResourceResults data={(part as any).output as ResourceSearchResult} source='seals' onItemClick={sealAction} />
                           </div>
                         );
                       case 'output-error':
@@ -243,6 +266,136 @@ export default function Chat({ className = '', sealAction = () => {}, sizeAction
                           <div key={index} className="p-2 bg-red-50 border border-red-200 rounded-lg">
                             <p className="text-xs text-red-600">
                               ❌ Error al buscar sellos: {part.errorText}
+                            </p>
+                          </div>
+                        );
+                    }
+                    break;
+
+                  case 'tool-list-types':
+                    switch (part.state) {
+                      case 'input-streaming':
+                        return (
+                          <div key={index} className="flex items-center gap-2 p-2 bg-[var(--color-muted)]/50 border border-[var(--color-border)] rounded-lg">
+                            <Loader2 className="w-3 h-3 animate-spin text-[var(--color-primary)]" />
+                            <span className="text-xs text-[var(--color-muted-foreground)]">
+                              🎨 Preparando búsqueda de tipos...
+                            </span>
+                          </div>
+                        );
+                      case 'input-available':
+                        return (
+                          <div key={index} className="flex items-center gap-2 p-2 bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 rounded-lg">
+                            <Loader2 className="w-3 h-3 animate-spin text-[var(--color-primary)]" />
+                            <span className="text-xs text-[var(--color-primary)]">
+                              🎨 Buscando tipos de playmat...
+                            </span>
+                          </div>
+                        );
+                      case 'output-available':
+                        return (
+                          <div key={index}>
+                            <ResourceResults 
+                              data={(part as any).output as ResourceSearchResult} 
+                              source="types"
+                              onItemClick={typeAction}
+                              showTotalPrice={false}
+                              emptyMessage="No se encontraron tipos disponibles"
+                            />
+                          </div>
+                        );
+                      case 'output-error':
+                        return (
+                          <div key={index} className="p-2 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-xs text-red-600">
+                              ❌ Error al buscar tipos: {part.errorText}
+                            </p>
+                          </div>
+                        );
+                    }
+                    break;
+
+                  case 'tool-list-sizes':
+                  case 'tool-list-sizes-by-type':
+                    switch (part.state) {
+                      case 'input-streaming':
+                        return (
+                          <div key={index} className="flex items-center gap-2 p-2 bg-[var(--color-muted)]/50 border border-[var(--color-border)] rounded-lg">
+                            <Loader2 className="w-3 h-3 animate-spin text-[var(--color-primary)]" />
+                            <span className="text-xs text-[var(--color-muted-foreground)]">
+                              📏 Preparando búsqueda de tamaños...
+                            </span>
+                          </div>
+                        );
+                      case 'input-available':
+                        return (
+                          <div key={index} className="flex items-center gap-2 p-2 bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 rounded-lg">
+                            <Loader2 className="w-3 h-3 animate-spin text-[var(--color-primary)]" />
+                            <span className="text-xs text-[var(--color-primary)]">
+                              📏 Buscando tamaños disponibles...
+                            </span>
+                          </div>
+                        );
+                      case 'output-available':
+                        return (
+                          <div key={index}>
+                            <ResourceResults 
+                              data={(part as any).output as ResourceSearchResult}
+                              source="sizes"
+                              onItemClick={sizeAction}
+                              showTotalPrice={true}
+                              emptyMessage="No se encontraron tamaños disponibles"
+                            />
+                          </div>
+                        );
+                      case 'output-error':
+                        return (
+                          <div key={index} className="p-2 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-xs text-red-600">
+                              ❌ Error al buscar tamaños: {part.errorText}
+                            </p>
+                          </div>
+                        );
+                    }
+                    break;
+
+                  case 'tool-list-borders':
+                    switch (part.state) {
+                      case 'input-streaming':
+                        return (
+                          <div key={index} className="flex items-center gap-2 p-2 bg-[var(--color-muted)]/50 border border-[var(--color-border)] rounded-lg">
+                            <Loader2 className="w-3 h-3 animate-spin text-[var(--color-primary)]" />
+                            <span className="text-xs text-[var(--color-muted-foreground)]">
+                              🖼️ Preparando búsqueda de bordes...
+                            </span>
+                          </div>
+                        );
+                      case 'input-available':
+                        return (
+                          <div key={index} className="flex items-center gap-2 p-2 bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 rounded-lg">
+                            <Loader2 className="w-3 h-3 animate-spin text-[var(--color-primary)]" />
+                            <span className="text-xs text-[var(--color-primary)]">
+                              🖼️ Buscando bordes disponibles...
+                            </span>
+                          </div>
+                        );
+                      case 'output-available':
+                        return (
+                          <div key={index}>
+                            <ResourceResults 
+                              data={(part as any).output as ResourceSearchResult}
+                              source="borders"
+                              onItemClick={borderAction}
+                              showTotalPrice={false}
+                              emptyMessage="No se encontraron bordes disponibles"
+                            />
+                          </div>
+                        );
+                      case 'output-error':
+                        return (
+                          <div key={index} className="p-2 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-xs text-red-600">
+                              ❌ Error al buscar bordes: {part.errorText}
                             </p>
                           </div>
                         );

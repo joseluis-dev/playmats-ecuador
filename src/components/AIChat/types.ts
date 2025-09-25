@@ -35,3 +35,36 @@ export interface SealSearchResult {
   seals: Seal[];
   message: string;
 }
+
+// Tipos genéricos para recursos reutilizables
+export interface ResourceAttribute {
+  id: number;
+  name: string;
+  value: string;
+  color: string;
+}
+
+export interface ResourceCategory {
+  id: number;
+  name: string;
+}
+
+export interface ResourceItem {
+  id: number;
+  name: string;
+  url: string;
+  publicId?: string;
+  thumbnail?: string;
+  watermark?: string;
+  hosting?: string;
+  type?: string;
+  attributes?: ResourceAttribute[];
+  categories?: ResourceCategory[];
+}
+
+export interface ResourceSearchResult {
+  found: boolean;
+  count: number;
+  items: ResourceItem[];
+  message: string;
+}
