@@ -4,13 +4,23 @@ import { X, MessageCircle } from 'lucide-react';
 import Chat from './AIChat/chat';
 import { Button } from './ui/button';
 import { useCustomizationTool } from '@/stores/customToolStore';
+import { resourcesService } from '@/services/resourcesService';
 
 interface ChatbotProps {
   className?: string;
 }
 
+const fetchSizes = async ({ type }: { type: string }) => {
+  if (!type) return [];
+  return await resourcesService.list({ category: `8,${type}` })
+}
+
+const fetchTypes = async () => {
+  return await resourcesService.list({ category: '10' })
+}
+
 export const Chatbot = ({ className = '' }: ChatbotProps) => {
-  const { addLayers, formRef } = useCustomizationTool()
+  const { addLayers, modifyItems, formRef, setSizes, setSize, types } = useCustomizationTool()
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
 
@@ -61,6 +71,71 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
     const currentSeals = formRef.getValues('seals') || [];
     formRef.setValue('seals', [...currentSeals, seal]);
     addLayers('seals', seal);
+  };
+
+  const handleBorderAction = (border: any) => {
+    const location = window.location.href;
+    if (!location.includes('customise')) {
+      // window.open(border.url, '_blank');
+      return;
+    }
+    formRef.setValue('border', border);
+    modifyItems('border', parseFloat(border.attributes?.find((attr: any) => attr.name.includes('price'))?.value) || 0);
+  };
+
+  const handleTypesAction = (type: any) => {
+    const location = window.location.href;
+    if (!location.includes('customise')) {
+      // window.open(type.url, '_blank');
+      return;
+    }
+    formRef.setValue('type', type);
+    const typeCategory = type.categories.find((cat: any) => cat.name === type.name);
+    fetchSizes({ type: typeCategory?.id }).then(res => {
+      setSizes(res)
+      const smallestSize = res.map(size => {
+        const ancho = size.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || "61";
+        const alto = size.attributes?.find((attr: any) => attr.name.includes('alto'))?.value || "22.5";
+        return {
+          ...size,
+          area: parseFloat(ancho) * parseFloat(alto)
+        }
+      }).sort((a, b) => a.area - b.area)[0];
+      setSize(
+        parseFloat(smallestSize?.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || "61") * 10,
+        parseFloat(smallestSize?.attributes?.find((attr: any) => attr.name.includes('alto'))?.value || "22.5") * 10
+      )
+      const price = parseFloat(smallestSize?.attributes?.find((attr: any) => attr.name.includes('price'))?.value || "0") || 0;
+      formRef.setValue('size', smallestSize);
+      modifyItems('size', price)
+    });
+  };
+
+  const handleSizeAction = (size: any) => {
+    const location = window.location.href;
+    if (!location.includes('customise')) {
+      // window.open(size.url, '_blank');
+      return;
+    }
+    const ancho = size.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || 61;
+    const alto = size.attributes?.find((attr: any) => attr.name.includes('alto'))?.value || 22.5;
+    const price = parseFloat(size.attributes?.find((attr: any) => attr.name.includes('price'))?.value) || 0;
+    const sizeTypeCategory = size.categories.find((cat: any) => cat.name.toLowerCase().includes('playmat') || cat.name.toLowerCase().includes('mousepad'));
+    const matchedType = types.find((type: any) => type.name.toLowerCase() === sizeTypeCategory?.name.toLowerCase());
+    // if (matchedType) {
+    //   const typeSearch = matchedType.categories?.find((cat: any) => cat.name === matchedType.name)
+    //   typeSearch && fetchSizes({ type: typeSearch.id.toString() }).then(res => {
+    //     setSizes(res);
+    //   });
+    // }
+    console.log({ matchedType, size })
+    formRef.setValue('type', matchedType);
+    formRef.setValue('size', size);
+    setSize(
+      parseFloat(ancho) * 10 || 610,
+      parseFloat(alto) * 10 || 355
+    )
+    modifyItems('size', price);
   };
 
   return (
@@ -120,7 +195,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
 
             {/* Chat Content */}
             <div className="h-[calc(100%-4rem)] overflow-hidden">
-              <Chat sealAction={handleSealAction} sizeAction={() => {}} borderAction={() => {}} />
+              <Chat sealAction={handleSealAction} sizeAction={handleSizeAction} borderAction={handleBorderAction} typeAction={handleTypesAction} />
             </div>
           </div>
         )}

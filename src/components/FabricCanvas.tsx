@@ -23,10 +23,11 @@ export const FabricCanvas = () => {
 
   const getGap = () => {
     if (!wrapperRef.current || !overlayRef.current) return 8; // coincide con inset-2 (~8px)
-    const w = wrapperRef.current.getBoundingClientRect();
-    const o = overlayRef.current.getBoundingClientRect();
-    const gap = Math.max(0, Math.round(o.left - w.left));
-    return gap || 8;
+    // const w = wrapperRef.current.getBoundingClientRect();
+    // const o = overlayRef.current.getBoundingClientRect();
+    // const gap = Math.max(0, Math.round(o.left - w.left));
+    // return gap || 8;
+    return 8;
   };
 
   const syncRingRadii = () => {
@@ -52,17 +53,10 @@ export const FabricCanvas = () => {
     ring.style.mask = '';
     (ring.style as any).webkitMaskComposite = '';
     (ring.style as any).maskComposite = '';
-
     if (!fill) return; // anillo transparente
 
     const gap = getGap();
-    if (fill.image) {
-      ring.style.backgroundImage = `url(${fill.image})`;
-      ring.style.backgroundSize = 'cover';
-      ring.style.backgroundPosition = 'center';
-    } else {
-      ring.style.background = fill.color || 'transparent';
-    }
+    ring.style.background = fill.color || 'transparent';
     // Máscara para recortar el interior y formar un anillo perfecto
     ring.style.padding = `${gap}px`;
     ring.style.mask = 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)';
@@ -140,8 +134,7 @@ export const FabricCanvas = () => {
       if (!name || name.includes('sin borde') || name.includes('transparente')) {
         setRingFill(null);
       } else if (name.includes('negro')) {
-        const url: string | undefined = currentBorder?.url;
-        if (url) setRingFill({ image: url }); else setRingFill({ color: '#000' });
+        setRingFill({ color: '#000' });
       } else {
         setRingFill(null);
       }

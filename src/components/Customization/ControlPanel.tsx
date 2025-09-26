@@ -81,29 +81,6 @@ export const ControlPanel = () => {
     setFormRef(form);
   }, [])
 
-  useEffect(() => {
-    if (!types || types.length === 0) return;
-    if (!borders || borders.length === 0) return;
-    if (!sizes || sizes.length === 0) return;
-    form.reset({
-      type: types.find(t => t.name === 'Playmat') || undefined,
-      size: (() => {
-        if (!sizes || sizes.length === 0) return undefined;
-        const sizesWithArea = sizes.map(s => {
-          const ancho = s.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || "61";
-          const alto = s.attributes?.find((attr: any) => attr.name.includes('alto'))?.value || "22.5";
-          const area = parseFloat(ancho) * parseFloat(alto);
-          return { ...s, area };
-        });
-        const sortedSizes = sizesWithArea.sort((a, b) => (a.area || 0) - (b.area || 0));
-        return sortedSizes[0];
-      })(),
-      img: undefined,
-      seals: [],
-      border: borders.find(b => b.name === 'Bordes sin borde') || undefined
-    });
-  }, [types, borders, sizes])
-
   async function onSubmit(values: z.infer<typeof designSchema>) {
     if (!values.type) return toast.warning("Debes seleccionar un tipo de diseño");
     if (!values.img) return toast.warning("Debes subir una imagen");
@@ -219,6 +196,8 @@ export const ControlPanel = () => {
                           )
                           const price = parseFloat(smallestSize?.attributes?.find((attr: any) => attr.name.includes('price'))?.value || "0") || 0;
                           modifyItems('size', price)
+                          form.setValue('size', smallestSize)
+                          console.log(form.watch('border')) 
                         }).catch(err => console.error(err))
                         // addLayers('background', item);
                       }}

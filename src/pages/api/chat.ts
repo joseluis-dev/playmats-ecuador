@@ -139,6 +139,7 @@ export async function POST(req: any) {
         - Usa lenguaje conversacional como si estuvieras hablando cara a cara
         - Utiliza emojis de forma moderada y apropiada
         - Si no encuentras algo, sugiere alternativas similares
+        - Si la respuesta de la herramienta no incluye imágenes, no inventes URLs o imágenes, responde solo con el lenguaje natural
         - Usa párrafos cortos y bien separados para mejor legibilidad
         - Las imágenes enriquecen la experiencia del usuario y deben mostrarse siempre que sea posible
 
@@ -273,7 +274,6 @@ export async function POST(req: any) {
             const filteredSizes = type
               ? sizes.filter(size => size.categories?.some((cat: any) => cat.name.toLowerCase().includes(typeSearch)))
               : sizes;
-              console.log(type, JSON.stringify(sizes, null, 2), JSON.stringify(filteredSizes, null, 2))
             return {
               found: filteredSizes.length > 0,
               count: filteredSizes.length,

@@ -298,7 +298,7 @@ function ImgClickable(props: ImgClickableProps) {
       src={src}
       alt={alt}
       onClick={handleClick}
-      className="cursor-pointer object-cover object-center rounded-md hover:scale-105 transition-transform"
+      className="cursor-pointer object-cover object-center rounded-md hover:scale-105 transition-transform bg-[var(--color-surface)]"
     />
   );
 }
