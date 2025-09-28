@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import { BotIcon } from "./icons/BotIcon";
 import { X, MessageCircle } from 'lucide-react';
-import Chat from './AIChat/chat';
+// Lazy load del módulo de chat para reducir JS inicial
+const Chat = lazy(() => import('./AIChat/chat'));
 import { Button } from './ui/button';
 import { useCustomizationTool } from '@/stores/customToolStore';
 import { resourcesService } from '@/services/resourcesService';
@@ -47,21 +48,39 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
     return sizes;
   }
 
-  const toggleChat = () => {
-    if (isOpen) {
-      setIsOpen(false);
-    } else {
-      setIsOpen(true);
-      setShowTooltip(false);
+  // Prefetch del bundle del Chat en idle para que la apertura sea inmediata
+  useEffect(() => {
+    let triggered = false;
+    const prefetch = () => {
+      if (triggered) return;
+      triggered = true;
+      import('./AIChat/chat').catch(() => {});
+    };
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        // @ts-ignore
+        requestIdleCallback(prefetch, { timeout: 2000 });
+      } else {
+        const t = setTimeout(prefetch, 1500);
+        return () => clearTimeout(t);
+      }
     }
-  };
+  }, []);
 
-  const closeChat = (e: React.MouseEvent) => {
+  const toggleChat = useCallback(() => {
+    setIsOpen(prev => {
+      const next = !prev;
+      if (next) setShowTooltip(false);
+      return next;
+    });
+  }, []);
+
+  const closeChat = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setIsOpen(false);
-  };
+  }, []);
 
-  const handleSealAction = (seal: any) => {
+  const handleSealAction = useCallback((seal: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
       window.location.assign(`customise`);
@@ -70,9 +89,9 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
     const currentSeals = formRef.getValues('seals') || [];
     formRef.setValue('seals', [...currentSeals, seal]);
     addLayers('seals', seal);
-  };
+  }, [addLayers, formRef]);
 
-  const handleBorderAction = (border: any) => {
+  const handleBorderAction = useCallback((border: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
       window.location.assign(`customise`);
@@ -80,9 +99,9 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
     }
     formRef.setValue('border', border);
     modifyItems('border', parseFloat(border.attributes?.find((attr: any) => attr.name.includes('price'))?.value) || 0);
-  };
+  }, [formRef, modifyItems]);
 
-  const handleTypesAction = (type: any) => {
+  const handleTypesAction = useCallback((type: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
       window.location.assign(`customise`);
@@ -108,9 +127,9 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
       formRef.setValue('size', smallestSize);
       modifyItems('size', price)
     });
-  };
+  }, [fetchSizes, formRef, modifyItems, setSize, setSizes]);
 
-  const handleSizeAction = (size: any) => {
+  const handleSizeAction = useCallback((size: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
       window.location.assign(`customise`);
@@ -134,9 +153,9 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
       parseFloat(alto) * 10 || 355
     )
     modifyItems('size', price);
-  };
+  }, [fetchSizes, formRef, modifyItems, setSize, setSizes, types]);
 
-  const handleProductAction = async (product: any) => {
+  const handleProductAction = useCallback(async (product: any) => {
     const location = window.location.href;
     console.log('Product action:', product);
     const products = await productService.list({ resource: product.id });
@@ -148,7 +167,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
       const productId = products[0].id;
       window.location.assign(`/playmats/${productId}`);
     }
-  }
+  }, []);
 
   return (
     <>
@@ -207,7 +226,15 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
 
             {/* Chat Content */}
             <div className="h-[calc(100%-4rem)] overflow-hidden">
-              <Chat sealAction={handleSealAction} sizeAction={handleSizeAction} borderAction={handleBorderAction} typeAction={handleTypesAction} productAction={handleProductAction} />
+              <Suspense fallback={<div className="p-4 text-sm text-[var(--color-muted-foreground)]">Cargando asistente...</div>}>
+                <Chat 
+                  sealAction={handleSealAction}
+                  sizeAction={handleSizeAction}
+                  borderAction={handleBorderAction}
+                  typeAction={handleTypesAction}
+                  productAction={handleProductAction}
+                />
+              </Suspense>
             </div>
           </div>
         )}
