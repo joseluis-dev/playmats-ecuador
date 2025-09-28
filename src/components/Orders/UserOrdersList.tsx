@@ -44,7 +44,6 @@ function formatAddress(addr?: ApiShippingAddress) {
 
 export const UserOrdersList: React.FC<UserOrdersListProps> = ({ orders, onSelectOrder, className }) => {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
-  console.log({ orders })
   if (!orders || orders.length === 0) {
     return (
       <div className={cn('flex flex-col items-center justify-center py-12 text-center rounded-xl border border-dashed', className)}>

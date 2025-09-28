@@ -51,17 +51,20 @@ export const ControlPanel = () => {
   })
 
   const fetchSeals = async () => {
-    return await resourcesService.list({ category: '3' })
+    return await resourcesService.list({ category: 'sellos' })
   }
   const fetchBorders = async () => {
-    return await resourcesService.list({ category: '4' })
+    return await resourcesService.list({ category: 'bordes' })
   }
   const fetchTypes = async () => {
-    return await resourcesService.list({ category: '10' })
+    return await resourcesService.list({ category: 'tipos' })
   }
   const fetchSizes = async ({ type }: { type: string }) => {
     if (!type) return [];
-    return await resourcesService.list({ category: `8,${type}` })
+    const allSizes = await resourcesService.list({ category: `tamaños` });
+    // Filter sizes that have the category matching the type
+    const sizes = allSizes.filter(resource => resource.categories?.some(cat => cat.id.toString() === type.toString()));
+    return sizes;
   }
 
   useEffect(() => {
@@ -74,10 +77,36 @@ export const ControlPanel = () => {
   }, [layers]);
   
   useEffect(() => {
-    fetchSeals().then(res => setSeals(res)).catch(err => console.error(err))
-    fetchBorders().then(res => setBorders(res)).catch(err => console.error(err))
-    fetchTypes().then(res => setTypes(res)).catch(err => console.error(err))
-    fetchSizes({ type: '1' }).then(res => setSizes(res)).catch(err => console.error(err))
+    fetchSeals().then(res => {
+      setSeals(res)
+      form.setValue('seals', [])
+    }).catch(err => console.error(err))
+    fetchBorders().then(res => {
+      setBorders(res)
+      form.setValue('border', res.find(border => border.name?.toLocaleLowerCase().includes('sin borde')))
+    }).catch(err => console.error(err))
+    fetchTypes().then(res => {
+      setTypes(res)
+      form.setValue('type', res.find(type => type.name?.toLocaleLowerCase().includes('playmat')))
+    }).catch(err => console.error(err))
+    fetchSizes({ type: '1' }).then(res => {
+      setSizes(res)
+      const smallestSize = res.map(size => {
+        const ancho = size.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || "61";
+        const alto = size.attributes?.find((attr: any) => attr.name.includes('alto'))?.value || "22.5";
+        return {
+          ...size,
+          area: parseFloat(ancho) * parseFloat(alto)
+        }
+      }).sort((a, b) => a.area - b.area)[0];
+      setSize(
+        parseFloat(smallestSize?.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || "61") * 10,
+        parseFloat(smallestSize?.attributes?.find((attr: any) => attr.name.includes('alto'))?.value || "22.5") * 10
+      );
+      const price = parseFloat(smallestSize?.attributes?.find((attr: any) => attr.name.includes('price'))?.value || "0") || 0;
+      modifyItems('size', price)
+      form.setValue('size', smallestSize)
+    }).catch(err => console.error(err))
     setFormRef(form);
   }, [])
 
@@ -197,7 +226,6 @@ export const ControlPanel = () => {
                           const price = parseFloat(smallestSize?.attributes?.find((attr: any) => attr.name.includes('price'))?.value || "0") || 0;
                           modifyItems('size', price)
                           form.setValue('size', smallestSize)
-                          console.log(form.watch('border')) 
                         }).catch(err => console.error(err))
                         // addLayers('background', item);
                       }}

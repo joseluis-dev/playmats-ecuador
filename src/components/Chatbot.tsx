@@ -5,18 +5,10 @@ import Chat from './AIChat/chat';
 import { Button } from './ui/button';
 import { useCustomizationTool } from '@/stores/customToolStore';
 import { resourcesService } from '@/services/resourcesService';
+import productService from '@/services/productService';
 
 interface ChatbotProps {
   className?: string;
-}
-
-const fetchSizes = async ({ type }: { type: string }) => {
-  if (!type) return [];
-  return await resourcesService.list({ category: `8,${type}` })
-}
-
-const fetchTypes = async () => {
-  return await resourcesService.list({ category: '10' })
 }
 
 export const Chatbot = ({ className = '' }: ChatbotProps) => {
@@ -47,6 +39,13 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
       return () => document.removeEventListener('keydown', handleEscape);
     }
   }, [isOpen]);
+
+  const fetchSizes = async ({ type }: { type: string }) => {
+    if (!type) return [];
+    const allSizes = await resourcesService.list({ category: `tamaños` });
+    const sizes = allSizes.filter(resource => resource.categories?.some(cat => cat.id.toString() === type.toString()));
+    return sizes;
+  }
 
   const toggleChat = () => {
     if (isOpen) {
@@ -122,13 +121,12 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
     const price = parseFloat(size.attributes?.find((attr: any) => attr.name.includes('price'))?.value) || 0;
     const sizeTypeCategory = size.categories.find((cat: any) => cat.name.toLowerCase().includes('playmat') || cat.name.toLowerCase().includes('mousepad'));
     const matchedType = types.find((type: any) => type.name.toLowerCase() === sizeTypeCategory?.name.toLowerCase());
-    // if (matchedType) {
-    //   const typeSearch = matchedType.categories?.find((cat: any) => cat.name === matchedType.name)
-    //   typeSearch && fetchSizes({ type: typeSearch.id.toString() }).then(res => {
-    //     setSizes(res);
-    //   });
-    // }
-    console.log({ matchedType, size })
+    if (matchedType) {
+      const typeSearch = matchedType.categories?.find((cat: any) => cat.name === matchedType.name)
+      typeSearch && fetchSizes({ type: typeSearch.id.toString() }).then(res => {
+        setSizes(res);
+      });
+    }
     formRef.setValue('type', matchedType);
     formRef.setValue('size', size);
     setSize(
@@ -137,6 +135,20 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
     )
     modifyItems('size', price);
   };
+
+  const handleProductAction = async (product: any) => {
+    const location = window.location.href;
+    console.log('Product action:', product);
+    const products = await productService.list({ resource: product.id });
+    console.log('Matched products:', products);
+    if (products.length > 0 && location.includes('customise')) {
+      const productId = products[0].id;
+      window.open(`/playmats/${productId}`, '_blank');
+    } else if (products.length > 0) {
+      const productId = products[0].id;
+      window.location.assign(`/playmats/${productId}`);
+    }
+  }
 
   return (
     <>
@@ -195,7 +207,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
 
             {/* Chat Content */}
             <div className="h-[calc(100%-4rem)] overflow-hidden">
-              <Chat sealAction={handleSealAction} sizeAction={handleSizeAction} borderAction={handleBorderAction} typeAction={handleTypesAction} />
+              <Chat sealAction={handleSealAction} sizeAction={handleSizeAction} borderAction={handleBorderAction} typeAction={handleTypesAction} productAction={handleProductAction} />
             </div>
           </div>
         )}

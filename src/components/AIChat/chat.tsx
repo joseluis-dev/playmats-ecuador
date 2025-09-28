@@ -19,6 +19,7 @@ interface ChatProps {
   typeAction?: (type: ResourceItem) => void;
   sizeAction?: (size: ResourceItem) => void;
   borderAction?: (border: ResourceItem) => void;
+  productAction?: (product: ResourceItem) => void;
 }
 
 export default function Chat({ 
@@ -26,7 +27,8 @@ export default function Chat({
   sealAction = () => {}, 
   typeAction = () => {}, 
   sizeAction = () => {}, 
-  borderAction = () => {} 
+  borderAction = () => {}, 
+  productAction = () => {},
 }: ChatProps) {
   // Chat ID & initial messages persistence layer
   const [chatId, setChatId] = useState<string | undefined>();
@@ -85,7 +87,7 @@ export default function Chat({
     data = await resourcesService.list({ thumbnail: href });
     if (data.length === 0) data = await resourcesService.list({ url: href });
     if (data.length === 0) return;
-    const categories = ['Sellos', 'Tipo', 'Tamaño', 'Bordes'];
+    const categories = ['Sellos', 'Tipos', 'Tamaños', 'Bordes', 'Productos'];
     const item = data[0];
     const category = categories.find(cat =>
       item.categories?.some((c: any) =>
@@ -96,9 +98,10 @@ export default function Chat({
     );
     const actionMap: Record<string, (item: ResourceItem) => void> = {
       'Sellos': sealAction,
-      'Tipo': typeAction,
-      'Tamaño': sizeAction,
+      'Tipos': typeAction,
+      'Tamaños': sizeAction,
       'Bordes': borderAction,
+      'Productos': productAction,
     };
     if (category && actionMap[category]) {
       actionMap[category](item as ResourceItem);

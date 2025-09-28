@@ -4,6 +4,7 @@
  */
 
 export interface ProductFilters {
+  resource?: string
   page?: number
   limit?: number
   name?: string

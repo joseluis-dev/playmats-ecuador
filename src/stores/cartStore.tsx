@@ -151,7 +151,6 @@ export const useCartStore = create<CartState>((set, get) => ({
       if (!exists) {
         throw new Error('El item no existe en el carrito');
       }
-      console.log({ exists });
       await get().updateCart(exists, 0);
       get().loadCart();
     } catch (e) {
