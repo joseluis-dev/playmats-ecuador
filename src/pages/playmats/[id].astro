@@ -53,7 +53,7 @@ const resources = PRODUCT.productResources.map(({ resource }) => resource) as Re
     </div>
 
     <div class="flex flex-col lg:flex-row gap-4 w-full">
-      <Galery client:load resources={resources}/>
+      <Galery client:visible resources={resources}/>
       <div class="flex flex-col gap-4 w-full lg:max-w-[35%]">
         <Image
           src={PRODUCT.productResources.filter((image) => image.isBanner)[0]?.resource?.url || resources[0]?.url || ''}

@@ -28,15 +28,16 @@ const { isAuthorized } = await checkUserAuth(Astro, 'ADMIN');
     <li><NavLink href="/">Inicio</NavLink></li>
     <li><NavLink href="/cataloge">Catalogo</NavLink></li>
     <li><NavLink href="/customise">Personalizar</NavLink></li>
+    <li><NavLink href="/orders">Mis Ordenes</NavLink></li>
     <li><NavLink href="#contact">Contacto</NavLink></li>
     {isAuthorized && (
       <li><NavLink href="/admin">Administración</NavLink></li>
     )}
   </ul>
   <div class="flex items-center gap-2">
-    <Cart client:load transition:persist/>
+    <Cart client:visible transition:persist/>
     <div class="flex gap-2">
-      <ModeToggle client:load />
+      <ModeToggle client:visible />
       <Menu isAuthorized={isAuthorized} />
       <SignedIn>
         <UserButton>
@@ -49,7 +50,7 @@ const { isAuthorized } = await checkUserAuth(Astro, 'ADMIN');
           <UserButton.UserProfilePage label="Dirección" url="direccion">
             <AddressIcon slot="label-icon" class="w-4 h-4" />
             <div class="w-full">
-              <AddressesClerk client:load />
+              <AddressesClerk client:visible />
             </div>
           </UserButton.UserProfilePage>
         </UserButton>

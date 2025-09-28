@@ -8,5 +8,5 @@ const user = await Astro.locals.currentUser()
 ---
 
 <Layout title="Playmats EC - Catálogo">
-    <ProductList client:load />
+    <ProductList client:visible />
 </Layout>

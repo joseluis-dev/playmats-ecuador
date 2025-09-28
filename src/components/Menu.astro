@@ -23,6 +23,7 @@ const { isAuthorized } = Astro.props as MenuProps;
     <li><NavLink href="/">Inicio</NavLink></li>
     <li><NavLink href="/cataloge">Catalogo</NavLink></li>
     <li><NavLink href="/customise">Personalizar</NavLink></li>
+    <li><NavLink href="/orders">Mis Ordenes</NavLink></li>
     <li><NavLink id="contact-link" href="#contact">Contacto</NavLink></li>
     {isAuthorized && (
       <li><NavLink href="/admin">Administración</NavLink></li>
