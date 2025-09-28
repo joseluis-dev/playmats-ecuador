@@ -64,7 +64,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
   const handleSealAction = (seal: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
-      // window.open(seal.url, '_blank');
+      window.location.assign(`customise`);
       return;
     }
     const currentSeals = formRef.getValues('seals') || [];
@@ -75,7 +75,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
   const handleBorderAction = (border: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
-      // window.open(border.url, '_blank');
+      window.location.assign(`customise`);
       return;
     }
     formRef.setValue('border', border);
@@ -85,7 +85,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
   const handleTypesAction = (type: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
-      // window.open(type.url, '_blank');
+      window.location.assign(`customise`);
       return;
     }
     formRef.setValue('type', type);
@@ -113,7 +113,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
   const handleSizeAction = (size: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
-      // window.open(size.url, '_blank');
+      window.location.assign(`customise`);
       return;
     }
     const ancho = size.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || 61;
