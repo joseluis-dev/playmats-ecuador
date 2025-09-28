@@ -2,22 +2,13 @@ import { useCartStore } from "@/stores/cartStore"
 import { useEffect } from "react"
 
 export const useCart = () => {
-  const { cart, addToCart, removeFromCart, clearCart, updateCart, total, totalItems, loadCart, loading } = useCartStore()
+  const { cart, addToCart, removeFromCart, clearCart, updateCart, total, totalItems, loadCart, loading, initialized } = useCartStore()
 
   useEffect(() => {
-    // Cargar el carrito al montar el componente
-    loadCart()
-  }, [])
+    if (!initialized) {
+      loadCart();
+    }
+  }, [initialized, loadCart])
 
-  return {
-    cart,
-    total,
-    totalItems,
-    loading,
-    addToCart,
-    removeFromCart,
-    clearCart,
-    updateCart,
-    loadCart,
-  }
+  return { cart, total, totalItems, loading, addToCart, removeFromCart, clearCart, updateCart, loadCart }
 }

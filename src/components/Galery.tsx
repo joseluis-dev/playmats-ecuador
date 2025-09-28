@@ -39,14 +39,16 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
   return (
     <div className="relative w-full flex justify-center sm:justify-baseline gap-4">
       <div className="flex flex-col gap-4 w-full max-w-[calc(100vw-5rem)] lg:max-w-2xl xl:max-w-3xl">
-        <div className="relative w-full aspect-video">
+        <div className="relative w-full aspect-video" data-galery-main>
           {resources.map((resource) => (
             <div
               key={resource.id}
+              data-res-id={resource.id}
               className={clsx(
-                "absolute top-0 left-0 right-0 bottom-0 inset-0 flex items-center justify-center rounded-lg overflow-hidden",
+                "absolute top-0 left-0 right-0 bottom-0 inset-0 flex items-center justify-center rounded-lg overflow-hidden galery-item",
                 resource.id === prevSelected?.id && "fade-out",
-                resource.id === selected.id && "fade-in"
+                resource.id === selected.id && "fade-in",
+                resource.id === selected.id ? 'is-active' : 'is-inactive'
               )}
               style={{
                 opacity: resource.id === selected.id ? 1 : 0,
@@ -77,11 +79,15 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
             </div>
           ))}
         </div>
-        <div className="flex gap-2 overflow-x-auto">
+        <div className="flex gap-2 overflow-x-auto" data-galery-thumbs>
           {resources.map((resource) => (
             <div
               key={resource.id}
-              className="relative flex-none aspect-video w-32 bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+              data-thumb-id={resource.id}
+              className={clsx(
+                "relative flex-none aspect-video w-32 bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer galery-thumb",
+                resource.id === selected.id && 'ring-2 ring-blue-500'
+              )}
               onClick={() => handleSelect(resource)}
             >
               <Image src={resource.thumbnail as string} alt={resource.name} width={128} height={72} />

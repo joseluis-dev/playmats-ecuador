@@ -26,6 +26,7 @@ interface CartState {
   totalItems: number;
   loading: boolean;
   error: string | null;
+  initialized: boolean; // evita cargas múltiples innecesarias
   // Sin cambiar la firma pública para los componentes actuales
   addToCart: (item: CartItemType) => Promise<void> | void;
   removeFromCart: (item: CartItemType) => Promise<void> | void;
@@ -64,7 +65,6 @@ const mapCartApiToItems = (cart: Cart): CartItemType[] => {
 };
 
 const getUserId = () => useUser.getState().user?.id ?? null;
-const userId = getUserId();
 
 export const useCartStore = create<CartState>((set, get) => ({
   cart: [],
@@ -72,113 +72,131 @@ export const useCartStore = create<CartState>((set, get) => ({
   totalItems: 0,
   loading: false,
   error: null,
+  initialized: false,
 
   loadCart: async () => {
+    const uid = getUserId();
     set({ loading: true, error: null });
-    if (!userId) {
-      // Usuario no autenticado: mantener estado local
-      set({ cart: [], loading: false });
+    if (!uid) {
+      // Usuario no autenticado: mantener estado local existente (no borrar para permitir carrito guest)
+      set({ loading: false, initialized: true });
       return;
     }
     try {
-      const cart = await cartService.listByUser(userId);
-      if (!cart) {
-        set({ cart: [], loading: false });
+      const cartArr = await cartService.listByUser(uid);
+      if (!cartArr || cartArr.length === 0) {
+        set({ cart: [], loading: false, initialized: true });
         return;
       }
-      if (cart.length > 1) {
+      if (cartArr.length > 1) {
         throw new Error('Se encontraron múltiples carritos para el usuario. Por favor, contacte al soporte.');
       }
-      const mapped = mapCartApiToItems(cart[0]);
+      const mapped = mapCartApiToItems(cartArr[0]);
       const { total, totalItems } = computeTotals(mapped);
-      set({ cart: mapped, total, totalItems, loading: false, error: null });
+      set({ cart: mapped, total, totalItems, loading: false, error: null, initialized: true });
     } catch (e: any) {
-      set({ loading: false, error: e?.message || 'Error al cargar carrito' });
+      set({ loading: false, error: e?.message || 'Error al cargar carrito', initialized: true });
     }
   },
 
   addToCart: async (item) => {
-    if (!userId) {
-      return
+    const uid = getUserId();
+    // Actualización optimista local (funciona también para guest)
+    const current = get().cart.slice();
+    const exists = current.find(ci => ci.id === item.id);
+    let newCart: CartItemType[];
+    if (exists) {
+      exists.quantity += 1;
+      exists.subtotal = (exists.price * exists.quantity).toFixed(2);
+      newCart = [...current];
+    } else {
+      newCart = [...current, { ...item, quantity: 1, subtotal: Number(item.price || 0).toFixed(2) }];
+    }
+    const { total, totalItems } = computeTotals(newCart);
+    set({ cart: newCart, total, totalItems });
+
+    if (!uid) {
+      // guest: no sincronizar con backend
+      return;
     }
     try {
-      const existCart = await cartService.listByUser(userId);
+      const existCart = await cartService.listByUser(uid);
       if (existCart.length > 1) {
         throw new Error('Se encontraron múltiples carritos para el usuario. Por favor, contacte al soporte.');
       }
-
-      const currentItems = get().cart;
-      const exists = currentItems.find((ci) => ci.id === item.id);
-      
-      if (exists) {
-        // Si ya existe, actualizar cantidad
-        await get().updateCart(exists, exists.quantity + 1);
-        return;
-      }
-
       const newItem: Cart = {
-        user: {
-          id: userId
-        },
+        user: { id: uid },
         cartProducts: [
-          {
-            product: {
-              id: item.id
-            },
-            quantity: 1,
-            price: item.price ?? 0,
-          }
+          { product: { id: item.id } as Product, quantity: 1, price: item.price ?? 0 }
         ]
-      }
-
+      };
       if (!existCart || existCart.length === 0) {
         await cartService.create(newItem);
-        return
+      } else if (exists) {
+        await get().updateCart(exists, exists.quantity); // ya incrementado
+        return; // updateCart refresca
+      } else {
+        await get().updateCart(item, 1);
+        return;
       }
-      console.log({ existCart })
-      await get().updateCart(item, 1);
+      // sincronizar estado después de crear
+      await get().loadCart();
     } catch (e) {
       console.error('Error al agregar item al carrito:', e);
+      // rollback básico (re-cargar desde API si es posible)
+      await get().loadCart();
     }
   },
 
   removeFromCart: async (item) => {
-    if (!userId) {
-      return;
-    }
+    const uid = getUserId();
+    // optimista
+    const filtered = get().cart.filter(ci => ci.id !== item.id);
+    const { total, totalItems } = computeTotals(filtered);
+    set({ cart: filtered, total, totalItems });
+    if (!uid) return; // guest
     try {
-      const exists = get().cart.find((ci) => ci.id === item.id);
-      if (!exists) {
-        throw new Error('El item no existe en el carrito');
-      }
-      await get().updateCart(exists, 0);
-      get().loadCart();
+      const exists = { ...item };
+      await get().updateCart(exists, 0); // updateCart hará loadCart
     } catch (e) {
       console.error('Error al eliminar item del carrito:', e);
+      await get().loadCart();
     }
-
-    await get().loadCart();
   },
 
   clearCart: async () => {
-    if (!userId) {
-      return;
-    }
+    const uid = getUserId();
+    set({ cart: [], total: '0', totalItems: 0 });
+    if (!uid) return;
     try {
-      await cartService.clearByUser(userId);
+      await cartService.clearByUser(uid);
     } catch (e) {
       console.error('Error al limpiar carrito:', e);
+    } finally {
+      await get().loadCart();
     }
-
-    await get().loadCart();
   },
 
   updateCart: async (item, quantity) => {
-    if (!userId) {
-      return;
+    const uid = getUserId();
+    // optimista local
+    const current = get().cart.slice();
+    const idx = current.findIndex(ci => ci.id === item.id);
+    if (idx >= 0) {
+      if (quantity <= 0) {
+        current.splice(idx, 1);
+      } else {
+        current[idx].quantity = quantity;
+        current[idx].subtotal = (current[idx].price * quantity).toFixed(2);
+      }
+    } else if (quantity > 0) {
+      current.push({ ...item, quantity, subtotal: (item.price * quantity).toFixed(2) });
     }
+    const { total, totalItems } = computeTotals(current);
+    set({ cart: current, total, totalItems });
+    if (!uid) return; // guest
     try {
-      const userCart = await cartService.listByUser(userId);
+      const userCart = await cartService.listByUser(uid);
       if (userCart.length === 0) {
         throw new Error('No se encontró un carrito para el usuario.');
       }
@@ -186,52 +204,41 @@ export const useCartStore = create<CartState>((set, get) => ({
       if (cartId === undefined) {
         throw new Error('El carrito no tiene un id válido');
       }
-      const exists = get().cart.find((ci) => ci.id === item.id);
+      const exists = current.find(ci => ci.id === item.id);
       if (!exists && quantity > 0) {
-        console.log('Agregar nuevo item al carrito');
         const updatedCart = {
           ...userCart[0],
           cartProducts: [
             ...(userCart[0].cartProducts || []),
             { product: { id: item.id } as Product, quantity }
           ]
-        }
+        };
         await cartService.update(updatedCart, cartId);
-        return
-      }
-
-      if (exists && quantity <= 0) {
-        console.log('Eliminar item del carrito');
+      } else if (!exists && quantity <= 0) {
+        // nada que hacer, ya fue removido
+      } else if (exists && quantity <= 0) {
         const updatedCart = {
           ...userCart[0],
           cartProducts: (userCart[0].cartProducts || []).filter((cp) => {
             const cartProductID = (cp as any).id;
-            return cartProductID !== exists.cartItemId;
+            return cartProductID !== exists?.cartItemId;
           }),
         };
         await cartService.update(updatedCart, cartId);
-        return
+      } else {
+        const updatedCartProducts = userCart[0].cartProducts?.map((cp) => {
+          const cartProductID = (cp as any).id;
+          if (cartProductID === exists?.cartItemId) {
+            return { ...cp, quantity };
+          }
+          return cp;
+        });
+        const updatedCart = { ...userCart[0], cartProducts: updatedCartProducts };
+        await cartService.update(updatedCart, cartId);
       }
-
-      const updatedCartProducts = userCart[0].cartProducts?.map((cp) => {
-        const cartProductID = (cp as any).id;
-        if (cartProductID === exists?.cartItemId) {
-          return {
-            ...cp,
-            quantity
-          };
-        }
-        return cp;
-      });
-
-      const updatedCart = {
-        ...userCart[0],
-        cartProducts: updatedCartProducts,
-      };
-      console.log({ updatedCart })
-      await cartService.update(updatedCart, cartId);
     } catch (e) {
       console.error('Error al actualizar item del carrito:', e);
+      await get().loadCart(); // re-sync
     } finally {
       await get().loadCart();
     }

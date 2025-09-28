@@ -1,12 +1,78 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { ProductList } from "@/components/Catalogue/ProductList";
+import { api } from "@/services/api";
+import { AddToCartButton } from "@/components/AddToCartButton";
+import Card from "@/components/Card.astro";
+import { CustomBadge } from "@/components/ui/custom-badge";
+import type { Product, ResourceProduct, Resource, Category, Attribute } from "@/types";
 
-const user = await Astro.locals.currentUser()
-// console.log(user)
-// console.log(user?.emailAddresses.map(email => email.emailAddress))
+// SSR fetch with cache (short TTL already handled inside api.get)
+let products: Product[] = [];
+try {
+    products = await api.get<Product[]>("products");
+} catch (e) {
+    products = [];
+}
 ---
 
 <Layout title="Playmats EC - Catálogo">
-    <ProductList client:load />
+    <section class="w-full max-w-screen-xl mx-auto p-8 md:p-12">
+        {products.length > 0 ? (
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-[25rem] gap-6">
+                {products.map((product) => {
+                    const bannerResource = (product.resourceProducts || []).find((rp: ResourceProduct) => rp.isBanner)?.resource ||
+                        (product.resourceProducts || [])[0]?.resource as Resource | undefined;
+                    const imageUrl = bannerResource?.url || '';
+                    return (
+                        <a href={`/playmats/${product.id}`} class="rounded-xl group" data-prefetch>
+                            <Card 
+                                class="text-[var(--color-text)]"
+                                id={product.id}
+                                title={product.name as string}
+                                subtitle="Etiquetas"
+                                price={product.price?.toString()}
+                            >
+                                <div slot="image"
+                                    data-transition-key={`img-${product.id}`}
+                                    class="absolute top-0 left-0 bottom-0 h-full w-full group-hover:scale-110 transition-scale duration-1000 ease-in-out opacity-90 -z-10 bg-center bg-cover bg-no-repeat bg-blend-luminosity"
+                                    style={`background-image: url(${imageUrl});`}
+                                />
+                                <ul slot="content" class="w-full flex flex-wrap gap-2 text-sm">
+                                    {(product.categories || []).map((category: Category) => (
+                                        <CustomBadge 
+                                            label={category.name}
+                                            color={category.color || 'gray'}
+                                            type="outline" />
+                                    ))}
+                                    {(product.attributes || []).map((attribute: Attribute) => (
+                                        <CustomBadge 
+                                            label={attribute.name}
+                                            color={attribute.color || 'gray'}
+                                            type="outline" />
+                                    ))}
+                                </ul>
+                                <AddToCartButton
+                                    slot="footer"
+                                    client:visible
+                                    className="flex items-center justify-center gap-2 absolute top-0 right-0 p-4 ring-1 ring-black/20 dark:ring-white/20 rounded-rt-lg rounded-bl-lg bg-[var(--color-primary)]/90 hover:bg-[var(--color-primary)] transition-colors duration-300"
+                                    label="Añadir"
+                                    product={product}
+                                />
+                            </Card>
+                        </a>
+                    );
+                })}
+            </div>
+        ) : (
+            <div class="w-full min-h-[50vh] flex flex-col items-center justify-center p-8 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] shadow-lg">
+                <div class="flex flex-col text-center items-center gap-4">
+                    <h2 class="text-3xl font-bold text-[var(--color-text)]">No hay productos disponibles</h2>
+                    <p class="text-lg text-[var(--color-text)]/70">No se encontraron productos en el catálogo en este momento.</p>
+                    <a href="/" class="inline-flex items-center justify-center gap-2 px-6 py-3 hover:bg-[var(--color-primary-dark)] text-white rounded-lg transition-colors duration-300 font-medium">
+                        Volver al inicio
+                    </a>
+                </div>
+            </div>
+        )}
+    </section>
 </Layout>

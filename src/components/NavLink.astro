@@ -1,6 +1,6 @@
 ---
 const { href } = Astro.props;
 ---
-<a href={href} class="flex items-center space-x-2 hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2" {...Astro.props}>
+<a href={href} data-prefetch={href.startsWith('/') ? 'true' : undefined} class="flex items-center space-x-2 hover:bg-[var(--color-surface)] transition-all duration-300 ease-in-out rounded-md p-2" {...Astro.props}>
   <slot />
 </a>

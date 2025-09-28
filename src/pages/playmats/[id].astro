@@ -139,4 +139,29 @@ const resources = PRODUCT.productResources.map(({ resource }) => resource) as Re
       }
     });
   });
+  // Fallback de interacción de galería si React aún no hidrató
+  document.addEventListener('astro:page-load', () => {
+    const main = document.querySelector('[data-galery-main]');
+    const thumbs = document.querySelectorAll('[data-galery-thumbs] .galery-thumb');
+    if (!main || !thumbs.length) return;
+    thumbs.forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        const id = thumb.getAttribute('data-thumb-id');
+        if (!id) return;
+        document.querySelectorAll('.galery-item').forEach(item => {
+          const rid = item.getAttribute('data-res-id');
+            if (rid === id) {
+              item.classList.add('fade-in','is-active');
+              (item as HTMLElement).style.opacity = '1';
+              (item as HTMLElement).style.pointerEvents = 'auto';
+            } else {
+              item.classList.remove('fade-in','is-active');
+              item.classList.add('fade-out','is-inactive');
+              (item as HTMLElement).style.opacity = '0';
+              (item as HTMLElement).style.pointerEvents = 'none';
+            }
+        });
+      }, { passive: true });
+    });
+  });
 </script>

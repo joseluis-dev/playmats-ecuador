@@ -34,9 +34,9 @@ const { isAuthorized } = await checkUserAuth(Astro, 'ADMIN');
     )}
   </ul>
   <div class="flex items-center gap-2">
-    <Cart client:load transition:persist/>
+  <Cart client:idle />
     <div class="flex gap-2">
-      <ModeToggle client:load />
+  <ModeToggle client:idle />
       <Menu isAuthorized={isAuthorized} />
       <SignedIn>
         <UserButton>
