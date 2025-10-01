@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api } from '@/services/api';
+import { productService } from '@/services/productService';
 import { Card } from '@/components/Card';
 import { AddToCartButton } from '@/components/AddToCartButton';
 import { BoxIcon } from 'lucide-react';
@@ -15,7 +15,7 @@ export const ProductList = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const fetchedProducts = await api.get<Product[]>('products');
+        const fetchedProducts = await productService.list();
         setProducts(fetchedProducts);
         setError(null);
       } catch (err) {
@@ -72,7 +72,7 @@ export const ProductList = () => {
                     <div 
                       data-transition-key={`img-${product.id}`}
                       className="absolute top-0 left-0 bottom-0 h-full w-full group-hover:scale-110 transition-scale duration-1000 ease-in-out opacity-90 -z-10 bg-center bg-cover bg-no-repeat bg-blend-luminosity"
-                      style={{ backgroundImage: `url(${imageUrl})` }}
+                      style={{ backgroundImage: `url(${imageUrl})`, viewTransitionName: `img-${product.id}` }}
                     />
                   }
                   contentSlot={

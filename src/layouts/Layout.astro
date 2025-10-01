@@ -1,81 +1,151 @@
 ---
-import { ClientRouter } from 'astro:transitions'
-import '@/styles/global.css'
-import Header from '@/components/Header.astro'
-import Footer from '@/components/Footer.astro'
-import { Chatbot } from '@/components/Chatbot'
-import { Toaster } from 'sonner'
+import { ClientRouter } from "astro:transitions";
+import "@/styles/global.css";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { Chatbot } from "@/components/Chatbot";
+import { Toaster } from "sonner";
 
-const { title } = Astro.props
+const { title } = Astro.props;
 ---
+
 <!doctype html>
 <html lang="es" class="">
-	<head>
-		<script is:inline>
-			if (!window.__themeInit) {
-				window.__themeInit = true;
+  <head>
+    <script is:inline>
+      if (!window.__themeInit) {
+        window.__themeInit = true;
 
-				const getThemePreference = () => {
-					try {
-						const ls = localStorage.getItem('theme');
-						if (ls === 'dark' || ls === 'light') return ls;
-					} catch {}
-					return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-				};
+        const getThemePreference = () => {
+          try {
+            const ls = localStorage.getItem("theme");
+            if (ls === "dark" || ls === "light") return ls;
+          } catch {}
+          return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        };
 
-				const applyTheme = (doc = document) => {
-					const mode = getThemePreference();
-					const root = doc.documentElement;
-					if (mode === 'dark') {
-						root.classList.add('dark');
-						root.style.colorScheme = 'dark';
-					} else {
-						root.classList.remove('dark');
-						root.style.colorScheme = 'light';
-					}
-				};
+        const applyTheme = (doc = document) => {
+          const mode = getThemePreference();
+          const root = doc.documentElement;
+          if (mode === "dark") {
+            root.classList.add("dark");
+            root.style.colorScheme = "dark";
+          } else {
+            root.classList.remove("dark");
+            root.style.colorScheme = "light";
+          }
+        };
 
-				// Initial apply
-				applyTheme(document);
+        // Initial apply
+        applyTheme(document);
 
-				// Keep localStorage and color-scheme synced when user toggles the class
-				try {
-					const observer = new MutationObserver(() => {
-						const isDarkNow = document.documentElement.classList.contains('dark');
-						try { localStorage.setItem('theme', isDarkNow ? 'dark' : 'light'); } catch {}
-						document.documentElement.style.colorScheme = isDarkNow ? 'dark' : 'light';
-					});
-					observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-					window.__themeObserver = observer;
-				} catch {}
+        // Keep localStorage and color-scheme synced when user toggles the class
+        try {
+          const observer = new MutationObserver(() => {
+            const isDarkNow =
+              document.documentElement.classList.contains("dark");
+            try {
+              localStorage.setItem("theme", isDarkNow ? "dark" : "light");
+            } catch {}
+            document.documentElement.style.colorScheme = isDarkNow
+              ? "dark"
+              : "light";
+          });
+          observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class"],
+          });
+          window.__themeObserver = observer;
+        } catch {}
 
-				// Ensure theme persists through ClientRouter swaps
-				document.addEventListener('astro:before-swap', (event) => {
-					try { applyTheme(event.newDocument); } catch {}
-				});
-				document.addEventListener('astro:after-swap', () => {
-					applyTheme(document);
-				});
-			}
-		</script>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/images/Playmats-EC-Logo.png" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		<ClientRouter />
-	</head>
-	<body>
-		<header class="sticky top-0 z-50 bg-[var(--color-background)]">
-			<Header />
-		</header>
-		<main class="relative flex flex-col items-center">
-			<slot />
-		</main>
-		<footer>
-			<Footer />
-		</footer>
-		<Chatbot client:idle />
-		<Toaster richColors closeButton position="top-right" client:only />
-	</body>
+        // Ensure theme persists through ClientRouter swaps
+        document.addEventListener("astro:before-swap", (event) => {
+          try {
+            applyTheme(event.newDocument);
+          } catch {}
+        });
+        document.addEventListener("astro:after-swap", () => {
+          applyTheme(document);
+        });
+      }
+    </script>
+    <script is:inline>
+      // Global navigation timing + loading bar state
+      if (!window.__navPerfInit) {
+        window.__navPerfInit = true;
+        const setLoading = (on) => {
+          if (on) document.documentElement.dataset.nav = "loading";
+          else delete document.documentElement.dataset.nav;
+        };
+        document.addEventListener("astro:before-preparation", () => {
+          performance.mark?.("nav-start");
+          setLoading(true);
+        });
+        document.addEventListener("astro:page-load", () => {
+          performance.mark?.("nav-end");
+          try {
+            performance.measure?.("nav", "nav-start", "nav-end");
+          } catch {}
+          const entries = performance.getEntriesByName?.("nav");
+          const last = entries?.[entries.length - 1];
+          if (last)
+            console.debug(
+              "[perf] navigation duration(ms)=",
+              last.duration.toFixed(0)
+            );
+          setLoading(false);
+        });
+      }
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/images/Playmats-EC-Logo.png" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <ClientRouter />
+  </head>
+  <body>
+    <header class="sticky top-0 z-50 bg-[var(--color-background)]">
+      <Header />
+    </header>
+    <main class="relative flex flex-col items-center">
+      <slot />
+    </main>
+    <footer transition:persist>
+      <Footer />
+    </footer>
+    <Chatbot client:idle />
+    <Toaster richColors closeButton position="top-right" client:only />
+  </body>
 </html>
+
+<style is:global>
+  /* Loading indicator bar at top during navigation */
+  html[data-nav="loading"]:before {
+    content: "";
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 3px;
+    width: 100%;
+    background: linear-gradient(
+      90deg,
+      var(--color-primary),
+      transparent,
+      var(--color-primary)
+    );
+    background-size: 200% 100%;
+    animation: nav-bar-move 1s linear infinite;
+    z-index: 9999;
+  }
+  @keyframes nav-bar-move {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: 200% 0;
+    }
+  }
+</style>
