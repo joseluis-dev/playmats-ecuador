@@ -28,17 +28,6 @@ const cache = new Map<string, CacheEntry>();
 const DEFAULT_TTL = 60_000; // 60s
 const DEFAULT_TIMEOUT = 10_000; // 10s
 
-// Hash simple (determinista) para cuerpos (no criptográfico)
-const hash = (input: any): string => {
-  if (input == null) return '0';
-  try {
-    const str = typeof input === 'string' ? input : JSON.stringify(input, Object.keys(input).sort());
-    let h = 0, i = 0, len = str.length;
-    while (i < len) { h = (Math.imul(31, h) + str.charCodeAt(i++)) | 0; }
-    return h.toString(16);
-  } catch { return '0'; }
-};
-
 const getUserId = () => useUser.getState().user?.id ?? null; // dinámico
 
 // Construye URL con query extra segura
@@ -192,7 +181,7 @@ export const api = {
   post: async <T>(endpoint: string, body: any, headers: Record<string, string> = {}): Promise<T> => {
     const uid = getUserId();
     const url = buildURL(endpoint, undefined);
-    const res = await timedFetch(url, {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(uid ? { 'X-User-Id': uid } : {}), ...headers },
       body: JSON.stringify(body)
@@ -206,7 +195,7 @@ export const api = {
   postForm: async <T = any>(endpoint: string, formData: FormData, headers: Record<string, string> = {}): Promise<T> => {
     const uid = getUserId();
     const url = buildURL(endpoint, undefined);
-    const res = await timedFetch(url, {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { ...(uid ? { 'X-User-Id': uid } : {}), ...headers },
       body: formData
@@ -219,7 +208,7 @@ export const api = {
   put: async <T>(endpoint: string, body: any, headers: Record<string, string> = {}): Promise<T> => {
     const uid = getUserId();
     const url = buildURL(endpoint, undefined);
-    const res = await timedFetch(url, {
+    const res = await fetch(url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', ...(uid ? { 'X-User-Id': uid } : {}), ...headers },
       body: JSON.stringify(body)
@@ -232,7 +221,7 @@ export const api = {
   putForm: async <T = any>(endpoint: string, formData: FormData, headers: Record<string, string> = {}): Promise<T> => {
     const uid = getUserId();
     const url = buildURL(endpoint, undefined);
-    const res = await timedFetch(url, {
+    const res = await fetch(url, {
       method: 'PUT',
       headers: { ...(uid ? { 'X-User-Id': uid } : {}), ...headers },
       body: formData
@@ -245,7 +234,7 @@ export const api = {
   patch: async <T>(endpoint: string, body: any, headers: Record<string, string> = {}): Promise<T> => {
     const uid = getUserId();
     const url = buildURL(endpoint, undefined);
-    const res = await timedFetch(url, {
+    const res = await fetch(url, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...(uid ? { 'X-User-Id': uid } : {}), ...headers },
       body: JSON.stringify(body)
@@ -258,7 +247,7 @@ export const api = {
   delete: async (endpoint: string, headers: Record<string, string> = {}): Promise<boolean> => {
     const uid = getUserId();
     const url = buildURL(endpoint, undefined);
-    const res = await timedFetch(url, {
+    const res = await fetch(url, {
       method: 'DELETE',
       headers: { ...(uid ? { 'X-User-Id': uid } : {}), ...headers },
     });

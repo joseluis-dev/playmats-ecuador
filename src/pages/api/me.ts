@@ -4,7 +4,7 @@ import { userService } from '@/services/userService'
 // In-memory cache per userId (small TTL) - safe on single instance / ephemeral runtime
 interface UserCacheEntry { user: any; expiry: number }
 const userCache = new Map<string, UserCacheEntry>()
-const USER_TTL = 300_000 // 300s
+const USER_TTL = 30_000 // 30s
 
 export const GET: APIRoute = async ({ locals }) => {
   try {
