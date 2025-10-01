@@ -105,6 +105,22 @@ const { title } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <ClientRouter />
+    <link id="__persistCss" rel="stylesheet" href="/src/styles/persist.css?init" />
+    <script is:inline data-astro-rerun>
+      (function(){
+        function bust(){
+          const el = document.getElementById('__persistCss');
+          if(!el) return;
+          const base = '/src/styles/persist.css';
+          // usar pathname + hora parcial para invalidar cache sin impedir caching total
+          const stamp = encodeURIComponent(location.pathname+'|'+(Date.now()%60000));
+          el.href = base + '?v=' + stamp;
+        }
+        document.addEventListener('astro:after-swap', bust);
+        // primera carga SPA
+        bust();
+      })();
+    </script>
   </head>
   <body>
     <header class="sticky top-0 z-50 bg-[var(--color-background)]">

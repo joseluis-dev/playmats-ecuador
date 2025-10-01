@@ -1,0 +1,4 @@
+/* CSS persistente recargado en cada navegación (cache-bust por ruta) */
+@import "sonner/dist/styles.css";
+
+@import "@clerk/themes/shadcn.css";

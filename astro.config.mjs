@@ -4,7 +4,7 @@ import clerk from "@clerk/astro";
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
-import { shadcn, dark } from '@clerk/themes'
+import { shadcn } from '@clerk/themes'
 import { esES } from '@clerk/localizations';
 
 
@@ -15,16 +15,13 @@ export default defineConfig({
   integrations: [react(), clerk({
     localization: esES,
     appearance: {
-      theme: shadcn,
+      theme: shadcn
     }
   })],
 
   vite: {
     plugins: [tailwindcss()],
-    server: {
-      // Explícitamente permitir tu dominio de ngrok
-      allowedHosts: ["535984375447.ngrok-free.app"],
-    }
+    server: {}
   },
 
   adapter: vercel(),
