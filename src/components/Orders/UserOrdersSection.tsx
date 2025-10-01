@@ -16,7 +16,6 @@ export const UserOrdersSection: React.FC = () => {
       setLoading(true)
       // @ts-ignore – asumimos que la API ya devuelve en camelCase (si devuelve snake_case habría que mapear)
       const data = await orderService.listByUser()
-      console.log({ data })
       setOrders(data as unknown as ApiOrder[])
     } catch (e: any) {
       setError(e?.message || 'Error cargando órdenes')

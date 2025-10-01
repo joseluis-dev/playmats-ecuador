@@ -12,7 +12,7 @@ export const userService = {
    */
   getUserByProviderId: async (providerId: string): Promise<User[] | null> => {
     try {
-      const users = await api.get<User[]>(`${API_ENDPOINT}?providerId=${providerId}`);
+      const users = await api.get<User[]>(`${API_ENDPOINT}?providerId=${providerId}`, { headers: { 'X-User-Id': 'system-clerk' } });
       return users;
     } catch (error) {
       // Manejar error si el usuario no existe
@@ -52,7 +52,7 @@ export const userService = {
     };
     
     console.log('Sending user data to API:', apiUser);
-    return await api.post(API_ENDPOINT, apiUser);
+    return await api.post(API_ENDPOINT, apiUser, { 'X-User-Id': 'system-clerk' });
   },
 
   /**
@@ -75,7 +75,7 @@ export const userService = {
       status: 'ACTIVE'
     };
 
-    return await api.put<User>(`${API_ENDPOINT}/${apiUserArray[0].id}`, user);
+    return await api.put<User>(`${API_ENDPOINT}/${apiUserArray[0].id}`, user, { 'X-User-Id': 'system-clerk' });
   },
 
   /**
@@ -84,6 +84,6 @@ export const userService = {
    * @returns true si el usuario fue eliminado correctamente
    */
   deleteUser: async (userData: User): Promise<boolean> => {
-    return await api.delete(`${API_ENDPOINT}/${userData.id}`);
+    return await api.delete(`${API_ENDPOINT}/${userData.id}`, { 'X-User-Id': 'system-clerk' });
   }
 }
