@@ -1,5 +1,10 @@
+import { useUser } from "@/stores/userStore";
+
 // Use environment variable for API URL
 const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8080';
+
+const getUserId = () => useUser.getState().user?.id ?? null;
+const userId = getUserId();
 
 export const api = {
   get: async <T>(endpoint: string): Promise<T> => {
@@ -7,7 +12,8 @@ export const api = {
       method: 'GET',
       mode: 'cors',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...(userId ? { 'X-User-Id': userId } : {})
       }
     })
     const data = await response.json()
@@ -18,7 +24,8 @@ export const api = {
       method: 'POST',
       mode: 'cors',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...(userId ? { 'X-User-Id': userId } : {})
       },
       body: JSON.stringify(body)
     })
@@ -29,6 +36,9 @@ export const api = {
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: 'POST',
       mode: 'cors',
+      headers: {
+        ...(userId ? { 'X-User-Id': userId } : {})
+      },
       body: formData
     })
     const data = await response.json()
@@ -39,7 +49,8 @@ export const api = {
       method: 'PUT',
       mode: 'cors',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...(userId ? { 'X-User-Id': userId } : {})
       },
       body: JSON.stringify(body)
     })
@@ -51,6 +62,9 @@ export const api = {
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: 'PUT',
       mode: 'cors',
+      headers: {
+        ...(userId ? { 'X-User-Id': userId } : {})
+      },
       body: formData
     })
     const data = await response.json()
@@ -61,7 +75,8 @@ export const api = {
       method: 'PATCH',
       mode: 'cors',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...(userId ? { 'X-User-Id': userId } : {})
       },
       body: JSON.stringify(body)
     })
@@ -71,7 +86,10 @@ export const api = {
   delete: async (endpoint: string) => {
     const response = await fetch(`${API_URL}/${endpoint}`, {
       mode: 'cors',
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        ...(userId ? { 'X-User-Id': userId } : {})
+      }
     })
     return response.ok
   }
