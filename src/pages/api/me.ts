@@ -22,7 +22,6 @@ export const GET: APIRoute = async ({ locals }) => {
     const users = await userService.getUserByProviderId(current.id)
     const user = users && users.length > 0 ? users[0] : null
     userCache.set(current.id, { user, expiry: now + USER_TTL })
-    console.log('API /me user', user);
     return new Response(JSON.stringify({ user }), { status: 200, headers: { 'X-Cache': 'MISS' } })
   } catch (error) {
     return new Response(JSON.stringify({ user: null }), { status: 200 })

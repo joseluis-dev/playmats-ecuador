@@ -8,6 +8,8 @@ interface FabricCanvasState {
   items: Record<string, any>;
   imgSrc: Record<string, any> | null;
   layers: Record<string, any[]>;
+  // Loading flag for async operations (e.g., submit/add to cart)
+  loading: boolean;
   size: {
     width: number;
     height: number;
@@ -29,6 +31,8 @@ interface FabricCanvasState {
   setBorders: (list: Resource[]) => void;
   setTypes: (list: Resource[]) => void;
   setSizes: (list: Resource[]) => void;
+  // Generic loading setter
+  setLoading: (loading: boolean) => void;
 }
 
 export const useCustomizationTool = create<FabricCanvasState>((set) => ({
@@ -45,6 +49,7 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
     action: null,
   },
   layers: {},
+  loading: false,
   size: {
     width: 610,
     height: 225,
@@ -64,6 +69,7 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
   setBorders: (list) => set(() => ({ borders: list })),
   setTypes: (list) => set(() => ({ types: list })),
   setSizes: (list) => set(() => ({ sizes: list })),
+  setLoading: (loading: boolean) => set(() => ({ loading })),
   addLayers: (name: string, object: any) => set((state) => {
     const newLayers = state.layers[name] ? [...state.layers[name], object] : [object];
     return ({

@@ -35,7 +35,7 @@ const designSchema = z.object({
 });
 
 export const ControlPanel = () => {
-  const { addLayers, setSize, layers, modifyItems, canvasRef, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes, setFormRef, total } = useCustomizationTool()
+  const { addLayers, setSize, layers, modifyItems, canvasRef, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes, setFormRef, total, loading, setLoading } = useCustomizationTool()
   const { user } = useUser();
   const { addToCart } = useCart()
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -111,9 +111,11 @@ export const ControlPanel = () => {
   }, [])
 
   async function onSubmit(values: z.infer<typeof designSchema>) {
+    if (loading) return; // evitar doble submit
     if (!values.type) return toast.warning("Debes seleccionar un tipo de diseño");
     if (!values.img) return toast.warning("Debes subir una imagen");
     if (!canvasRef) return toast.error("El lienzo no está listo. Por favor, intenta de nuevo.");
+    setLoading(true);
     const dataUrl = canvasRef.toDataURL({
       format: 'png',
       multiplier: 4
@@ -188,6 +190,7 @@ export const ControlPanel = () => {
         seals: [],
         border: undefined
       });
+      setLoading(false);
     }
   }
 
@@ -390,10 +393,15 @@ export const ControlPanel = () => {
 
   return (
     <Form {...form}>
+      {loading && (
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 grid place-items-center">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground/40 border-t-primary" />
+        </div>
+      )}
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3 w-full">
         <AccordionDynamic items={accordionItems} />
-        <Button type="submit" className="text-[var(--color-text)]" variant="default">
-          Añadir al carrito - ${total.toFixed(2)}
+        <Button type="submit" className="text-[var(--color-text)] disabled:opacity-70 disabled:cursor-not-allowed" variant="default" disabled={loading}>
+          {`Añadir al carrito - $${total.toFixed(2)}`}
         </Button>
       </form>
     </Form>
