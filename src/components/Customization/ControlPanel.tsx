@@ -112,6 +112,10 @@ export const ControlPanel = () => {
 
   async function onSubmit(values: z.infer<typeof designSchema>) {
     if (loading) return; // evitar doble submit
+    if (!user?.id) {
+      toast.warning('Debes iniciar sesión para añadir al carrito');
+      return;
+    }
     if (!values.type) return toast.warning("Debes seleccionar un tipo de diseño");
     if (!values.img) return toast.warning("Debes subir una imagen");
     if (!canvasRef) return toast.error("El lienzo no está listo. Por favor, intenta de nuevo.");
