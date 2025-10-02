@@ -309,7 +309,7 @@ export const FabricCanvas = () => {
     <div
       ref={wrapperRef}
       style={{ width: `${size.width + 2}px`, height: `${size.height + 2}px` }}
-      className='relative rounded-xl border border-[var(--color-text)]'
+      className='relative rounded-xl border !border-[var(--color-text)]'
     >
       {/* Mantener el canvas sin transiciones CSS para evitar escalado/blur */}
       <canvas ref={canvasRef} className='block rounded-xl' />
