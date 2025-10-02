@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from "astro:transitions";
 import "@/styles/global.css";
+import persistCssUrl from "@/styles/persist.css?url";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import { Chatbot } from "@/components/Chatbot";
@@ -105,19 +106,19 @@ const { title } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <ClientRouter />
-    <link id="__persistCss" rel="stylesheet" href="/src/styles/persist.css?init" />
+    <link id="__persistCss" rel="stylesheet" data-base={persistCssUrl} href={persistCssUrl} />
     <script is:inline data-astro-rerun>
       (function(){
+        const isDev = /localhost|127\.0\.0\.1/.test(location.hostname);
+        if(!isDev) return; // En producción no forzamos bust para evitar 404 y dejar caching hashado
         function bust(){
           const el = document.getElementById('__persistCss');
           if(!el) return;
-          const base = '/src/styles/persist.css';
-          // usar pathname + hora parcial para invalidar cache sin impedir caching total
-          const stamp = encodeURIComponent(location.pathname+'|'+(Date.now()%60000));
-          el.href = base + '?v=' + stamp;
+          const base = el.getAttribute('data-base');
+          const stamp = Date.now() % 60000; // cambia cada minuto
+          el.href = base + '?v=' + stamp + '&p=' + encodeURIComponent(location.pathname);
         }
         document.addEventListener('astro:after-swap', bust);
-        // primera carga SPA
         bust();
       })();
     </script>
