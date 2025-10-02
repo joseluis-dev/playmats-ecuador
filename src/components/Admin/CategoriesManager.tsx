@@ -54,7 +54,6 @@ export const CategoriesManager = () => {
   }, [])
 
   const handleSubmit = async (values: z.infer<typeof categoryFormSchema>) => {
-    console.log('Submitting category:', values)
     setIsLoading(true)
     try {
       if (isEditing && selectedCategory) {

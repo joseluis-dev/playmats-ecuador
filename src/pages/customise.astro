@@ -10,7 +10,7 @@ import { TotalPrice } from "@/components/Customization/TotalPrice";
 	<section 
 		class="
 			flex flex-col gap-4
-			w-full max-w-screen-xl mx-auto
+			w-full mx-auto
 			p-8 md:p-12
 		">
 		<div class="flex w-full justify-evenly items-center sticky top-16 z-40 bg-[var(--color-background)]">
@@ -19,8 +19,8 @@ import { TotalPrice } from "@/components/Customization/TotalPrice";
 				<TotalPrice client:visible />
 			</div>
 		</div>
-		<div class="flex flex-col-reverse lg:flex-row gap-3">
-			<div class="w-full min-w-[620px] lg:max-w-[800px] flex lg:sticky top-32 self-start justify-center transition-all duration-200 ease-in-out">
+		<div class="flex flex-col-reverse 2xl:flex-row gap-4">
+			<div class="w-full min-w-[900px] 2xl:max-w-[950px] flex 2xl:sticky top-32 self-start justify-center transition-all duration-200 ease-in-out">
 				<FabricCanvas client:only />
 			</div>
 			<ControlPanel client:only/>

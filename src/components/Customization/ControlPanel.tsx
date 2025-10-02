@@ -402,12 +402,14 @@ export const ControlPanel = () => {
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground/40 border-t-primary" />
         </div>
       )}
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3 w-full">
-        <AccordionDynamic items={accordionItems} />
-        <Button type="submit" className="text-[var(--color-text)] disabled:opacity-70 disabled:cursor-not-allowed" variant="default" disabled={loading}>
-          {`Añadir al carrito - $${total.toFixed(2)}`}
-        </Button>
-      </form>
+      <div className="flex justify-center w-full 2xl:max-w-[650px]">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-1/2 flex-col gap-3 w-full max-w-[600px]">
+          <AccordionDynamic items={accordionItems} />
+          <Button type="submit" className="text-[var(--color-text)] disabled:opacity-70 disabled:cursor-not-allowed" variant="default" disabled={loading}>
+            {`Añadir al carrito - $${total.toFixed(2)}`}
+          </Button>
+        </form>
+      </div>
     </Form>
   )
 }
