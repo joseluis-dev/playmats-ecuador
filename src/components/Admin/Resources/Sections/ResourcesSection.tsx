@@ -46,6 +46,7 @@ export default function ResourcesSection() {
   const [isEditing, setIsEditing] = useState(false)
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   
   const form = useForm({
     resolver: zodResolver(resourceFormSchema),
@@ -107,7 +108,7 @@ export default function ResourcesSection() {
   };
 
   const handleSubmit = async (values: z.infer<typeof resourceFormSchema>) => {
-    console.log(values);
+    setLoading(true);
     try {
       let resourceId;
       
@@ -140,6 +141,7 @@ export default function ResourcesSection() {
       });
       setIsEditing(false);
       setSelectedResource(null);
+      setLoading(false);
     }
   };
 
@@ -242,6 +244,11 @@ export default function ResourcesSection() {
         </Card>
 
         <Card className="relative overflow-hidden">
+          {(loading) && (
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 grid place-items-center">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground/40 border-t-primary" />
+            </div>
+          )}
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">{isEditing ? "Editar recurso" : "Nuevo recurso"}</CardTitle>
             <CardDescription>Sube una imagen o video y asigna metadatos.</CardDescription>
