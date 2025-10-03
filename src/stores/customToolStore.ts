@@ -33,14 +33,16 @@ interface FabricCanvasState {
   setSizes: (list: Resource[]) => void;
   // Generic loading setter
   setLoading: (loading: boolean) => void;
+  // Reset state to initial values
+  reset: (newState?: Partial<FabricCanvasState>) => void;
 }
 
 export const useCustomizationTool = create<FabricCanvasState>((set) => ({
   canvasRef: null,
   formRef: null,
-  total: 20,
+  total: 0,
   items: {
-    size: 20,
+    size: 0,
     border: 0,
   },
   imgSrc: {
@@ -148,5 +150,31 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
       items: currentItems,
       total: total,
     };
-  })
+  }),
+  reset: (newState) => set((state) => ({
+    ...state,
+    canvasRef: null,
+    formRef: null,
+    total: 0,
+    items: {
+      size: 0,
+      border: 0,
+    },
+    imgSrc: {
+      url: null,
+      layer: null,
+      action: null,
+    },
+    layers: {},
+    loading: false,
+    size: {
+      width: 610,
+      height: 225,
+    },
+    seals: [],
+    borders: [],
+    types: [],
+    sizes: [],
+    ...newState,
+  }))
 }));

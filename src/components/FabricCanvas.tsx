@@ -8,11 +8,11 @@ const deleteIcon =
 export const FabricCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fabricCanvasRef = useRef<Canvas | null>(null);
-  const { imgSrc, setImgSrc, layers, removeLayer, size, modifyItems, setCanvasRef, formRef } = useCustomizationTool()
+  const { imgSrc, setImgSrc, layers, removeLayer, size, modifyItems, setCanvasRef, formRef, reset } = useCustomizationTool()
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
-  
+
   // Helpers: radio del wrapper, gap (distancia entre bordes), y dibujo del anillo
   const getWrapperRadius = () => {
     if (!wrapperRef.current) return 12; // aprox. rounded-xl
@@ -73,6 +73,7 @@ export const FabricCanvas = () => {
   }, []);
 
   useEffect(() => {
+    reset();
     if (!canvasRef.current) return;
     const canvas = new Canvas(canvasRef.current, {
       width: size.width,
