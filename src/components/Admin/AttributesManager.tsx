@@ -57,7 +57,6 @@ export const AttributesManager = () => {
     setIsLoading(true)
     try {
       if (isEditing && selectedAttribute) {
-        console.log('Updating attribute:', values)
         await api.put(`attributes/${selectedAttribute.id}`, {
           ...values
         })

@@ -126,7 +126,7 @@ export const ControlPanel = () => {
     });
     const fileDesign = await dataUrlToFile(dataUrl, values.img.name);
     const newProduct = {
-      name: `${values.type?.name} - Diseño personalizado`,
+      name: `${values.type?.name} - Custom`,
       description: `Diseño personalizado de tipo ${values.type?.name} y tamaño ${values.size?.name || 'personalizado'} - ${user?.id || 'invitado'}`,
       price: total,
       isCustomizable: true
@@ -212,7 +212,7 @@ export const ControlPanel = () => {
                   {(item, index) => (
                     <div
                       className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
-                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
+                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                       onClick={() => {
                         field.onChange(item)
                         const type = item.categories.find((cat: any) => cat.name === item.name);
@@ -263,7 +263,7 @@ export const ControlPanel = () => {
                   {(item, index) => (
                     <div
                       className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
-                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
+                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                       onClick={() => {
                         field.onChange(item)
                         const ancho = item.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || 61;
@@ -339,8 +339,8 @@ export const ControlPanel = () => {
                 <CarouselSize items={seals}>
                   {(item, index) => (
                     <div
-                      className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
-                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
+                      className="relative flex-none aspect-video bg-[--color-surface] dark:bg-gray-200/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
                       onClick={() => {
                         const currentSeals = field.value || [];
                         field.onChange([...currentSeals, item]);
@@ -373,7 +373,7 @@ export const ControlPanel = () => {
                   {(item, index) => (
                     <div
                       className="relative flex-none aspect-video bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
-                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover' }}
+                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                       onClick={() => {
                         field.onChange(item);
                         // addLayers('borders', item);

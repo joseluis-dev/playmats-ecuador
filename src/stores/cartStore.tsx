@@ -135,7 +135,6 @@ export const useCartStore = create<CartState>((set, get) => ({
         await cartService.create(newItem);
         return
       }
-      console.log({ existCart })
       await get().updateCart(item, 1);
     } catch (e) {
       console.error('Error al agregar item al carrito:', e);
@@ -188,7 +187,6 @@ export const useCartStore = create<CartState>((set, get) => ({
       }
       const exists = get().cart.find((ci) => ci.id === item.id);
       if (!exists && quantity > 0) {
-        console.log('Agregar nuevo item al carrito');
         const updatedCart = {
           ...userCart[0],
           cartProducts: [
@@ -201,7 +199,6 @@ export const useCartStore = create<CartState>((set, get) => ({
       }
 
       if (exists && quantity <= 0) {
-        console.log('Eliminar item del carrito');
         const updatedCart = {
           ...userCart[0],
           cartProducts: (userCart[0].cartProducts || []).filter((cp) => {
@@ -228,7 +225,6 @@ export const useCartStore = create<CartState>((set, get) => ({
         ...userCart[0],
         cartProducts: updatedCartProducts,
       };
-      console.log({ updatedCart })
       await cartService.update(updatedCart, cartId);
     } catch (e) {
       console.error('Error al actualizar item del carrito:', e);

@@ -51,7 +51,6 @@ export const userService = {
       status: "ACTIVE" // Valor predeterminado
     };
     
-    console.log('Sending user data to API:', apiUser);
     return await api.post(API_ENDPOINT, apiUser, { 'X-User-Id': 'system-clerk' });
   },
 

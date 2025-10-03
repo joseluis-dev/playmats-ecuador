@@ -43,7 +43,6 @@ export const PaymentForm = () => {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log('Submitting with values:', values);
     await orderService.createFromCart(cart, values)
     await clearCart()
     form.reset({

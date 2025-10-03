@@ -38,7 +38,7 @@ export async function POST(req: any) {
         // Importar dinámicamente para evitar problemas SSR
         const { loadChat } = await import('@/utils/chatPersistence');
         conversationHistory = loadChat(chatId);
-        console.log('📚 Contexto cargado desde persistencia:', conversationHistory.length, 'mensajes');
+        // console.log('📚 Contexto cargado desde persistencia:', conversationHistory.length, 'mensajes');
       } catch (error) {
         console.warn('⚠️ No se pudo cargar contexto:', error);
         conversationHistory = [];
@@ -52,11 +52,11 @@ export async function POST(req: any) {
     }
   }
   
-  console.log('📨 Nueva solicitud de chat recibida');
+  // console.log('📨 Nueva solicitud de chat recibida');
   
   if (lastUserMessage?.parts?.[0]?.type === 'text') {
     const messageText = lastUserMessage.parts[0].text;
-    console.log('👤 Mensaje del usuario:', messageText.substring(0, 100) + (messageText.length > 100 ? '...' : ''));
+    // console.log('👤 Mensaje del usuario:', messageText.substring(0, 100) + (messageText.length > 100 ? '...' : ''));
     
     // Crear cliente OpenAI una sola vez
     const openai = createOpenAI({
@@ -109,7 +109,7 @@ export async function POST(req: any) {
       arr.findIndex(m => m.id === msg.id) === index
     );
     
-    console.log('🎯 Usando contexto reducido:', contextMessages.length, 'mensajes para forzar uso de herramientas');
+    // console.log('🎯 Usando contexto reducido:', contextMessages.length, 'mensajes para forzar uso de herramientas');
     
     // Si llega aquí, procesar con el sistema principal
     const result = streamText({
@@ -373,7 +373,7 @@ export async function POST(req: any) {
           try {
             const { saveChat } = await import('@/utils/chatPersistence');
             saveChat(chatId, messages);
-            console.log('💾 Conversación guardada en persistencia');
+            // console.log('💾 Conversación guardada en persistencia');
           } catch (error) {
             console.warn('⚠️ Error al guardar conversación:', error);
           }

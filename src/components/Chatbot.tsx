@@ -157,9 +157,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
 
   const handleProductAction = useCallback(async (product: any) => {
     const location = window.location.href;
-    console.log('Product action:', product);
     const products = await productService.list({ resource: product.id });
-    console.log('Matched products:', products);
     if (products.length > 0 && location.includes('customise')) {
       const productId = products[0].id;
       window.open(`/playmats/${productId}`, '_blank');

@@ -298,7 +298,6 @@ export const FabricCanvas = () => {
         if (imgSrc.url.startsWith('blob:')) {
           // Si es un blob, liberar memoria
           URL.revokeObjectURL(imgSrc.url);
-          console.log('Blob URL revoked');
         }
       } else {
         console.error('Failed to load image');

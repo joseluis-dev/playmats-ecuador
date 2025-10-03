@@ -91,7 +91,7 @@ export function isBusinessRelated(message: string): boolean {
   });
   
   if (hasProhibitedContent) {
-    console.log('🔍 Tema prohibido detectado en el mensaje');
+    // console.log('🔍 Tema prohibido detectado en el mensaje');
     return false;
   }
   
@@ -132,12 +132,12 @@ export function isBusinessRelated(message: string): boolean {
   
   const isBusinessRelated = hasBusinessKeywords || hasBusinessPatterns || hasGreeting;
   
-  console.log('🔍 Análisis de contenido:', {
-    hasBusinessKeywords,
-    hasBusinessPatterns,
-    hasGreeting,
-    isBusinessRelated
-  });
+  // console.log('🔍 Análisis de contenido:', {
+  //   hasBusinessKeywords,
+  //   hasBusinessPatterns,
+  //   hasGreeting,
+  //   isBusinessRelated
+  // });
   
   return isBusinessRelated;
 }

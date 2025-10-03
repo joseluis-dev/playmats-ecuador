@@ -101,7 +101,6 @@ export const orderService = {
         product: { id: string };
         quantity: number;
       }
-      console.log({ cart, values });
       const orderProducts: OrderProductInput[] = cart.map((cp: CartItemType): OrderProductInput => ({
         product: { id: cp.id },
         quantity: cp.quantity,

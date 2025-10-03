@@ -75,7 +75,6 @@ export const ShippingAddressForm = ({ onSave, countries, states }: ShippingAddre
   const availableStates = useMemo(() => {
     if (!selectedCountry) return []
     const cid = Number(selectedCountry)
-    console.log(countries.find(c => c.id === cid))
     return countries.find(c => c.id === cid)?.states
   }, [selectedCountry, states])
 
