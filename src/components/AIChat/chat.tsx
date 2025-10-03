@@ -182,7 +182,7 @@ export default function Chat({
             )}
 
             {messages.map(message => (
-              <div key={message.id} className="space-y-3">
+              <div key={message.id} className="space-y-3 mb-4">
                 {/* Message Header */}
                 <div className="flex items-center gap-2">
                   <div className={cn(
@@ -220,6 +220,9 @@ export default function Chat({
                               className='text-[var(--color-text)]'
                               components={{
                                 img: (props) => <ImgClickable onImageClick={handleClick} {...props} />,
+                                h1: (props) => <h1 className="text-2xl mt-6 mb-4 text-[var(--color-primary)]" {...props} />,
+                                h2: (props) => <h2 className="font-heading text-xl mt-5 mb-3 text-[var(--color-primary)]" {...props} />,
+                                h3: (props) => <h3 className="font-heading text-lg mt-4 mb-2 text-[var(--color-primary)]" {...props} />,
                               }}
                             >
                               {part.text}
@@ -301,7 +304,7 @@ function ImgClickable(props: ImgClickableProps) {
       src={src}
       alt={alt}
       onClick={handleClick}
-      className="cursor-pointer object-cover object-center rounded-md hover:scale-105 transition-transform bg-[var(--color-surface)]"
+      className="cursor-pointer object-cover object-center rounded-md hover:scale-105 transition-transform bg-[--color-surface] dark:bg-gray-200/90"
     />
   );
 }
