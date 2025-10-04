@@ -21,6 +21,7 @@ import { useUser } from "@/stores/userStore";
 import { dataUrlToFile } from "@/utils/fileUtils";
 import { useCart } from "@/hooks/useCart";
 import productService from "@/services/productService";
+import { categoriesService } from "@/services/categoriesService";
 
 const designSchema = z.object({
   type: z.custom<Resource>().optional(),
@@ -176,8 +177,10 @@ export const ControlPanel = () => {
           .map(id => String(id))
       })
 
-      await resourcesService.assignCategories(resourceId, categories)
+      const productsCategory = await categoriesService.list({ name: 'productos' })
+      await resourcesService.assignCategories(resourceId, [...categories, productsCategory[0]?.id.toString()].filter(id => id !== undefined) as string[])
       await resourcesService.assignAttributes(resourceId, attributes)
+      await resourcesService.assignCategories(resourceBackgroundId, [...categories, productsCategory[0]?.id.toString()].filter(id => id !== undefined) as string[])
 
       toast.success('Producto personalizado guardado correctamente')
 

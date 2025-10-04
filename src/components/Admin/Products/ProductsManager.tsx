@@ -6,6 +6,8 @@ import { ProductForm } from '@/components/Admin/Products/ProductForm'
 import type { Product } from '@/types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ProductNotFoundError, ProductValidationError, ProductUploadError } from '@/types/product'
+import { resourcesService } from '@/services/resourcesService'
+import { categoriesService } from '@/services/categoriesService'
 
 export const ProductsManager = () => {
   const [products, setProducts] = useState<Product[]>([])
@@ -121,12 +123,17 @@ export const ProductsManager = () => {
                   const toDeleteResources = (selectedProduct?.resourceProducts ?? []).filter(({ resource }) => !product.resources.some(r => r.id === resource.id)).map(({ resource }) => resource)
                   
                   if (newResources.length > 0) {
-                    await Promise.all(newResources.map(async (r) => {
+                    const uploadedResources = await Promise.all(newResources.map(async (r) => {
                       const formData = new FormData()
                       if (r.file) formData.append('file', r.file)
                       formData.append('isBanner', r.isBanner ? 'true' : 'false')
                       return productService.uploadResource(productId, formData)
                     }))
+                    console.log(uploadedResources)
+                    const productsCategory = await categoriesService.list({ name: 'productos' })
+                    for (const uploaded of uploadedResources) {
+                      await resourcesService.assignCategories(uploaded.resource.id, [...product.categories, productsCategory[0]?.id.toString()].filter(id => id !== undefined) as string[])
+                    }
                   }
 
                   // Nota: La eliminación de recursos individuales requeriría un endpoint específico

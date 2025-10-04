@@ -155,8 +155,8 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
                   <FormLabel>Descripción</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Tell us a little bit about yourself"
-                      className="resize-none"
+                      placeholder="Descripción del producto"
+                      className="resize-none max-h-[300px]"
                       {...field}
                     />
                   </FormControl>
