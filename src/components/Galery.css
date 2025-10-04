@@ -6,6 +6,16 @@
   animation: fadeOut 0.5s ease-in-out;
 }
 
+/* Hide scrollbar for carousel */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
