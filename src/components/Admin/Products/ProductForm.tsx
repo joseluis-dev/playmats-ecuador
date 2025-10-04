@@ -51,7 +51,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
       isCustomizable: product?.isCustomizable || false,
       categories: product?.categories?.map(c => String(c.id)) || [],
       attributes: product?.attributes?.map(a => String(a.id)) || [],
-      resources: product?.resourceProducts?.map(r => r.resource) || []
+      resources: product?.resourceProducts?.map(r => ({ ...r.resource, isBanner: r.isBanner })) || []
     }
   })
   
@@ -78,7 +78,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
 
   useEffect(() => {
     if (product) {
-      setResources(product.resourceProducts?.map(r => r.resource) || [])
+      setResources(product.resourceProducts?.map(r => ({ ...r.resource, isBanner: r.isBanner })) || [])
       form.reset({
         name: product.name,
         description: product.description || '',
@@ -86,7 +86,7 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
         isCustomizable: product.isCustomizable || false,
         categories: product.categories?.map(c => String(c.id)) || [],
         attributes: product.attributes?.map(a => String(a.id)) || [],
-        resources: product.resourceProducts?.map(r => r.resource) || []
+        resources: product.resourceProducts?.map(r => ({ ...r.resource, isBanner: r.isBanner })) || []
       })
     }
   }, [product, form])
@@ -220,23 +220,26 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
               <MultiImageUploader
                 value={form.watch('resources')}
                 onChange={(items) => form.setValue('resources', items)}
-                onUpload={async (file) => {
+                onUpload={async (files) => {
                   try {
                     setIsLoading(true)
-                    const url = URL.createObjectURL(file)
-                    const newResource = {
-                      id: `${file.name}-${Date.now()}`,
-                      name: file.name,
-                      url: url,
-                      thumbnail: url,
-                      watermark: url,
-                      hosting: "cloudinary",
-                      type: 'IMAGE' as const,
-                      isBanner: false,
-                      file
-                    }
-                    setResources(prev => [...prev, newResource])
-                    return newResource
+                    const newResources = files.map((file) => {
+                      const url = URL.createObjectURL(file)
+                      const newResource = {
+                        id: `${file.name}-${Date.now()}`,
+                        name: file.name,
+                        url: url,
+                        thumbnail: url,
+                        watermark: url,
+                        hosting: "cloudinary",
+                        type: 'IMAGE' as const,
+                        isBanner: false,
+                        file
+                      }
+                      setResources(prev => [...prev, newResource])
+                      return newResource
+                    })
+                    return newResources
                   } catch (error) {
                     console.error('Error al subir imagen:', error)
                     throw error
@@ -248,6 +251,11 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
                   const filtered = resources.filter(r => r.id.toString() !== item.id.toString())
                   form.setValue('resources', filtered)
                   setResources(filtered)
+                }}
+                onSelect={(item) => {
+                  const resourcesUpdated = resources.map(r => ({...r, isBanner: r.id === item.id}))
+                  form.setValue('resources', resourcesUpdated)
+                  setResources(resourcesUpdated)
                 }}
               />
             </div>

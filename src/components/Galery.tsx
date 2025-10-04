@@ -10,7 +10,7 @@ interface GaleryProps {
 }
 
 export const Galery = ({ resources = [] }: GaleryProps) => {
-  const [selected, setSelected] = useState<Resource>(resources[0]);
+  const [selected, setSelected] = useState<Resource>(resources.find(r => r.isBanner) || resources[0]);
   const [prevSelected, setPrevSelected] = useState<Resource | null>(null);
 
   const handleSelect = (resource: Resource) => {
@@ -84,7 +84,17 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
               className="relative flex-none aspect-video w-32 bg-gray-500/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
               onClick={() => handleSelect(resource)}
             >
-              <Image src={resource.thumbnail as string} alt={resource.name} width={128} height={72} />
+              {resource.type === 'IMAGE' ? (
+                <Image src={resource.thumbnail ?? resource.url as string} alt={resource.name} width={128} height={72} />
+              ) : (
+                <video
+                  src={resource.url}
+                  className="object-cover rounded-md border"
+                  controls={false}
+                  muted
+                  preload="metadata"
+                />
+              )}
               {resource.type === 'VIDEO' && (
                 <span className="absolute  top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-surface)] rounded-full p-2 shadow-md">
                   <PlayIcon className="fill-[var(--color-text)]"/>

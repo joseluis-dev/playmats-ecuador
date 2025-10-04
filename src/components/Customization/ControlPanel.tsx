@@ -172,9 +172,9 @@ export const ControlPanel = () => {
       })
 
       await productService.replaceResources(productId, {
-        resourceIds: [...sealsIds, resourceId, resourceBackgroundId, borderId]
+        resourcesProduct: [...sealsIds, resourceId, resourceBackgroundId, borderId]
           .filter(id => id !== undefined)
-          .map(id => String(id))
+          .map(id => ({ resourceId: String(id), isBanner: id === resourceId  }))
       })
 
       const productsCategory = await categoriesService.list({ name: 'productos' })

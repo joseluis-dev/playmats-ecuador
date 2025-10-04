@@ -402,10 +402,10 @@ export const productService = {
       if (!productId) {
         throw new ProductValidationError([{ field: 'productId', message: 'El ID del producto es requerido' }])
       }
-      if (!resources || resources.resourceIds.length === 0) {
-        throw new ProductValidationError([{ field: 'resourceIds', message: 'Debe proporcionar al menos un ID de recurso' }])
+      if (!resources || resources.resourcesProduct.length === 0) {
+        throw new ProductValidationError([{ field: 'resourcesProduct', message: 'Debe proporcionar al menos un ID de recurso' }])
       }
-      await api.put(`${PRODUCTS_ENDPOINT}/${productId}/resources`, { resourceIds: resources.resourceIds })
+      await api.put(`${PRODUCTS_ENDPOINT}/${productId}/resources`, { resourcesProduct: resources.resourcesProduct })
     } catch (error) {
       console.error(`Error al reemplazar recursos del producto ${productId}:`, error)
       if (error instanceof ProductValidationError) {

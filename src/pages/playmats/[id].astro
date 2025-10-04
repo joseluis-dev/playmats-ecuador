@@ -18,7 +18,7 @@ const PRODUCT = await api.get(`products/${id}`) as Product & {
   }[];
 };
 
-const resources = PRODUCT.productResources.map(({ resource }) => resource) as Resource[];
+const resources = PRODUCT.productResources.map(({ resource, isBanner }) => ({ ...resource, isBanner })) as Resource[];
 
 ---
 
@@ -35,7 +35,7 @@ const resources = PRODUCT.productResources.map(({ resource }) => resource) as Re
         transition-scale duration-1000 ease-in-out
         opacity-30 -z-10
         bg-center bg-cover bg-no-repeat bg-blend-luminosity"
-      style={`background-image: url(${resources[0].url});`}
+      style={`background-image: url(${resources.find((r) => r.isBanner)?.url || resources[0]?.url});`}
     >
     </div>
 

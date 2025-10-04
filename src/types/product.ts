@@ -36,7 +36,7 @@ export interface ProductAttributeAssignment {
 }
 
 export interface ProductResourceAssignment {
-  resourceIds: string[]
+  resourcesProduct: { resourceId: string; isBanner: boolean }[]
 }
 
 export interface ProductResourceUpload {

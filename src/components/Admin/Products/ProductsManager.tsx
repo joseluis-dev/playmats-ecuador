@@ -119,6 +119,16 @@ export const ProductsManager = () => {
                     toast.success('Producto creado correctamente')
                   }
 
+                  if (selectedProduct) {
+                    const selectedBanner = product.resources.find(r => r.isBanner)
+                    const currentBanner = selectedProduct.resourceProducts?.find(r => r.isBanner)?.resource
+                    if (selectedBanner?.id !== currentBanner?.id && selectedBanner) {
+                      await productService.replaceResources(selectedProduct.id, {
+                        resourcesProduct: product.resources.map(r => ({ resourceId: String(r.id), isBanner: r.isBanner ? true : false }))
+                      })
+                    }
+                  }
+
                   const newResources = product.resources.filter(r => r.file)
                   const toDeleteResources = (selectedProduct?.resourceProducts ?? []).filter(({ resource }) => !product.resources.some(r => r.id === resource.id)).map(({ resource }) => resource)
                   
@@ -129,15 +139,13 @@ export const ProductsManager = () => {
                       formData.append('isBanner', r.isBanner ? 'true' : 'false')
                       return productService.uploadResource(productId, formData)
                     }))
-                    console.log(uploadedResources)
+
                     const productsCategory = await categoriesService.list({ name: 'productos' })
                     for (const uploaded of uploadedResources) {
                       await resourcesService.assignCategories(uploaded.resource.id, [...product.categories, productsCategory[0]?.id.toString()].filter(id => id !== undefined) as string[])
                     }
                   }
 
-                  // Nota: La eliminación de recursos individuales requeriría un endpoint específico
-                  // que no está disponible en el servicio actual, mantenemos la implementación directa
                   if (toDeleteResources.length > 0) {
                     // Esta funcionalidad requiere un endpoint de recursos que no está en el servicio
                     // Se mantiene la implementación original hasta que se agregue al servicio
