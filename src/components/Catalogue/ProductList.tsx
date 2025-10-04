@@ -5,6 +5,7 @@ import { AddToCartButton } from '@/components/AddToCartButton';
 import { BoxIcon } from 'lucide-react';
 import type { Product, Category, Attribute, ResourceProduct, Resource } from '@/types';
 import { CustomBadge } from '@/components/ui/custom-badge';
+import { Spinner } from '@/components/ui/spinner';
 
 export const ProductList = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -32,7 +33,7 @@ export const ProductList = () => {
   if (loading) {
     return (
       <div className="w-full min-h-[50vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--color-primary)]"></div>
+        <Spinner className='text-[var(--color-primary)] size-14'/>
       </div>
     );
   }

@@ -17,6 +17,7 @@ import type { Attribute } from '@/types'
 import { api } from '@/services/api'
 import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
+import { Spinner } from '../ui/spinner'
 
 const attributeFormSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
@@ -155,7 +156,7 @@ export const AttributesManager = () => {
         <Card className="relative overflow-hidden w-full flex flex-col gap-2">
           {isLoading && (
             <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 grid place-items-center">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground/40 border-top-primary"></div>
+              <Spinner className='text-[var(--color-primary)] size-14'/>
             </div>
           )}
           <CardHeader className="pb-2">

@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ProductNotFoundError, ProductValidationError, ProductUploadError } from '@/types/product'
 import { resourcesService } from '@/services/resourcesService'
 import { categoriesService } from '@/services/categoriesService'
+import { Spinner } from '@/components/ui/spinner'
 
 export const ProductsManager = () => {
   const [products, setProducts] = useState<Product[]>([])
@@ -91,7 +92,7 @@ export const ProductsManager = () => {
           {/* Loading overlay (visual only) */}
           {isLoading && (
             <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 grid place-items-center">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground/40 border-t-primary" />
+              <Spinner className='text-[var(--color-primary)] size-14'/>
             </div>
           )}
           <CardContent className="p-6">

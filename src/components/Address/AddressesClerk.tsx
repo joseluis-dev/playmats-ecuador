@@ -5,6 +5,7 @@ import { addressService } from "@/services/addressService";
 import type { ShippingAddress } from "@/types";
 import { useAddress } from "@/hooks/useAddress";
 import type { FormValues } from "../Payment/ShippingAddressForm";
+import { Spinner } from "@/components/ui/spinner";
 
 export const AddressesClerk = () => {
   // Estados para gestionar la interfaz
@@ -94,7 +95,7 @@ export const AddressesClerk = () => {
       <div className="py-2">
         {loading ? (
           <div className="w-full min-h-[30vh] flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--color-primary)]" />
+            <Spinner className='text-[var(--color-primary)] size-14'/>
           </div>
         ) : activeTab === "list" ? (
           <AddressList 

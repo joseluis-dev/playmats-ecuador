@@ -3,6 +3,7 @@ import { orderService } from '@/services/orderService'
 import type { ApiOrder } from '@/types/api-order'
 import AdminOrdersList from './AdminOrdersList'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 
 const statusOptions: Array<{ label: string; value: ApiOrder['status'] | 'ALL' }> = [
   { label: 'Todos', value: 'ALL' },
@@ -64,7 +65,7 @@ export const AdminOrdersSection: React.FC = () => {
           </div>
           <Button size='sm' variant='outline' className='min-w-24' onClick={handleRefresh} disabled={refreshing}>
             {refreshing ? <>
-              <span className="animate-spin mr-2 h-4 w-4 border-2 border-t-transparent border-current rounded-full" />
+              <Spinner className='text-[var(--color-primary)] size-4'/>
             </> : 'Actualizar'}
           </Button>
         </div>

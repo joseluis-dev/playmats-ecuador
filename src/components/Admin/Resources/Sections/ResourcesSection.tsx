@@ -21,6 +21,7 @@ import type { Resource, Category, Attribute } from "@/types"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MultiSelect } from "@/components/ui/multi-select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Spinner } from "@/components/ui/spinner"
 
 const resourceFormSchema = z.object({
   name: z.string().min(1, "El nombre es obligatorio"),
@@ -246,7 +247,7 @@ export default function ResourcesSection() {
         <Card className="relative overflow-hidden">
           {(loading) && (
             <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 grid place-items-center">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground/40 border-t-primary" />
+              <Spinner className='text-[var(--color-primary)] size-14'/>
             </div>
           )}
           <CardHeader className="pb-2">

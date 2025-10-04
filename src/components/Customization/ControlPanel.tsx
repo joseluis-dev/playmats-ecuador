@@ -22,6 +22,7 @@ import { dataUrlToFile } from "@/utils/fileUtils";
 import { useCart } from "@/hooks/useCart";
 import productService from "@/services/productService";
 import { categoriesService } from "@/services/categoriesService";
+import { Spinner } from "../ui/spinner";
 
 const designSchema = z.object({
   type: z.custom<Resource>().optional(),
@@ -401,8 +402,8 @@ export const ControlPanel = () => {
   return (
     <Form {...form}>
       {loading && (
-        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 grid place-items-center">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground/40 border-t-primary" />
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-40 grid place-items-center">
+          <Spinner className='text-[var(--color-primary)] size-14'/>
         </div>
       )}
       <div className="flex justify-center w-full 2xl:max-w-[650px]">

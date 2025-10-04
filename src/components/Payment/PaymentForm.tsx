@@ -11,10 +11,12 @@ import {
 } from "@/components/ui/form"
 import { ImageUploader } from "@/components/ImageUploader"
 import { useAddress } from "@/hooks/useAddress"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { orderService } from "@/services/orderService"
 import { useCart } from "@/hooks/useCart"
 import type { ShippingAddress } from "@/types"
+import { toast } from "sonner"
+import { Spinner } from "../ui/spinner"
 
 const formSchema = z.object({
   comprobante: z
@@ -34,6 +36,7 @@ export interface PaymentFormValues extends z.infer<typeof formSchema> {}
 export const PaymentForm = () => {
   const { selected } = useAddress()
   const { cart, clearCart } = useCart()
+  const [loading, setLoading] = useState(false)
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,13 +46,23 @@ export const PaymentForm = () => {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await orderService.createFromCart(cart, values)
-    await clearCart()
-    form.reset({
-      comprobante: undefined,
-      shippingAddress: selected ?? null,
-    })
-    window.location.assign('/orders')
+    if (!cart) return
+    setLoading(true)
+    try {
+      await orderService.createFromCart(cart, values)
+      await clearCart()
+      form.reset({
+        comprobante: undefined,
+        shippingAddress: selected ?? null,
+      })
+      window.location.assign('/orders')
+      toast.success("Orden creada correctamente")
+    } catch (error) {
+      console.error("Error al crear la orden:", error)
+      toast.error("Error al crear la orden")
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -60,6 +73,11 @@ export const PaymentForm = () => {
 
   return (
     <Form {...form}>
+      {loading && (
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 grid place-items-center select-none rounded-md">
+          <Spinner className='text-[var(--color-primary)] size-14'/>
+        </div>
+      )}
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
         <FormField
           control={form.control}

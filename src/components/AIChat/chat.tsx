@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BotIcon } from '@/components/icons/BotIcon';
-import { Send, User, Loader2 } from 'lucide-react';
+import { Send, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ResourceItem } from './types';
 import type { UIMessage } from 'ai';
@@ -12,6 +12,7 @@ import { getOrCreateChatId, loadChat, saveChat } from '@/utils/chatPersistence';
 import { Conversation, ConversationContent, ConversationScrollButton } from '../ai-elements/conversation';
 import { Response } from '../ai-elements/response';
 import { resourcesService } from '@/services/resourcesService';
+import { Spinner } from '../ui/spinner';
 
 interface ChatProps {
   className?: string;
@@ -243,6 +244,11 @@ export default function Chat({
 
       {/* Input Area - Compact for popup */}
       <div className="border-t border-[var(--color-border)] p-3 bg-[var(--color-muted)]/20">
+      {status !== 'ready' && (
+        <p className="text-xs text-[var(--color-muted-foreground)] mb-2 text-start italic">
+          {status === 'streaming' ? 'El asistente está escribiendo...' : 'Procesando...'}
+        </p>
+      )}
         <form onSubmit={handleSubmit} className="flex gap-2 items-center">
           <Input
             value={input}
@@ -267,17 +273,12 @@ export default function Chat({
             size="sm"
           >
             {status !== 'ready' ? (
-              <Loader2 className="w-4 h-4 animate-spin text-[var(--color-text)]" />
+              <Spinner className='text-[var(--color-text)] size-4'/>
             ) : (
               <Send className="w-4 h-4 text-[var(--color-text)]" />
             )}
           </Button>
         </form>
-        {status !== 'ready' && (
-          <p className="text-xs text-[var(--color-muted-foreground)] mt-1 text-center">
-            {status === 'streaming' ? 'El asistente está escribiendo...' : 'Procesando...'}
-          </p>
-        )}
       </div>
     </div>
   );
