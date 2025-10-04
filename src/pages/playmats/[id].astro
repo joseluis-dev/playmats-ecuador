@@ -4,6 +4,7 @@ import { Galery } from "@/components/Galery.tsx";
 import { AddToCartButton } from "@/components/AddToCartButton.tsx";
 import Layout from "@/layouts/Layout.astro";
 import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon.astro";
+import FormattedDescription from "@/components/FormattedDescription.astro";
 import { Image } from "astro:assets";
 import type { Product, Resource } from "@/types";
 import { api } from "@/services/api";
@@ -66,7 +67,7 @@ const resources = PRODUCT.productResources.map(({ resource }) => resource) as Re
         />
         <div class="flex flex-col gap-4 w-full h-full bg-[var(--color-surface)]/70 rounded-lg p-4">
           <div class="flex flex-col gap-2 h-full md:max-h-48 overflow-auto">
-            <p class="text-pretty">{PRODUCT.description}</p>
+            <FormattedDescription text={PRODUCT.description || ''} />
             <div class="flex flex-wrap gap-2 p-[1px]">
               {
                 PRODUCT.categories?.map((category) => (

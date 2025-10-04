@@ -1,0 +1,43 @@
+---
+interface Props {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className = "" } = Astro.props;
+
+// Procesar el texto para manejar saltos de línea y formato
+const processedText = text
+  ?.trim()
+  ?.split(/\n+/) // Dividir por uno o más saltos de línea
+  ?.filter(paragraph => paragraph.trim().length > 0) // Filtrar párrafos vacíos
+  ?.map(paragraph => paragraph.trim()) || [];
+---
+
+<div class={`formatted-description ${className}`}>
+  {processedText.length > 0 ? (
+    processedText.map((paragraph) => (
+      <p class="text-pretty paragraph-spacing">
+        {paragraph}
+      </p>
+    ))
+  ) : (
+    <p class="text-pretty text-[var(--color-text)]/70 italic">
+      Sin descripción disponible
+    </p>
+  )}
+</div>
+
+<style>
+  .formatted-description {
+    line-height: 1.6;
+  }
+  
+  .paragraph-spacing {
+    margin-bottom: 0.75rem;
+  }
+  
+  .paragraph-spacing:last-child {
+    margin-bottom: 0;
+  }
+</style>

@@ -18,6 +18,7 @@ import { z } from "zod"
 import { api } from '@/services/api'
 import type { Product, Category, Attribute, Resource } from '@/types'
 import { MultiSelect } from '@/components/ui/multi-select'
+import { Textarea } from '@/components/ui/textarea'
 
 const productFormSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
@@ -153,7 +154,11 @@ export const ProductForm = ({ product, setProduct, onSave }: ProductFormProps) =
                 <FormItem>
                   <FormLabel>Descripción</FormLabel>
                   <FormControl>
-                    <Input {...field} className='bg-background' placeholder="Descripción del producto" />
+                    <Textarea
+                      placeholder="Tell us a little bit about yourself"
+                      className="resize-none"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
