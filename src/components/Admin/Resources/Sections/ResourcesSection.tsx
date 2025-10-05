@@ -246,7 +246,7 @@ export default function ResourcesSection() {
 
         <Card className="relative overflow-hidden">
           {(loading) && (
-            <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 grid place-items-center">
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-50 grid place-items-center">
               <Spinner className='text-[var(--color-primary)] size-14'/>
             </div>
           )}

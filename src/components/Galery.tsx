@@ -122,6 +122,7 @@ export const Galery = ({ resources = [] }: GaleryProps) => {
                   src={resource.url as string}
                   className="object-cover aspect-video w-full"
                   controls
+                  controlsList="nodownload"
                   muted
                 />
               )}

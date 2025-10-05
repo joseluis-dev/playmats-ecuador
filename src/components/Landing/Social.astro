@@ -1,53 +1,52 @@
 ---
 import Carousel from "@/components/Carousel.astro"
 import ReelPlayer from "./ReelPlayer.astro"
+import { resourcesService } from "@/services/resourcesService"
 
-const VIDEOS = [
-  {
-    id: 'dQw4w9WgXcQ',
-    image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Reel-Facebook-Image_gehtas.webp',
-    title: 'Video 1',
-    source: 'https://res.cloudinary.com/dcxt2wrcm/video/upload/v1745801921/Reel_Facebook_as4coi.mp4',
-  },
-  {
-    id: 'dQw4w9WgXc2',
-    image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Reel-Facebook-Image_gehtas.webp',
-    title: 'Video 2',
-    source: 'https://res.cloudinary.com/dcxt2wrcm/video/upload/v1745801921/Reel_Facebook_as4coi.mp4',
-  },
-  {
-    id: 'dQw4w9WgXc3',
-    image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Reel-Facebook-Image_gehtas.webp',
-    title: 'Video 3',
-    source: 'https://res.cloudinary.com/dcxt2wrcm/video/upload/v1745801921/Reel_Facebook_as4coi.mp4',
-  },
-  {
-    id: 'dQw4w9WgXc4',
-    image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Reel-Facebook-Image_gehtas.webp',
-    title: 'Video 4',
-    source: 'https://res.cloudinary.com/dcxt2wrcm/video/upload/v1745801921/Reel_Facebook_as4coi.mp4',
-  },
-  {
-    id: 'dQw4w9WgXc5',
-    image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Reel-Facebook-Image_gehtas.webp',
-    title: 'Video 5',
-    source: 'https://res.cloudinary.com/dcxt2wrcm/video/upload/v1745801921/Reel_Facebook_as4coi.mp4',
-  }
-]
+const reels = await resourcesService.list({ category: 'Landing Reel' })
+const reelsImages = reels
+  .filter(reel => reel.type === 'IMAGE')
+  .sort((a, b) => {
+    const aAttr = a.attributes?.find(att => att.name.includes('reel'));
+    const bAttr = b.attributes?.find(att => att.name.includes('reel'));
+    const aValue = aAttr ? Number(aAttr.value) : 0;
+    const bValue = bAttr ? Number(bAttr.value) : 0;
+    return aValue - bValue;
+  });
+const reelsVideos = reels.filter(reel => reel.type === 'VIDEO').sort((a, b) => {
+    const aAttr = a.attributes?.find(att => att.name.includes('reel'));
+    const bAttr = b.attributes?.find(att => att.name.includes('reel'));
+    const aValue = aAttr ? Number(aAttr.value) : 0;
+    const bValue = bAttr ? Number(bAttr.value) : 0;
+    return aValue - bValue;
+  });
+const combinedReels = reelsImages.map((image, index) => ({
+  id: image.id as string,
+  image: image.url as string,
+  title: image.name as string,
+  source: reelsVideos[index]?.url || '',
+})).filter(reel => reel.source);
 ---
 
 <section id="social" class="w-full max-w-[1400px]
     mx-auto p-16 md:p-20">
-    <Carousel items={VIDEOS} title="Reels">
-      {
-        VIDEOS.map(({ id, image, title, source }) => (
-          <ReelPlayer
-            videoId={id}
-            image={image}
-            title={title}
-            source={source}
-          />
-        ))
-      }
-    </Carousel>
+    {
+      combinedReels && combinedReels.length > 0 
+      ? <Carousel items={combinedReels} title="Reels">
+        {
+          combinedReels.map(({ id, image, title, source }) => (
+            <ReelPlayer
+              videoId={id}
+              image={image}
+              title={title}
+              source={source}
+            />
+          ))
+        }
+        </Carousel>
+      : <article class="w-full h-64 flex flex-col gap-2">
+        <h2 class="text-[16px] md:text-3xl font-semibold text-balance flex items-center">Reels</h2>
+          <div class="text-[var(--color-muted-foreground)] bg-[var(--color-surface)] rounded-md w-full h-full flex items-center justify-center">No hay reels disponibles en este momento.</div>
+        </article>
+    }
 </section>
