@@ -110,6 +110,7 @@ const resources = PRODUCT.productResources.map(({ resource, isBanner }) => ({ ..
 </Layout>
 
 <script>
+  import { navigate } from "astro:transitions/client";
   document.addEventListener("astro:page-load", () => {
     const backLink = document.querySelector('#back-link');
     const backLinkDesktop = document.querySelector('#back-link-desktop');
@@ -118,12 +119,11 @@ const resources = PRODUCT.productResources.map(({ resource, isBanner }) => ({ ..
 
       // Si el referrer es del mismo dominio, vuelve atrás
       const isInternal = document.referrer && document.referrer.startsWith(window.location.origin);
-
       if (isInternal) {
-        window.history.back();
+        navigate(document.referrer);
       } else {
         // Si no hay referrer (acceso directo), ir a catálogo
-        window.location.href = '/cataloge';
+        navigate('/cataloge');
       }
     });
     backLinkDesktop?.addEventListener('click', (e) => {
@@ -136,7 +136,7 @@ const resources = PRODUCT.productResources.map(({ resource, isBanner }) => ({ ..
         window.history.back();
       } else {
         // Si no hay referrer (acceso directo), ir a catálogo
-        window.location.href = '/cataloge';
+        navigate('/cataloge');
       }
     });
   });

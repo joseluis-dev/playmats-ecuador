@@ -1,6 +1,7 @@
 ---
 import Carousel from "@/components/Carousel.astro";
 import productService from "@/services/productService";
+import { Image } from "astro:assets";
 
 const featuredProducts = await productService.list({ category: 'Landing Featured' });
 const featuredProductsItems = featuredProducts.map(product => ({
@@ -14,7 +15,22 @@ const featuredProductsItems = featuredProducts.map(product => ({
     mx-auto p-16 md:p-20">
   {
     featuredProductsItems && featuredProductsItems.length > 0 
-    ? <Carousel items={featuredProductsItems} title="Trabaja con nosotros"/>
+    ? <Carousel items={featuredProductsItems} title="Trabaja con nosotros">
+      {featuredProductsItems.map(({ id, image, title }) => (
+        <a
+          data-role="carousel-item"
+          class="shrink-0 snap-start w-[250px] rounded-lg group overflow-hidden !text-[var(--color-text)]"
+          href={`/playmats/${id}`}
+        >
+          <div class="relative w-full h-[478px] rounded-lg">
+            {image && <Image src={image} alt={title} width={100} height={100} class="w-full h-full object-cover group-hover:scale-105 transition-scale duration-1000 ease-in-out" />}
+            <div class="absolute bottom-0 left-0 right-0 bg-[var(--color-surface)]/70 p-4 ">
+              <h3 class="text-sm md:text-lg font-semibold">{title}</h3>
+            </div>
+          </div>
+        </a>
+      ))}
+    </Carousel>
     : <article class="w-full h-64 flex flex-col gap-2">
       <h2 class="text-[16px] md:text-3xl font-semibold text-balance flex items-center">Trabaja con nosotros</h2>
         <div class="text-[var(--color-muted-foreground)] bg-[var(--color-surface)] rounded-md w-full h-full flex items-center justify-center">No hay productos destacados en este momento.</div>

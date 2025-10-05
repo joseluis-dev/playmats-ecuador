@@ -23,6 +23,7 @@ import { useCart } from "@/hooks/useCart";
 import productService from "@/services/productService";
 import { categoriesService } from "@/services/categoriesService";
 import { Spinner } from "../ui/spinner";
+import { navigate } from "astro:transitions/client";
 
 const designSchema = z.object({
   type: z.custom<Resource>().optional(),
@@ -186,7 +187,7 @@ export const ControlPanel = () => {
       toast.success('Producto personalizado guardado correctamente')
 
       await addToCart({ id: createdProduct.id, product: createdProduct, quantity: 1, price: createdProduct.price as number })
-      window.location.assign('/payment')
+      navigate('/payment')
     } catch (error) {
       console.error('Error al guardar el producto:', error)
       toast.error('Error al guardar el producto')

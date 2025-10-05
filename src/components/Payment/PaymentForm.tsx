@@ -17,6 +17,7 @@ import { useCart } from "@/hooks/useCart"
 import type { ShippingAddress } from "@/types"
 import { toast } from "sonner"
 import { Spinner } from "../ui/spinner"
+import { navigate } from "astro:transitions/client"
 
 const formSchema = z.object({
   comprobante: z
@@ -55,7 +56,7 @@ export const PaymentForm = () => {
         comprobante: undefined,
         shippingAddress: selected ?? null,
       })
-      window.location.assign('/orders')
+      navigate('/orders')
       toast.success("Orden creada correctamente")
     } catch (error) {
       console.error("Error al crear la orden:", error)

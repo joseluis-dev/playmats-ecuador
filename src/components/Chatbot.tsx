@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import { BotIcon } from "./icons/BotIcon";
 import { X, MessageCircle } from 'lucide-react';
+import { navigate } from "astro:transitions/client";
 // Lazy load del módulo de chat para reducir JS inicial
 const Chat = lazy(() => import('./AIChat/chat'));
 import { Button } from './ui/button';
@@ -83,7 +84,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
   const handleSealAction = useCallback((seal: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
-      window.location.assign(`customise`);
+      navigate(`/customise`);
       return;
     }
     const currentSeals = formRef.getValues('seals') || [];
@@ -94,7 +95,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
   const handleBorderAction = useCallback((border: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
-      window.location.assign(`customise`);
+      navigate(`/customise`);
       return;
     }
     formRef.setValue('border', border);
@@ -104,7 +105,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
   const handleTypesAction = useCallback((type: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
-      window.location.assign(`customise`);
+      navigate(`/customise`);
       return;
     }
     formRef.setValue('type', type);
@@ -132,7 +133,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
   const handleSizeAction = useCallback((size: any) => {
     const location = window.location.href;
     if (!location.includes('customise')) {
-      window.location.assign(`customise`);
+      navigate(`/customise`);
       return;
     }
     const ancho = size.attributes?.find((attr: any) => attr.name.includes('ancho'))?.value || 61;
@@ -163,7 +164,7 @@ export const Chatbot = ({ className = '' }: ChatbotProps) => {
       window.open(`/playmats/${productId}`, '_blank');
     } else if (products.length > 0) {
       const productId = products[0].id;
-      window.location.assign(`/playmats/${productId}`);
+      navigate(`/playmats/${productId}`);
     }
   }, []);
 
