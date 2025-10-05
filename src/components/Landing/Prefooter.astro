@@ -1,36 +1,23 @@
 ---
 import Carousel from "@/components/Carousel.astro";
+import productService from "@/services/productService";
 
-const ITEMS = [
-  {
-    id: '1',
-    image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp',
-    title: 'Info 1',
-  },
-  {
-    id: '2',
-    image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Info-Playmats_u4q0zr.webp',
-    title: 'Info 2',
-  },
-  {
-    id: '3',
-    image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Mouspad-Gamer_yau6cl.webp',
-    title: 'Info 3',
-  },
-  {
-    id: '4',
-    image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Info-Logos_ngvy1q.webp',
-    title: 'Info 4',
-  },
-  {
-    id: '5',
-    image: 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801197/Info-Bordados_n8tl7d.webp',
-    title: 'Info 5',
-  }
-]
+const featuredProducts = await productService.list({ category: 'Landing Featured' });
+const featuredProductsItems = featuredProducts.map(product => ({
+  id: product.id as string,
+  image: product.resourceProducts?.find(pr => pr.isBanner)?.resource?.url || 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp',
+  title: product.name as string,
+}));
 ---
 
 <section class="w-full max-w-[1400px]
     mx-auto p-16 md:p-20">
-  <Carousel items={ITEMS} title="Trabaja con nosotros"/>
+  {
+    featuredProductsItems && featuredProductsItems.length > 0 
+    ? <Carousel items={featuredProductsItems} title="Trabaja con nosotros"/>
+    : <article class="w-full h-64 flex flex-col gap-2">
+      <h2 class="text-[16px] md:text-3xl font-semibold text-balance flex items-center">Trabaja con nosotros</h2>
+        <div class="text-[var(--color-muted-foreground)] bg-[var(--color-surface)] rounded-md w-full h-full flex items-center justify-center">No hay productos destacados en este momento.</div>
+      </article>
+  }
 </section>
