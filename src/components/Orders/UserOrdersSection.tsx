@@ -3,6 +3,7 @@ import { orderService } from '@/services/orderService'
 import { UserOrdersList } from './UserOrdersList'
 import { Button } from '@/components/ui/button'
 import type { ApiOrder } from '@/types/api-order'
+import { Spinner } from '../ui/spinner'
 
 export const UserOrdersSection: React.FC = () => {
   const [orders, setOrders] = useState<ApiOrder[]>([])
@@ -36,10 +37,8 @@ export const UserOrdersSection: React.FC = () => {
 
   if (loading) {
     return (
-      <div className='space-y-4'>
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className='h-40 rounded-xl border bg-accent/10 animate-pulse' />
-        ))}
+      <div className="absolute inset-0 z-10 grid place-items-center select-none rounded-md">
+        <Spinner className='text-[var(--color-primary)] size-14'/>
       </div>
     )
   }
