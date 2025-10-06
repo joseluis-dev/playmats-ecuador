@@ -18,7 +18,7 @@ const { isAuthorized } = await checkUserAuth(Astro, 'ADMIN');
 
 export const prerender = false;
 ---
-<div class="relative flex items-center justify-between py-4 px-8 " transition:persist>
+<div class="relative flex items-center justify-between py-4 px-8 ">
   <a href="/" class="z-100">
     <h1 class="flex items-center gap-2">
       <Image src="/images/Playmats-EC-Logo.png" width={40} height={40} alt="logo playmats ecuador" />
@@ -35,7 +35,7 @@ export const prerender = false;
       <li><NavLink href="/admin">Administración</NavLink></li>
     )}
   </ul>
-  <div class="flex items-center gap-2">
+  <div class="flex items-center gap-2 min-w-[128px]">
     <Cart client:visible transition:persist transition:persist-props />
     <div class="flex gap-2">
       <ModeToggle client:visible />
