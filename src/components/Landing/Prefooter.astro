@@ -3,7 +3,9 @@ import Carousel from "@/components/Carousel.astro";
 import productService from "@/services/productService";
 import { Image } from "astro:assets";
 
-const featuredProducts = await productService.list({ category: 'Landing Featured' });
+const featuredProducts = await productService.list({ category: 'Landing Featured' })
+  .then(res => res)
+  .catch(() => []);
 const featuredProductsItems = featuredProducts.map(product => ({
   id: product.id as string,
   image: product.resourceProducts?.find(pr => pr.isBanner)?.resource?.url || 'https://res.cloudinary.com/dcxt2wrcm/image/upload/v1745801198/Playmat-Vitral-de-Tierras_uklbn7.webp',

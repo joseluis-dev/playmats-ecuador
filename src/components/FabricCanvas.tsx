@@ -316,7 +316,7 @@ export const FabricCanvas = () => {
       {/* Capa que rellena el anillo entre bordes (por defecto transparente) */}
       <div ref={ringRef} className='pointer-events-none absolute inset-0 rounded-xl z-10'></div>
       {/* Borde interno para el efecto de doble borde */}
-      <div ref={overlayRef} className='pointer-events-none absolute inset-2 rounded-xl border border-black z-20'></div>
+      <div ref={overlayRef} className='pointer-events-none absolute inset-2 rounded-xl border-2 !border-black z-20'></div>
     </div>
   )
 }

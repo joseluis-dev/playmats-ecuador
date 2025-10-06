@@ -4,6 +4,8 @@ import ReelPlayer from "./ReelPlayer.astro"
 import { resourcesService } from "@/services/resourcesService"
 
 const reels = await resourcesService.list({ category: 'Landing Reel' })
+  .then(res => res)
+  .catch(() => []);
 const reelsImages = reels
   .filter(reel => reel.type === 'IMAGE')
   .sort((a, b) => {
