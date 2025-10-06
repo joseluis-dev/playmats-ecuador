@@ -49,7 +49,7 @@ const { isAuthorized } = await checkUserAuth(Astro, 'ADMIN');
           <UserButton.UserProfilePage label="Dirección" url="direccion">
             <AddressIcon slot="label-icon" class="w-4 h-4" />
             <div class="w-full">
-              <AddressesClerk client:visible transition:persist transition:persist-props />
+              <AddressesClerk client:visible />
             </div>
           </UserButton.UserProfilePage>
         </UserButton>

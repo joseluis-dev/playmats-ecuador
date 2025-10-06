@@ -1,5 +1,5 @@
 import { api } from './api';
-import type { APIUser, ClerkUser, UserCreatedEvent, UserUpdatedEvent } from '../types/clerk';
+import type { APIUser, UserCreatedEvent, UserUpdatedEvent } from '../types/clerk';
 import type { User } from '@/types';
 
 const API_ENDPOINT = 'users';
