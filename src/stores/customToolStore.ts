@@ -80,8 +80,8 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
     return ({
       ...state,
       imgSrc: {
-        ...object,
         ...state.imgSrc,
+        ...object,
         url: object.url,
         layer: name,
         action: 'add',
