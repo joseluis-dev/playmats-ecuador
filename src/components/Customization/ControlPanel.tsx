@@ -10,8 +10,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AccordionDynamic } from "../AccordionCustom/AccordionDynamic";
-import { CarouselSize } from "../Carousel";
+import { AccordionDynamic } from "@/components/AccordionCustom/AccordionDynamic";
+import { CarouselSize } from "@/components/Carousel";
 import { useCustomizationTool } from "@/stores/customToolStore";
 import { useEffect, useRef } from "react";
 import { resourcesService } from "@/services/resourcesService";
@@ -22,8 +22,9 @@ import { dataUrlToFile } from "@/utils/fileUtils";
 import { useCart } from "@/hooks/useCart";
 import productService from "@/services/productService";
 import { categoriesService } from "@/services/categoriesService";
-import { Spinner } from "../ui/spinner";
+import { Spinner } from "@/components/ui/spinner";
 import { navigate } from "astro:transitions/client";
+import { ColorPicker } from "@/components/ColorPicker";
 
 const designSchema = z.object({
   type: z.custom<Resource>().optional(),
@@ -38,7 +39,7 @@ const designSchema = z.object({
 });
 
 export const ControlPanel = () => {
-  const { addLayers, setSize, layers, modifyItems, canvasRef, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes, setFormRef, total, loading, setLoading } = useCustomizationTool()
+  const { addLayers, setSize, layers, modifyItems, canvasRef, seals, borders, types, sizes, setSeals, setBorders, setTypes, setSizes, setFormRef, total, loading, setLoading, setImgColor } = useCustomizationTool()
   const { user } = useUser();
   const { addToCart } = useCart()
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -78,7 +79,8 @@ export const ControlPanel = () => {
       }
     }
   }, [layers]);
-  
+
+  // Initial State Control Panel
   useEffect(() => {
     fetchSeals().then(res => {
       setSeals(res)
@@ -110,6 +112,7 @@ export const ControlPanel = () => {
       modifyItems('size', price)
       form.setValue('size', smallestSize)
     }).catch(err => console.error(err))
+    setImgColor('gold');
     setFormRef(form);
   }, [])
 
@@ -341,23 +344,28 @@ export const ControlPanel = () => {
           render={({ field }) => (
             <FormItem className="flex flex-col w-[85%] gap-3 items-center justify-center mx-auto">
               <FormControl>
-                <CarouselSize items={seals}>
-                  {(item, index) => (
-                    <div
-                      className="relative flex-none aspect-video bg-[--color-surface] dark:bg-gray-200/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
-                      style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
-                      onClick={() => {
-                        const currentSeals = field.value || [];
-                        field.onChange([...currentSeals, item]);
-                        addLayers('seals', item);
-                      }}
-                    >
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
-                        {item.name}
+                <div className="w-full">
+                  <ColorPicker
+                    onColorChange={(color) => setImgColor(color.name)}
+                  />
+                  <CarouselSize items={seals}>
+                    {(item, index) => (
+                      <div
+                        className="relative flex-none aspect-video bg-[--color-surface] dark:bg-gray-200/90 rounded-lg shadow-md overflow-hidden hover:ring-1 hover:ring-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                        style={{ backgroundImage: `url(${item.url})`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
+                        onClick={() => {
+                          const currentSeals = field.value || [];
+                          field.onChange([...currentSeals, item]);
+                          addLayers('seals', item);
+                        }}
+                      >
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
+                          {item.name}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </CarouselSize>
+                    )}
+                  </CarouselSize>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>

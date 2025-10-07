@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Canvas, Control, FabricImage, util as fabricUtil } from 'fabric';
+import { Canvas, Control, FabricImage, util as fabricUtil, filters } from 'fabric';
 import { useCustomizationTool } from '@/stores/customToolStore';
 
 const deleteIcon =
@@ -12,6 +12,48 @@ export const FabricCanvas = () => {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
+
+  const tintImage = (img: FabricImage, color: string) => {
+    // Limpia filtros previos que puedan interferir
+    img.filters = [];
+
+    // Mejorar filtros para efectos dorado/plateado más visibles
+    if (color.toLowerCase().includes('gold')) {
+      // Filtro dorado optimizado
+      img.filters.push(new filters.Saturation({ saturation: -0.5 }));
+      img.filters.push(new filters.BlendColor({
+        color: '#FFD700',
+        mode: 'overlay',
+        alpha: 0.7
+      }));
+      img.filters.push(new filters.Brightness({ brightness: 0.2 }));
+    } else if (color.toLowerCase().includes('silver')) {
+      // Filtro plateado optimizado
+      img.filters.push(new filters.Saturation({ saturation: -0.5 }));
+      img.filters.push(new filters.BlendColor({
+        color: '#E8E8E8',
+        mode: 'overlay',
+        alpha: 0.7
+      }));
+      img.filters.push(new filters.Brightness({ brightness: 0.5 }));
+    } else {
+      // Otros colores con overlay en lugar de multiply
+      img.filters.push(new filters.BlendColor({
+        color,
+        mode: 'overlay',
+        alpha: 0.6
+      }));
+    }
+
+    // Un toque de contraste para “sacar” brillos
+    img.filters.push(new filters.Contrast({ contrast: 0.1 }));
+    img.applyFilters();
+    
+    // Mejorar timing del renderizado
+    setTimeout(() => {
+      img.canvas?.requestRenderAll();
+    }, 10);
+  }
 
   // Helpers: radio del wrapper, gap (distancia entre bordes), y dibujo del anillo
   const getWrapperRadius = () => {
@@ -293,7 +335,14 @@ export const FabricCanvas = () => {
             fabricCanvasRef.current.insertAt(0, img);
           }
         }
+        
+        // Renderizar primero para que la imagen esté en el canvas
         fabricCanvasRef.current.renderAll();
+        
+        // Aplicar filtro con mejor timing, especialmente para seals
+        setTimeout(() => {
+          imgSrc.layer === 'seals' && tintImage(img, imgSrc.color || 'gold');
+        }, 10);
         
         if (imgSrc.url.startsWith('blob:')) {
           // Si es un blob, liberar memoria

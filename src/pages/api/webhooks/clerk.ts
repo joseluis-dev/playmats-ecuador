@@ -13,7 +13,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Do something with payload
     const { id } = evt.data
     const eventType = evt.type
-    console.log(`Received webhook with ID ${id} and event type of ${eventType}`)
+    // console.log(`Received webhook with ID ${id} and event type of ${eventType}`)
     
     // Para debugging
     // console.log('Webhook payload:', evt.data)

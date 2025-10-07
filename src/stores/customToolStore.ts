@@ -23,6 +23,7 @@ interface FabricCanvasState {
   setFormRef: (formRef: any) => void;
   setSize: (width: number, height: number) => void;
   setImgSrc: (url: object | null) => void;
+  setImgColor: (color: string | null) => void;
   addLayers: (name: string, object: any) => void;
   modifyItems: (name: string, item: number | any[]) => void;
   removeLayer: (name: string, id: string) => void;
@@ -49,6 +50,7 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
     url: null,
     layer: null,
     action: null,
+    color: null,
   },
   layers: {},
   loading: false,
@@ -67,6 +69,7 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
     size: { width, height },
   })),
   setImgSrc: (url) => set({ imgSrc: url }),
+  setImgColor: (color) => set({ imgSrc: { color } }),
   setSeals: (list) => set(() => ({ seals: list })),
   setBorders: (list) => set(() => ({ borders: list })),
   setTypes: (list) => set(() => ({ types: list })),
@@ -78,6 +81,7 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
       ...state,
       imgSrc: {
         ...object,
+        ...state.imgSrc,
         url: object.url,
         layer: name,
         action: 'add',
@@ -95,6 +99,7 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
     return {
       ...state,
       imgSrc: {
+        ...state.imgSrc,
         url: null,
         layer: null,
         action: 'remove',
@@ -164,6 +169,7 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
       url: null,
       layer: null,
       action: null,
+      color: null,
     },
     layers: {},
     loading: false,
