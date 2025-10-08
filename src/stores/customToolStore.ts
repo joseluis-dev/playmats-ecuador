@@ -76,11 +76,12 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
   setSizes: (list) => set(() => ({ sizes: list })),
   setLoading: (loading: boolean) => set(() => ({ loading })),
   addLayers: (name: string, object: any) => set((state) => {
+    console.log({name},object, state.imgSrc)
     const newLayers = state.layers[name] ? [...state.layers[name], object] : [object];
     return ({
       ...state,
       imgSrc: {
-        ...state.imgSrc,
+        color: state.imgSrc?.color || null,
         ...object,
         url: object.url,
         layer: name,
@@ -99,7 +100,7 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
     return {
       ...state,
       imgSrc: {
-        ...state.imgSrc,
+        color: state.imgSrc?.color || null,
         url: null,
         layer: null,
         action: 'remove',
