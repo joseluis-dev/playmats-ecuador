@@ -76,7 +76,6 @@ export const useCustomizationTool = create<FabricCanvasState>((set) => ({
   setSizes: (list) => set(() => ({ sizes: list })),
   setLoading: (loading: boolean) => set(() => ({ loading })),
   addLayers: (name: string, object: any) => set((state) => {
-    console.log({name},object, state.imgSrc)
     const newLayers = state.layers[name] ? [...state.layers[name], object] : [object];
     return ({
       ...state,
